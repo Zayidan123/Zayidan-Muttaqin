@@ -1,17 +1,8 @@
-'use client'
+﻿'use client'
 
-import { ThemeProvider as NextThemesProvider } from 'next-themes'
+import { ThemeProvider as ThemeProviderInternal } from '@/lib/theme'
 import type { ReactNode } from 'react'
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  return (
-    <NextThemesProvider
-      attribute="class"
-      defaultTheme="dark"
-      enableSystem={false}
-      themes={['dark', 'light', 'theme-3d', 'liquid-glass']}
-    >
-      {children}
-    </NextThemesProvider>
-  )
+  return <ThemeProviderInternal>{children}</ThemeProviderInternal>
 }

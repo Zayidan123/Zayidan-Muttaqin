@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useCallback } from 'react'
-import { useTheme } from 'next-themes'
+import { useTheme } from '@/lib/theme'
 
 interface Particle {
   x: number

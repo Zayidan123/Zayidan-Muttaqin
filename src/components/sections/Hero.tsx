@@ -8,7 +8,7 @@ import { ParticleBackground } from '@/components/ui/ParticleBackground'
 import { NeonButton } from '@/components/ui/NeonButton'
 import { useLanguageStore } from '@/store/language-store'
 import { useCvStore } from '@/store/cv-store'
-import { useTheme } from 'next-themes'
+import { useTheme } from '@/lib/theme'
 
 export function Hero() {
   const { t, lang } = useLanguageStore()
@@ -25,19 +25,10 @@ export function Hero() {
   const [displayedTagline, setDisplayedTagline] = useState('')
   const [typingDone, setTypingDone] = useState(false)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
-  const [imgSrc, setImgSrc] = useState('/zayidan-photo.png')
   const isDark = theme === 'dark'
   const parallaxRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: parallaxRef, offset: ["start end", "end start"] })
   const y = useTransform(scrollYProgress, [0, 1], [-15, 15])
-  
-  // Fallback image URL - professional business portrait
-  const fallbackImageUrl = 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=500&h=500'
-  
-  const handleImageError = () => {
-    console.warn('Profile image failed to load, using fallback')
-    setImgSrc(fallbackImageUrl)
-  }
 
   // Multi-line typing effect refs
   const lineIndexRef = useRef(0)
@@ -274,29 +265,12 @@ export function Hero() {
                 <span className="text-[var(--neon-magenta)]">{t('hero.role')}</span>
               </span>
 
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-xs font-mono-custom tracking-wider border border-green-500/30 shadow-[0_0_15px_rgba(0,255,136,0.2)]">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
-                </span>
-                <span className="text-green-400">{t('hero.available')}</span>
-              </span>
-            </motion.div>
-
-            {/* Tagline with multi-line typing effect */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.8 }}
-              className="text-sm sm:text-base md:text-lg text-[var(--text-secondary)] max-w-2xl mb-6 leading-relaxed min-h-[1.75rem] sm:min-h-[2rem]"
-            >
-              {displayedTagline}
               <motion.span
                 animate={{ opacity: typingDone ? [1, 0] : 1 }}
                 transition={{ duration: 0.6, repeat: typingDone ? Infinity : 0, repeatType: 'reverse' }}
                 className="inline-block w-[2px] h-[1em] bg-[var(--neon-cyan)] ml-0.5 align-middle typing-cursor-glow"
               />
-            </motion.p>
+            </motion.div>
 
             {/* Location Badge */}
             <motion.div
@@ -337,7 +311,7 @@ export function Hero() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.5 }}
-            className="lg:col-span-5 flex justify-center items-center w-full"
+            className="order-first lg:order-none lg:col-span-5 mb-8 lg:mb-0 flex justify-center items-center w-full"
           >
             <div className="relative w-60 h-60 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-[320px] lg:h-[320px] xl:w-[360px] xl:h-[360px] shrink-0">
               {/* HUD Brackets */}
@@ -354,13 +328,11 @@ export function Hero() {
               <div className="avatar-gradient-border w-full h-full rounded-2xl overflow-hidden p-[3px]">
                 <div className="avatar-inner w-full h-full rounded-2xl overflow-hidden bg-zinc-950/80 relative">
                   <Image
-                    src={imgSrc}
+                    src="/zayidan-photo.png"
                     alt="Zayidan Muttaqin"
                     fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                    className="object-cover transition-all duration-700 hover:scale-105"
-                    onError={handleImageError}
                     priority
+                    className="object-cover transition-all duration-700 hover:scale-105"
                   />
                   {/* Digital scanner line effect via Framer Motion */}
                   <motion.div

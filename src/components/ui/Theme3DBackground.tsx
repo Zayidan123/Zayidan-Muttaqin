@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useTheme } from 'next-themes'
+import { useTheme } from '@/lib/theme'
 import { use3DLightSource } from '@/hooks/use3DLightSource'
 
 function Cube3D({ className, variant = 'cyan', size = 40 }: { className?: string; variant?: 'cyan' | 'magenta' | 'purple'; size?: number }) {

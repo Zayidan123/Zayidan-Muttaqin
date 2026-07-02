@@ -77,22 +77,11 @@ const softSkills = [
 
 export function About() {
   const { t } = useLanguageStore()
-  const [imgSrc, setImgSrc] = useState('/zayidan-photo.png')
-  const [imageError, setImageError] = useState(false)
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.05 })
   const [skillsRef, skillsInView] = useInView({ triggerOnce: true, threshold: 0.05 })
   const parallaxRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: parallaxRef, offset: ["start end", "end start"] })
   const y = useTransform(scrollYProgress, [0, 1], [-15, 15])
-  
-  // Fallback image URL - professional business portrait
-  const fallbackImageUrl = 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=500&h=500'
-  
-  const handleImageError = () => {
-    console.warn('Profile image failed to load, using fallback')
-    setImageError(true)
-    setImgSrc(fallbackImageUrl)
-  }
 
   return (
     <section id="about" className="relative py-20 sm:py-28 px-4 sm:px-6 lg:px-8" ref={parallaxRef}>
@@ -128,13 +117,11 @@ export function About() {
               <div className="avatar-gradient-border w-full h-full rounded-2xl overflow-hidden p-[3px]">
                 <div className="avatar-inner w-full h-full rounded-2xl overflow-hidden bg-zinc-950/80 relative">
                   <Image
-                    src={imgSrc}
+                    src="/zayidan-photo.png"
                     alt="Zayidan Muttaqin - Sales, Leadership, Communication"
                     fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                    className="object-cover transition-all duration-700 hover:scale-105"
-                    onError={handleImageError}
                     priority
+                    className="object-cover transition-all duration-700 hover:scale-105"
                   />
                 </div>
               </div>

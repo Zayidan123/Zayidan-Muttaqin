@@ -46,10 +46,12 @@ self.addEventListener('fetch', (event) => {
   // Skip external requests
   if (url.origin !== self.location.origin) return;
 
+  // Never cache Next.js runtime/chunk assets to avoid stale client bundles.
+  if (url.pathname.startsWith('/_next/')) return;
+
   // Cache-first for static assets (fonts, images, etc.)
   if (
     url.pathname.startsWith('/icons/') ||
-    url.pathname.startsWith('/_next/static/') ||
     url.pathname.endsWith('.png') ||
     url.pathname.endsWith('.jpg') ||
     url.pathname.endsWith('.svg') ||

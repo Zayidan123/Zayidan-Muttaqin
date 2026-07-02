@@ -1,6 +1,6 @@
 'use client'
 
-import { useTheme } from 'next-themes'
+import { useTheme } from '@/lib/theme'
 import { useMemo, useState, useEffect } from 'react'
 
 /**

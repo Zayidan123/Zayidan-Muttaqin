@@ -1,6 +1,6 @@
 'use client'
 
-import { useTheme } from 'next-themes'
+import { useTheme } from '@/lib/theme'
 import { useState, useEffect } from 'react'
 
 export function DarkModeBackground() {

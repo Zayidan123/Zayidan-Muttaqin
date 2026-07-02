@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { Palette, X, RotateCcw } from 'lucide-react'
-import { useTheme } from 'next-themes'
+import { useTheme } from '@/lib/theme'
 
 interface Preset {
   name: string

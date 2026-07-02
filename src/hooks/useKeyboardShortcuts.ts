@@ -1,6 +1,6 @@
 'use client'
 import { useEffect } from 'react'
-import { useTheme } from 'next-themes'
+import { useTheme } from '@/lib/theme'
 import { useLanguageStore } from '@/store/language-store'
 
 // Module-level flag — CommandPalette sets this to true when open

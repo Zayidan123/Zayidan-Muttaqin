@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { useLanguageStore } from '@/store/language-store'
-import { useTheme } from 'next-themes'
+import { useTheme } from '@/lib/theme'
 import { ScrambleText } from '@/components/ui/ScrambleText'
 
 const innerSkills = ['sales', 'leadership', 'communication', 'negotiation'] as const

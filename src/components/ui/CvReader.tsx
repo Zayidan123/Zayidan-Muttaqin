@@ -74,14 +74,11 @@ export const CvReader: React.FC = () => {
                     {lang === 'id' ? 'Curriculum Vitae' : 'Curriculum Vitae'}
                   </h3>
                   <p className="text-xs font-mono-custom text-[var(--text-secondary)]">
-                    Zayidan Muttaqin &middot; {lang === 'id' ? 'Penjualan, Kepemimpinan, Komunikasi' : 'Sales, Leadership, Communication'}
+                    Zayidan Muttaqin {lang === 'id' ? 'Penjualan, Kepemimpinan, Komunikasi' : 'Sales, Leadership, Communication'}
                   </p>
                 </div>
               </div>
-
-              {/* Controls */}
               <div className="flex flex-wrap items-center gap-2">
-                {/* Segmented Tab */}
                 <div className="flex p-0.5 rounded-lg bg-zinc-900/80 border border-[var(--glass-border)] text-xs font-mono-custom">
                   <button
                     onClick={() => setActiveTab('interactive')}
@@ -163,7 +160,7 @@ export const CvReader: React.FC = () => {
                       Zayidan Muttaqin
                     </h1>
                     <p className="text-sm font-mono-custom text-[var(--neon-cyan)] font-semibold mb-4 print:text-zinc-700 uppercase tracking-widest">
-                      {lang === 'id' ? 'Penjualan &bull; Kepemimpinan &bull; Komunikasi' : 'Sales &bull; Leadership &bull; Communication'}
+                      {lang === 'id' ? 'Penjualan, Kepemimpinan, Komunikasi' : 'Sales, Leadership, Communication'}
                     </p>
                     
                     {/* Contact Details */}

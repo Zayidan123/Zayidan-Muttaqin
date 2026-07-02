@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Home, User, Briefcase, Mail, Sun, Moon, Globe, Download, ArrowUp, Search, HelpCircle, Trophy, Cpu, Eye } from 'lucide-react'
 import { useLanguageStore } from '@/store/language-store'
-import { useTheme } from 'next-themes'
+import { useTheme } from '@/lib/theme'
 import { useToastStore } from '@/store/toast-store'
 import { useCvStore } from '@/store/cv-store'
 

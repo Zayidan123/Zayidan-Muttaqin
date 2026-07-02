@@ -74,9 +74,13 @@ export function useCMS(options: UseCMSOptions = {}) {
   }, [category, staleTime, lastFetched, addToast])
 
   useEffect(() => {
-    if (enabled) {
-      fetchCMS()
+    if (!enabled) return
+
+    const loadCMS = async () => {
+      await fetchCMS()
     }
+
+    void loadCMS()
   }, [enabled, fetchCMS])
 
   // Helper to get nested value from flat key
