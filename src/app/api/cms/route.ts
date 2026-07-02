@@ -19,8 +19,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
   }
 
-  if (!checkAuth(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
+  // Allow unauthenticated access for reading CMS data (public content)
+  // Authentication is only required for PUT/DELETE operations
   try {
     const { searchParams } = new URL(request.url)
     const category = searchParams.get('category')

@@ -30,6 +30,14 @@ export function Hero() {
   const parallaxRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: parallaxRef, offset: ["start end", "end start"] })
   const y = useTransform(scrollYProgress, [0, 1], [-15, 15])
+  
+  // Fallback image URL - professional business portrait
+  const fallbackImageUrl = 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=500&h=500'
+  
+  const handleImageError = () => {
+    console.warn('Profile image failed to load, using fallback')
+    setImgSrc(fallbackImageUrl)
+  }
 
   // Multi-line typing effect refs
   const lineIndexRef = useRef(0)
@@ -351,11 +359,7 @@ export function Hero() {
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover transition-all duration-700 hover:scale-105"
-                    onError={() => {
-                      // Fallback to high-quality business portrait if local photo is corrupted/empty
-                      setImgSrc('https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=500&h=500')
-                    }}
-                    referrerPolicy="no-referrer"
+                    onError={handleImageError}
                     priority
                   />
                   {/* Digital scanner line effect via Framer Motion */}
