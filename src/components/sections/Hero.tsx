@@ -290,16 +290,16 @@ export function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 1.0 }}
-              className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 sm:gap-4 w-full"
+              className="flex w-full flex-col flex-wrap items-stretch justify-center gap-3 sm:flex-row sm:items-center sm:justify-start sm:gap-4 lg:justify-start"
             >
-              <NeonButton variant="primary" onClick={() => scrollTo('contact')}>
+              <NeonButton variant="primary" onClick={() => scrollTo('contact')} className="w-full sm:w-auto">
                 {t('hero.ctaContact')}
               </NeonButton>
-              <NeonButton variant="secondary" onClick={() => setCvOpen(true)}>
+              <NeonButton variant="secondary" onClick={() => setCvOpen(true)} className="w-full sm:w-auto">
                 <Eye className="h-4 w-4" />
                 {t('hero.readCV')}
               </NeonButton>
-              <NeonButton variant="secondary" href={lang === 'en' ? "/CV_ZAYIDAN_MUTTAQIN_EN.pdf" : "/CV_ZAYIDAN_MUTTAQIN.pdf"} download>
+              <NeonButton variant="secondary" href={lang === 'en' ? "/CV_ZAYIDAN_MUTTAQIN_EN.pdf" : "/CV_ZAYIDAN_MUTTAQIN.pdf"} download className="w-full sm:w-auto">
                 <Download className="h-4 w-4" />
                 {t('hero.downloadCV')}
               </NeonButton>

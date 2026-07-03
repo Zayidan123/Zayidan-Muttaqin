@@ -46,7 +46,7 @@ export function PortfolioPage() {
   }, [setLang])
 
   return (
-    <div className="relative flex flex-col min-h-screen">
+    <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden">
       <LoadingScreen />
       <ScrollProgress />
       <LightModeBackground />

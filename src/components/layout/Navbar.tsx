@@ -37,9 +37,9 @@ export function Navbar() {
     <>
       <header className={cn('fixed top-0 left-0 right-0 z-50 transition-all duration-300', scrolled ? 'glass-strong shadow-lg' : 'bg-transparent')}>
         {scrolled && <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--neon-cyan)]/40 to-transparent" />}
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <a href="#hero" onClick={(e) => { e.preventDefault(); handleClick('#hero') }} className="font-display text-lg font-bold tracking-wider text-[var(--neon-cyan)] text-glow-cyan hover:opacity-80 transition-opacity">ZAYIDAN</a>
-          <div className="hidden md:flex items-center gap-8">
+        <nav className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-2 px-3 sm:px-6 lg:px-8">
+          <a href="#hero" onClick={(e) => { e.preventDefault(); handleClick('#hero') }} className="shrink-0 font-display text-base font-bold tracking-wider text-[var(--neon-cyan)] text-glow-cyan transition-opacity hover:opacity-80 sm:text-lg">ZAYIDAN</a>
+          <div className="hidden items-center gap-8 md:flex">
             {navItems.map(item => (
               <a key={item.key} href={item.href} onClick={(e) => { e.preventDefault(); handleClick(item.href) }} className={cn('relative text-sm font-medium tracking-wide transition-colors duration-300 py-1', activeSection === item.key ? 'text-[var(--neon-cyan)]' : 'text-[var(--text-secondary)] hover:text-[var(--neon-cyan)]')}>
                 {t(`nav.${item.key}`)}
@@ -47,9 +47,9 @@ export function Navbar() {
               </a>
             ))}
           </div>
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="ml-auto flex items-center gap-1.5 sm:gap-3">
             <ThemeToggle />
-            <div className="hidden sm:block"><LanguageToggle /></div>
+            <LanguageToggle />
             <button onClick={() => window.dispatchEvent(new Event('command-palette:toggle'))} className="hidden lg:inline-flex items-center gap-2 px-3 py-1.5 rounded-lg glass border border-[var(--glass-border)] text-xs font-mono-custom text-[var(--text-secondary)] hover:text-[var(--neon-cyan)] hover:border-[var(--neon-cyan)]/30 transition-all" aria-label={t('commandPalette.title')}>
               <Search className="h-3.5 w-3.5" /><span className="hidden xl:inline">...</span><kbd className="hidden xl:inline-flex px-1.5 py-0.5 rounded text-[9px] font-mono-custom bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-secondary)]/60">Ctrl K</kbd>
             </button>
@@ -61,10 +61,10 @@ export function Navbar() {
       </header>
       <AnimatePresence>{mobileOpen && (<>
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/60 z-[55] md:hidden" onClick={() => setMobileOpen(false)} />
-        <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }} className="fixed top-0 right-0 bottom-0 w-72 z-[60] md:hidden flex flex-col" style={{ borderLeft: '2px solid transparent' }}>
+        <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }} className="fixed top-0 right-0 bottom-0 z-[60] flex w-[min(85vw,18rem)] flex-col md:hidden" style={{ borderLeft: '2px solid transparent' }}>
           <div className="h-1 bg-gradient-to-r from-[var(--neon-cyan)] via-[var(--neon-magenta)] to-[var(--neon-purple)] shrink-0" />
           <div className="absolute top-1 left-0 bottom-0 w-[2px] bg-gradient-to-b from-[var(--neon-cyan)] via-[var(--neon-magenta)] to-transparent animate-pulse" />
-          <div className="flex-1 flex flex-col glass-strong overflow-hidden">
+          <div className="flex flex-1 flex-col overflow-hidden glass-strong">
             <div className="px-6 pt-6 pb-4 flex items-center justify-between">
               <span className="font-display text-lg font-bold tracking-wider text-[var(--neon-cyan)] text-glow-cyan">ZAYIDAN</span>
               <button

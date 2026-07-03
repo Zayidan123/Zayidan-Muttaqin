@@ -11,7 +11,7 @@ const BOT_PATTERNS = [
 // Paths that require stricter rate limiting
 const SENSITIVE_PATHS = ['/api/analytics/track', '/api/contact']
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const response = NextResponse.next()
   const url = request.nextUrl
   const ip = getClientIp(request)

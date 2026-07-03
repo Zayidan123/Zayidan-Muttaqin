@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Orbitron, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
@@ -25,6 +25,14 @@ const jsonLd = JSON.stringify({
   ],
   "knowsAbout": ["Sales", "Leadership", "Communication", "Negotiation", "Video Editing", "Graphic Design", "AI Prompting", "Financial Markets"]
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
+  themeColor: "#00F5FF",
+};
 
 export const metadata: Metadata = {
   title: "Zayidan Muttaqin — Sales · Leadership · Communication | Portfolio",
@@ -61,7 +69,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
         <script id="structured-data" type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd }} />
       </head>
-      <body className="antialiased min-h-screen flex flex-col bg-[var(--background)] text-[var(--foreground)] transition-colors duration-300">
+      <body className="antialiased min-h-screen w-full overflow-x-hidden bg-[var(--background)] text-[var(--foreground)] transition-colors duration-300">
         <ThemeProvider>
           <PortfolioPage />
         </ThemeProvider>
