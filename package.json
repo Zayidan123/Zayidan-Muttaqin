@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node --optimize-for-size --max-semi-space-size=16 --max-old-space-size=1024 ./node_modules/next/dist/bin/next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint .",
     "clean": "next clean"
