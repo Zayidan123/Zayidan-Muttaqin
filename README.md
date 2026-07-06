@@ -249,3 +249,38 @@ Copyright © 2024 Zayidan Muttaqin. All rights reserved.
 
 **Versi**: 2.0.0  
 **Last Updated**: $(date +%Y-%m-%d)
+
+
+Build berhasil 100%! Berikut ringkasan semua perubahan dan langkah deploy:
+Perubahan yang sudah dilakukan
+✅ Build Fix (Cloudflare)
+File	Perubahan
+next.config.ts	Hapus standalone, serverExternalPackages, experimental. Tambah async headers() untuk security headers
+wrangler.toml	Konfigurasi dasar + D1 binding
+open-next.config.ts	Konfigurasi wrapper cloudflare-node / cloudflare-edge
+src/lib/sanitize.ts	Ganti isomorphic-dompurify (native deps) dengan regex
+src/proxy.ts	Dihapus — Next.js 16 paksa Node.js runtime, incompatible dengan Cloudflare
+✅ Prisma + D1 Integration
+File	Perubahan
+prisma/schema.prisma	Generator update (driverAdapters support)
+src/lib/db.ts	Auto-detect Cloudflare context → pakai PrismaD1 adapter; fallback ke SQLite standar
+package.json	Tambah @prisma/adapter-d1
+Langkah Manual untuk Deploy
+Sebelum deploy ke Cloudflare, kamu perlu:
+1. Buat D1 database:
+npx wrangler d1 create zayidan-portfolio-db
+2. Copy database_id dari output ke wrangler.toml:
+[[d1_databases]]
+binding = "DB"
+database_name = "zayidan-portfolio-db"
+database_id = "<copy-id-dari-sini>"
+3. Migration data SQLite → D1:
+npx wrangler d1 migrations create zayidan-portfolio-db init
+npx prisma migrate diff --from-empty --to-schema-datamodel ./prisma/schema.prisma --script > migrations/0001_init.sql
+npx wrangler d1 migrations apply zayidan-portfolio-db
+4. Deploy ke Cloudflare Pages:
+npx wrangler pages deploy .open-next/assets
+5. Binding D1 di Dashboard:  
+Buka Cloudflare Dashboard → Pages → zayidan-portfolio → Settings → Functions → D1 database bindings → binding name: DB, database: zayidan-portfolio-db
+6. Set env vars di dashboard:  
+GEMINI_API_KEY, ADMIN_PASSWORD, NEXT_PUBLIC_ADMIN_PASSWORD, FORMSPREE_ID, dll.

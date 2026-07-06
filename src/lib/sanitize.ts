@@ -1,15 +1,28 @@
-import DOMPurify from 'isomorphic-dompurify'
+/**
+ * Sanitize a string by stripping HTML tags.
+ * Uses a lightweight regex approach instead of DOMPurify to avoid jsdom native dependencies
+ * that break on Cloudflare Workers.
+ */
+function stripHtmlTags(html: string): string {
+  return html
+    .replace(/<[^>]*>/g, ' ')   // Remove HTML tags
+    .replace(/&nbsp;/g, ' ')    // Non-breaking spaces
+    .replace(/&amp;/g, '&')     // Ampersands
+    .replace(/&lt;/g, '<')      // Less than
+    .replace(/&gt;/g, '>')      // Greater than
+    .replace(/&quot;/g, '"')    // Quotes
+    .replace(/&#\d+;/g, ' ')    // Numeric entities
+    .replace(/&[a-zA-Z]+;/g, ' ') // Named entities
+    .trim()
+    .replace(/\s+/g, ' ')
+}
 
 /**
  * Sanitize a string for safe HTML output (XSS prevention).
- * Uses DOMPurify with strict allowlist.
+ * Strips all HTML tags.
  */
 export function sanitizeHtml(dirty: string): string {
-  return DOMPurify.sanitize(dirty, {
-    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'br', 'ul', 'ol', 'li', 'span', 'code', 'pre'],
-    ALLOWED_ATTR: ['href', 'target', 'rel', 'class'],
-    ALLOW_DATA_ATTR: false,
-  })
+  return stripHtmlTags(dirty)
 }
 
 /**
@@ -17,10 +30,7 @@ export function sanitizeHtml(dirty: string): string {
  * Safe for any text that will be rendered in the DOM.
  */
 export function sanitizeText(dirty: string): string {
-  return DOMPurify.sanitize(dirty, {
-    ALLOWED_TAGS: [],
-    ALLOWED_ATTR: [],
-  })
+  return stripHtmlTags(dirty)
 }
 
 /**

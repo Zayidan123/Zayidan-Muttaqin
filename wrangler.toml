@@ -1,0 +1,10 @@
+name = "zayidan-portfolio"
+compatibility_date = "2025-07-01"
+compatibility_flags = ["nodejs_compat"]
+
+pages_build_output_dir = ".open-next/assets"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "zayidan-portfolio-db"
+database_id = ""

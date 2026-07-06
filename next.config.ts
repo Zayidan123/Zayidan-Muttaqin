@@ -9,14 +9,14 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // Allow access to remote image placeholder.
   images: {
+    unoptimized: process.env.CLOUDFLARE_BUILD === 'true',
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'picsum.photos',
         port: '',
-        pathname: 'C:\\Users\\zayid\\Documents\\ilmu it\\Zayidan-Muttaqin\\upload\\bg merah.png', // This allows any path under the hostname
+        pathname: '/**',
       },
       {
         protocol: 'https',
@@ -26,13 +26,20 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  output: 'standalone',
   transpilePackages: ['motion'],
-  serverExternalPackages: ['@prisma/client'],
-  experimental: {
-    workerThreads: false,
-    cpus: 1,
-    webpackBuildWorker: false,
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-XSS-Protection', value: '1; mode=block' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' },
+        ],
+      },
+    ]
   },
   webpack: (config, {dev}) => {
     config.parallelism = 1;
@@ -43,8 +50,6 @@ const nextConfig: NextConfig = {
         minimize: false,
       };
     }
-    // HMR is disabled in AI Studio via DISABLE_HMR env var.
-    // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
     if (dev && process.env.DISABLE_HMR === 'true') {
       config.watchOptions = {
         ignored: /.*/,
