@@ -9,6 +9,7 @@ import { Stats } from '@/components/sections/Stats'
 import { TechStack } from '@/components/sections/TechStack'
 import { Achievements } from '@/components/sections/Achievements'
 import { Experience } from '@/components/sections/Experience'
+import { Projects } from '@/components/sections/Projects'
 import { FAQ } from '@/components/sections/FAQ'
 import { Contact } from '@/components/sections/Contact'
 import { LightModeBackground } from '@/components/ui/LightModeBackground'
@@ -66,6 +67,8 @@ export function PortfolioPage() {
         <Achievements />
         <div className="section-divider my-4 sm:my-8" />
         <Experience />
+        <div className="section-divider my-4 sm:my-8" />
+        <Projects />
         <div className="section-divider my-4 sm:my-8" />
         <FAQ />
         <div className="section-divider my-4 sm:my-8" />

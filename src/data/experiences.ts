@@ -55,29 +55,6 @@ export const experiences: ExperienceEntry[] = [
     tags: { id: ["Manajemen Retail", "Kepemimpinan", "Layanan Pelanggan", "SOP"], en: ["Retail Management", "Leadership", "Customer Service", "SOP"] },
   },
   {
-    id: 1.5,
-    period: { start: "2026-04", end: null },
-    role: { id: "Store Associate / Sales Clerk", en: "Store Associate / Sales Clerk" },
-    company: { id: "Toko Sinta (SH GROSIR)", en: "Toko Sinta (SH GROSIR)" },
-    description: {
-      id: [
-        "Melayani pelanggan dengan ramah dan membantu pemilihan ukuran, mengambil stok barang dari gudang dengan cepat, serta memberikan rekomendasi produk alternatif saat kehabisan stok.",
-        "Melakukan Penataan Visual (Visual Merchandising) profesional dengan merapikan sepatu, sandal, dan tas sesuai ukuran, warna, dan merek.",
-        "Menjaga kebersihan dan kerapian area display serta ruang pas agar selalu memenuhi standar premium.",
-        "Menjaga kualitas barang pajangan agar tetap bersih tanpa noda/cacat guna menghindari penurunan nilai jual.",
-        "Mencapai efisiensi waktu logistik barang dari gudang ke area pajangan secara optimal.",
-      ],
-      en: [
-        "Delivered high-quality customer service by assisting patrons with sizing, retrieving inventory efficiently from the warehouse, and recommending alternative product options during stock outages.",
-        "Executed professional Visual Merchandising by organizing shoes, sandals, and bags neatly based on size, color matrices, and brands.",
-        "Maintained display floors and fitting room areas to premium cleanliness and appearance standards.",
-        "Maintained display stock quality at a pristine level with zero stains/defects, successfully avoiding product markdowns.",
-        "Achieved optimal turnaround times and high efficiency in stock logistics from the warehouse to the sales floor.",
-      ],
-    },
-    tags: { id: ["Layanan Pelanggan", "Visual Merchandising", "Logistik Stok", "Retail"], en: ["Customer Service", "Visual Merchandising", "Stock Logistics", "Retail"] },
-  },
-  {
     id: 3,
     period: { start: "2024-01", end: "2024-12" },
     role: { id: "Pramuniaga", en: "Sales Associate" },

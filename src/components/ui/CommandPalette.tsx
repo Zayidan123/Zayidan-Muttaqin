@@ -3,7 +3,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Home, User, Briefcase, Mail, Sun, Moon, Globe, Download, ArrowUp, Search, HelpCircle, Trophy, Cpu, Eye } from 'lucide-react'
+import { Home, User, Briefcase, Mail, Sun, Moon, Globe, Download, ArrowUp, Search, HelpCircle, Trophy, Cpu, Eye, Github } from 'lucide-react'
 import { useLanguageStore } from '@/store/language-store'
 import { useTheme } from '@/lib/theme'
 import { useToastStore } from '@/store/toast-store'
@@ -28,6 +28,7 @@ export function CommandPalette() {
     { id: 'hero', labelKey: 'commandPalette.goHero', group: 'commandPalette.navGroup', icon: Home, shortcut: '1', action: () => scrollTo('hero') },
     { id: 'about', labelKey: 'commandPalette.goAbout', group: 'commandPalette.navGroup', icon: User, shortcut: '2', action: () => scrollTo('about') },
     { id: 'experience', labelKey: 'commandPalette.goExperience', group: 'commandPalette.navGroup', icon: Briefcase, shortcut: '3', action: () => scrollTo('experience') },
+    { id: 'projects', labelKey: 'commandPalette.goProjects', group: 'commandPalette.navGroup', icon: Github, action: () => scrollTo('projects') },
     { id: 'faq', labelKey: 'commandPalette.goFaq', group: 'commandPalette.navGroup', icon: HelpCircle, shortcut: '4', action: () => scrollTo('faq') },
     { id: 'contact', labelKey: 'commandPalette.goContact', group: 'commandPalette.navGroup', icon: Mail, shortcut: '5', action: () => scrollTo('contact') },
     { id: 'techstack', labelKey: 'commandPalette.goTechstack', group: 'commandPalette.navGroup', icon: Cpu, action: () => scrollTo('techstack') },

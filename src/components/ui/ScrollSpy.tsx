@@ -4,10 +4,10 @@ import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguageStore } from '@/store/language-store'
 
-const SECTION_IDS = ['hero', 'about', 'stats', 'techstack', 'achievements', 'experience', 'faq', 'contact']
+const SECTION_IDS = ['hero', 'about', 'stats', 'techstack', 'achievements', 'experience', 'projects', 'faq', 'contact']
 
-const LABELS_ID = ['', 'Tentang', 'Stats', 'Tech', 'Pencapaian', 'Pengalaman', 'FAQ', 'Kontak']
-const LABELS_EN = ['', 'About', 'Stats', 'Tech', 'Achievements', 'Experience', 'FAQ', 'Contact']
+const LABELS_ID = ['', 'Tentang', 'Stats', 'Tech', 'Pencapaian', 'Pengalaman', 'Proyek', 'FAQ', 'Kontak']
+const LABELS_EN = ['', 'About', 'Stats', 'Tech', 'Achievements', 'Experience', 'Projects', 'FAQ', 'Contact']
 
 export function ScrollSpy() {
   const { lang, t } = useLanguageStore()

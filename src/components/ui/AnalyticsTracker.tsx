@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useCallback } from 'react'
 
-const SECTION_IDS = ['hero', 'about', 'stats', 'techstack', 'achievements', 'experience', 'faq', 'contact']
+const SECTION_IDS = ['hero', 'about', 'stats', 'techstack', 'achievements', 'experience', 'projects', 'faq', 'contact']
 
 function getSessionId(): string {
   if (typeof window === 'undefined') return ''
