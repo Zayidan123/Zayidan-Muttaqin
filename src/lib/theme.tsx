@@ -111,6 +111,53 @@ export function getMostUsedTheme(): { theme: Theme; count: number } | null {
   return max ? { theme: max, count: maxCount } : null
 }
 
+// Reset all theme usage stats (for 'reset stats' button in ThemeCustomizer)
+export function resetThemeUsage() {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.removeItem(USAGE_KEY)
+    localStorage.removeItem(RECENT_KEY)
+  } catch { /* ignore */ }
+}
+
+// Theme scheduler — auto-switch theme based on time of day
+const SCHEDULE_KEY = 'theme-schedule-enabled'
+const SCHEDULE_MAP: { startHour: number; theme: Theme; labelId: string; labelEn: string }[] = [
+  { startHour: 6, theme: 'light', labelId: 'Pagi (06-12)', labelEn: 'Morning (6-12)' },
+  { startHour: 12, theme: 'skeuomorphic', labelId: 'Siang (12-17)', labelEn: 'Afternoon (12-17)' },
+  { startHour: 17, theme: 'liquid-glass', labelId: 'Sore (17-19)', labelEn: 'Evening (17-19)' },
+  { startHour: 19, theme: 'dark', labelId: 'Malam (19-06)', labelEn: 'Night (19-6)' },
+]
+
+export function isThemeScheduleEnabled(): boolean {
+  if (typeof window === 'undefined') return false
+  try {
+    return localStorage.getItem(SCHEDULE_KEY) === '1'
+  } catch { return false }
+}
+
+export function setThemeScheduleEnabled(enabled: boolean) {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.setItem(SCHEDULE_KEY, enabled ? '1' : '0')
+  } catch { /* ignore */ }
+}
+
+// Get the theme that should be active based on current hour
+export function getScheduledTheme(date: Date = new Date()): { theme: Theme; labelId: string; labelEn: string } | null {
+  const hour = date.getHours()
+  let match = SCHEDULE_MAP[SCHEDULE_MAP.length - 1] // default to last (night)
+  for (const entry of SCHEDULE_MAP) {
+    if (hour >= entry.startHour) match = entry
+  }
+  // Wrap: hours 0-5 are still "night" (last entry)
+  return { theme: match.theme, labelId: match.labelId, labelEn: match.labelEn }
+}
+
+export function getScheduleInfo() {
+  return SCHEDULE_MAP.map(e => ({ ...e }))
+}
+
 export function getRecentThemes(): Theme[] {
   if (typeof window === 'undefined') return []
   try {

@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Palette, X, RotateCcw, Star, Download, Upload, Share2, Clock, QrCode, BarChart3, Volume2, VolumeX } from 'lucide-react'
+import { Palette, X, RotateCcw, Star, Download, Upload, Share2, Clock, QrCode, BarChart3, Volume2, VolumeX, Trash2, CalendarClock } from 'lucide-react'
 import QRCode from 'qrcode'
-import { useTheme, getRecentThemes, getShareableThemeUrl, getThemeUsage, getMostUsedTheme, type Theme } from '@/lib/theme'
+import { useTheme, getRecentThemes, getShareableThemeUrl, getThemeUsage, getMostUsedTheme, resetThemeUsage, isThemeScheduleEnabled, setThemeScheduleEnabled, getScheduledTheme, getScheduleInfo, type Theme } from '@/lib/theme'
 import { useToastStore } from '@/store/toast-store'
 import { isThemeSoundEnabled, setThemeSoundEnabled } from '@/lib/theme-sound'
 
@@ -62,6 +62,8 @@ export function ThemeCustomizer() {
   const [qrModalOpen, setQrModalOpen] = useState(false)
   const [qrDataUrl, setQrDataUrl] = useState<string>('')
   const [soundEnabled, setSoundEnabled] = useState(true)
+  const [scheduleEnabled, setScheduleEnabled] = useState(false)
+  const [scheduledLabel, setScheduledLabel] = useState<{ labelId: string; labelEn: string } | null>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const hasAppliedInitialTheme = useRef(false)
@@ -84,6 +86,13 @@ export function ThemeCustomizer() {
       setThemeUsage(getThemeUsage())
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setSoundEnabled(isThemeSoundEnabled())
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setScheduleEnabled(isThemeScheduleEnabled())
+      const scheduled = getScheduledTheme()
+      if (scheduled) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setScheduledLabel({ labelId: scheduled.labelId, labelEn: scheduled.labelEn })
+      }
     } catch { /* ignore */ }
   }, [])
 
@@ -139,6 +148,38 @@ export function ThemeCustomizer() {
     setThemeSoundEnabled(next)
     addToast(next ? '🔊 Suara tema dinyakkan' : '🔇 Suara tema dimatikan', 'info')
   }, [soundEnabled, addToast])
+
+  // Reset all theme usage stats (count + recent)
+  const handleResetStats = useCallback(() => {
+    resetThemeUsage()
+    setThemeUsage({} as Record<Theme, number>)
+    setRecentThemes([])
+    addToast('📊 Statistik tema direset', 'success')
+  }, [addToast])
+
+  // Toggle theme scheduler — auto-switch theme based on time of day
+  const toggleScheduler = useCallback(() => {
+    const next = !scheduleEnabled
+    setScheduleEnabled(next)
+    setThemeScheduleEnabled(next)
+    if (next) {
+      // Apply scheduled theme immediately when enabling
+      const scheduled = getScheduledTheme()
+      if (scheduled) {
+        setTheme(scheduled.theme)
+        const html = document.documentElement
+        html.classList.remove('dark', 'light', 'theme-3d', 'liquid-glass', 'skeuomorphic')
+        if (scheduled.theme === 'dark') html.classList.add('dark')
+        else if (scheduled.theme === 'theme-3d') html.classList.add('theme-3d')
+        else if (scheduled.theme === 'liquid-glass') html.classList.add('liquid-glass')
+        else if (scheduled.theme === 'skeuomorphic') html.classList.add('skeuomorphic')
+        try { localStorage.removeItem('theme-preset') } catch { /* ignore */ }
+        addToast(`🕐 Scheduler aktif: ${scheduled.labelId} → ${scheduled.theme}`, 'success')
+      }
+    } else {
+      addToast('🕐 Scheduler dimatikan', 'info')
+    }
+  }, [scheduleEnabled, setTheme, addToast])
 
   // Generate QR code for current theme (mobile-friendly sharing)
   const openQrModal = useCallback(() => {
@@ -571,9 +612,19 @@ export function ThemeCustomizer() {
               const label = labels[mostUsed.theme]
               return (
                 <div className="border-t border-[var(--glass-border)] pt-3">
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <BarChart3 className="h-2.5 w-2.5 text-[var(--text-secondary)]" />
-                    <p className="text-[10px] font-mono-custom text-[var(--text-secondary)] tracking-wider uppercase">Tema Favorit</p>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-1.5">
+                      <BarChart3 className="h-2.5 w-2.5 text-[var(--text-secondary)]" />
+                      <p className="text-[10px] font-mono-custom text-[var(--text-secondary)] tracking-wider uppercase">Tema Favorit</p>
+                    </div>
+                    <button
+                      onClick={handleResetStats}
+                      className="w-5 h-5 rounded flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--neon-magenta)] transition-colors cursor-pointer"
+                      title="Reset statistik tema"
+                      aria-label="Reset theme stats"
+                    >
+                      <Trash2 className="h-2.5 w-2.5" />
+                    </button>
                   </div>
                   <div className="flex items-center justify-between p-2 rounded-md border border-[var(--glass-border)] bg-[var(--glass-bg)]/30">
                     <div className="flex items-center gap-2">
@@ -628,6 +679,41 @@ export function ThemeCustomizer() {
                 </div>
               )
             })()}
+
+            {/* Theme Scheduler — auto-switch theme based on time of day */}
+            <div className="border-t border-[var(--glass-border)] pt-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <CalendarClock className="h-2.5 w-2.5 text-[var(--text-secondary)]" />
+                  <p className="text-[10px] font-mono-custom text-[var(--text-secondary)] tracking-wider uppercase">Jadwal Otomatis</p>
+                </div>
+                <button
+                  onClick={toggleScheduler}
+                  className={`relative w-7 h-3.5 rounded-full transition-colors cursor-pointer ${scheduleEnabled ? 'bg-[var(--neon-cyan)]/60' : 'bg-[var(--glass-border)]'}`}
+                  role="switch"
+                  aria-checked={scheduleEnabled}
+                  aria-label="Toggle theme scheduler"
+                >
+                  <span
+                    className={`absolute top-0.5 w-2.5 h-2.5 rounded-full bg-white transition-transform ${scheduleEnabled ? 'translate-x-3.5' : 'translate-x-0.5'}`}
+                  />
+                </button>
+              </div>
+              {scheduleEnabled && scheduledLabel && (
+                <div className="mt-2 p-2 rounded-md border border-[var(--neon-cyan)]/20 bg-[var(--neon-cyan)]/5">
+                  <p className="text-[9px] font-mono-custom text-[var(--text-secondary)] mb-1">Periode saat ini:</p>
+                  <p className="text-[10px] font-mono-custom text-[var(--neon-cyan)]">{scheduledLabel.labelId}</p>
+                  <div className="mt-2 space-y-0.5">
+                    {getScheduleInfo().map((s, i) => (
+                      <div key={i} className="flex items-center justify-between text-[8px] font-mono-custom">
+                        <span className="text-[var(--text-secondary)]/70">{s.labelId}</span>
+                        <span className="text-[var(--text-secondary)]">{s.theme}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
 
             <div className="border-t border-[var(--glass-border)] pt-3">
               <p className="text-[10px] font-mono-custom text-[var(--text-secondary)] mb-2 tracking-wider uppercase">Custom Colors</p>
