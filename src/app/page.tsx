@@ -27,6 +27,7 @@ import { CursorGlow } from '@/components/ui/CursorGlow'
 import { AmbientSound } from '@/components/ui/AmbientSound'
 import { LiquidGlassBackground, SparkleField } from '@/components/ui/LiquidGlassBackground'
 import { Theme3DBackground } from '@/components/ui/Theme3DBackground'
+import { SkeuomorphicBackground } from '@/components/ui/SkeuomorphicBackground'
 import { ThemeCustomizer } from '@/components/ui/ThemeCustomizer'
 import { ScrollSpy } from '@/components/ui/ScrollSpy'
 import { AdminPanel } from '@/components/ui/AdminPanel'
@@ -55,6 +56,7 @@ export function PortfolioPage() {
       <LiquidGlassBackground />
       <SparkleField />
       <Theme3DBackground />
+      <SkeuomorphicBackground />
       <Navbar />
       <main className="flex-1 relative z-[1]">
         <Hero />

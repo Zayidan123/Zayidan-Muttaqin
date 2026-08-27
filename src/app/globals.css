@@ -1722,6 +1722,512 @@ html {
   50% { text-shadow: 0 1px 0 #ccc, 0 2px 0 #c9c9c9, 0 3px 0 #bbb, 0 4px 0 #b9b9b9, 0 5px 0 #aaa, 0 6px 1px rgba(0,0,0,.1), 0 0 10px rgba(0,245,255,.3), 0 1px 5px rgba(0,0,0,.3), 0 3px 8px rgba(0,245,255,.15), 0 5px 15px rgba(0,0,0,.25), 0 10px 15px rgba(0,245,255,.1), 0 20px 25px rgba(0,0,0,.15); }
 }
 
+/* ============================================================ */
+/* ===== SKEUOMORFISME CAHAYA — Light Skeuomorphism (2026) ===== */
+/* Soft warm surfaces, subtle gradients, light embossing,       */
+/* gentle drop shadows. Stripped-down Apple UI + sleek 3D.      */
+/* ============================================================ */
+
+/* --- Skeuomorphic floating light orbs (cahaya) keyframes --- */
+@keyframes skeuomorphic-float-0 {
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0) scale(1); }
+  33% { transform: translate(-50%, -50%) translate(40px, -30px) scale(1.08); }
+  66% { transform: translate(-50%, -50%) translate(-25px, 35px) scale(0.95); }
+}
+@keyframes skeuomorphic-float-1 {
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0) scale(1); }
+  50% { transform: translate(-50%, -50%) translate(-45px, 25px) scale(1.12); }
+}
+@keyframes skeuomorphic-float-2 {
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0) scale(1); }
+  40% { transform: translate(-50%, -50%) translate(30px, 40px) scale(0.9); }
+  70% { transform: translate(-50%, -50%) translate(-30px, -20px) scale(1.05); }
+}
+
+/* --- Skeuomorphic background base --- */
+.skeuomorphic-bg {
+  background: #EFE8DA;
+}
+
+/* Subtle grain drift (very slow, barely perceptible) */
+.skeuomorphic-grain {
+  animation: skeuomorphic-grain-drift 60s linear infinite;
+}
+@keyframes skeuomorphic-grain-drift {
+  0% { background-position: 0 0; }
+  100% { background-position: 160px 160px; }
+}
+
+/* --- Skeuomorphic Theme: CSS Variable Overrides --- */
+.skeuomorphic {
+  /* Warm ivory / cream base palette */
+  --background: #EFE8DA;
+  --foreground: #3A322A;
+  --card: #F8F5EF;
+  --card-foreground: #3A322A;
+  --popover: #FBF9F4;
+  --popover-foreground: #3A322A;
+  --primary: #B8862E;
+  --primary-foreground: #FBF9F4;
+  --secondary: #E8E0CF;
+  --secondary-foreground: #3A322A;
+  --muted: #E5DDCC;
+  --muted-foreground: #6B5E4E;
+  --accent: #E8D9B8;
+  --accent-foreground: #5A4A2E;
+  --destructive: #B5453B;
+  --border: rgba(120, 100, 70, 0.14);
+  --input: rgba(120, 100, 70, 0.16);
+  --ring: #B8862E;
+
+  /* Warm amber/gold + muted teal accent (cahaya = illumination) */
+  --neon-cyan: #C8932E;
+  --neon-magenta: #B8763E;
+  --neon-purple: #6B9B9E;
+  --dark-base: #EFE8DA;
+  --dark-surface: #F8F5EF;
+  --glass-bg: rgba(248, 245, 239, 0.78);
+  --glass-border: rgba(120, 100, 70, 0.14);
+  --glow-cyan: 0 8px 24px rgba(184, 134, 46, 0.18);
+  --glow-magenta: 0 8px 24px rgba(184, 118, 62, 0.16);
+  --text-primary: #3A322A;
+  --text-secondary: #6B5E4E;
+  --scanline-opacity: 0;
+
+  /* Skeuomorphic shadow tokens (soft, tactile, embossed) */
+  --skeu-raised: 0 1px 0 rgba(255, 252, 245, 0.95) inset, 0 -1px 0 rgba(120, 100, 70, 0.06) inset, 0 6px 16px rgba(120, 100, 70, 0.12), 0 2px 4px rgba(120, 100, 70, 0.08);
+  --skeu-raised-lg: 0 1px 0 rgba(255, 252, 245, 0.95) inset, 0 -1px 0 rgba(120, 100, 70, 0.08) inset, 0 12px 32px rgba(120, 100, 70, 0.16), 0 4px 8px rgba(120, 100, 70, 0.10);
+  --skeu-pressed: 0 1px 2px rgba(120, 100, 70, 0.18) inset, 0 -1px 0 rgba(255, 252, 245, 0.5) inset;
+  --skeu-surface-grad: linear-gradient(180deg, #FCFAF5 0%, #F2EBDD 100%);
+}
+
+/* --- Skeuomorphic body warm wash --- */
+.skeuomorphic body {
+  background: linear-gradient(160deg, #F6F1E7 0%, #EFE8DA 50%, #E8DFCD 100%);
+  color: var(--text-primary);
+}
+
+/* --- Skeuomorphic glass surfaces (raised, embossed, tactile) --- */
+.skeuomorphic .glass {
+  background: linear-gradient(180deg, rgba(252, 250, 245, 0.92) 0%, rgba(242, 235, 224, 0.88) 100%);
+  backdrop-filter: blur(8px) saturate(1.1);
+  -webkit-backdrop-filter: blur(8px) saturate(1.1);
+  border: 1px solid rgba(255, 252, 245, 0.6);
+  box-shadow: var(--skeu-raised);
+}
+
+.skeuomorphic .glass-strong {
+  background: linear-gradient(180deg, rgba(255, 253, 248, 0.95) 0%, rgba(245, 238, 227, 0.92) 100%);
+  backdrop-filter: blur(12px) saturate(1.15);
+  -webkit-backdrop-filter: blur(12px) saturate(1.15);
+  border: 1px solid rgba(255, 252, 245, 0.7);
+  box-shadow: var(--skeu-raised-lg);
+}
+
+.skeuomorphic .glass-card-advanced {
+  background: linear-gradient(160deg, rgba(252, 250, 245, 0.95) 0%, rgba(243, 236, 224, 0.90) 100%);
+  backdrop-filter: blur(8px) saturate(1.1);
+  -webkit-backdrop-filter: blur(8px) saturate(1.1);
+  border: 1px solid rgba(255, 252, 245, 0.65);
+  box-shadow:
+    0 1px 0 rgba(255, 252, 245, 0.95) inset,
+    0 -1px 0 rgba(120, 100, 70, 0.07) inset,
+    0 8px 22px rgba(120, 100, 70, 0.13),
+    0 2px 5px rgba(120, 100, 70, 0.09);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.skeuomorphic .glass-card-advanced:hover {
+  box-shadow:
+    0 1px 0 rgba(255, 252, 245, 1) inset,
+    0 -1px 0 rgba(120, 100, 70, 0.09) inset,
+    0 14px 36px rgba(120, 100, 70, 0.18),
+    0 4px 10px rgba(120, 100, 70, 0.12),
+    0 0 0 1px rgba(184, 134, 46, 0.12);
+  transform: translateY(-3px);
+  border-color: rgba(184, 134, 46, 0.22);
+}
+
+/* --- Skeuomorphic glass-hover-glow (warm amber glow on hover) --- */
+.skeuomorphic .glass-hover-glow:hover {
+  box-shadow:
+    0 1px 0 rgba(255, 252, 245, 1) inset,
+    0 12px 30px rgba(184, 134, 46, 0.22),
+    0 0 0 1px rgba(184, 134, 46, 0.18) !important;
+  border-color: rgba(184, 134, 46, 0.28) !important;
+}
+
+/* --- Skeuomorphic display font (soft, refined, no harsh neon) --- */
+.skeuomorphic .font-display {
+  text-shadow: 0 1px 0 rgba(255, 252, 245, 0.8), 0 2px 8px rgba(120, 100, 70, 0.10);
+  letter-spacing: 0.02em;
+}
+
+.skeuomorphic .font-mono-custom {
+  color: var(--text-secondary);
+}
+
+/* --- Skeuomorphic shimmering name (subtle warm sheen) --- */
+.skeuomorphic .hero-name-shimmer {
+  background: linear-gradient(120deg, #3A322A 0%, #8C6A2E 40%, #C8932E 50%, #8C6A2E 60%, #3A322A 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: skeuomorphic-sheen 6s linear infinite;
+  filter: drop-shadow(0 1px 0 rgba(255, 252, 245, 0.6));
+}
+@keyframes skeuomorphic-sheen {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+/* --- Skeuomorphic text gradient animate (warm amber flow) --- */
+.skeuomorphic .text-gradient-animate {
+  background: linear-gradient(120deg, #8C6A2E, #C8932E, #6B9B9E, #8C6A2E);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: skeuomorphic-sheen 8s linear infinite;
+}
+
+/* --- Skeuomorphic buttons (raised, tactile, press-down feel) --- */
+.skeuomorphic .ripple-effect {
+  background: linear-gradient(180deg, #FBF6EA 0%, #E8D9B8 100%) !important;
+  border: 1px solid rgba(184, 134, 46, 0.28) !important;
+  color: #5A4A2E !important;
+  box-shadow:
+    0 1px 0 rgba(255, 252, 245, 0.9) inset,
+    0 -1px 0 rgba(120, 100, 70, 0.10) inset,
+    0 4px 10px rgba(184, 134, 46, 0.14),
+    0 1px 2px rgba(120, 100, 70, 0.10) !important;
+  text-shadow: 0 1px 0 rgba(255, 252, 245, 0.5);
+  transition: all 0.2s ease !important;
+}
+
+.skeuomorphic .ripple-effect:hover {
+  background: linear-gradient(180deg, #FBF6EA 0%, #E8D9B8 100%) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 252, 245, 1) inset,
+    0 -1px 0 rgba(120, 100, 70, 0.12) inset,
+    0 8px 20px rgba(184, 134, 46, 0.24),
+    0 0 0 1px rgba(184, 134, 46, 0.22) !important;
+  color: #4A3A1E !important;
+  transform: translateY(-1px);
+}
+
+.skeuomorphic .ripple-effect:active {
+  box-shadow: var(--skeu-pressed) !important;
+  transform: translateY(1px);
+}
+
+/* --- Skeuomorphic navbar (raised bar, light from above) --- */
+.skeuomorphic header,
+.skeuomorphic header nav,
+.skeuomorphic .glass-nav {
+  background: linear-gradient(180deg, rgba(252, 250, 245, 0.92) 0%, rgba(244, 237, 225, 0.88) 100%) !important;
+  backdrop-filter: blur(12px) saturate(1.15) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(1.15) !important;
+  border-bottom: 1px solid rgba(120, 100, 70, 0.12) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 252, 245, 0.7) inset,
+    0 4px 14px rgba(120, 100, 70, 0.10) !important;
+}
+
+/* --- Skeuomorphic footer (slightly recessed, grounded) --- */
+.skeuomorphic footer {
+  background: linear-gradient(180deg, rgba(244, 237, 225, 0.92) 0%, rgba(236, 228, 214, 0.95) 100%) !important;
+  backdrop-filter: blur(10px) saturate(1.1) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(1.1) !important;
+  border-top: 1px solid rgba(120, 100, 70, 0.14) !important;
+  box-shadow:
+    0 -1px 0 rgba(120, 100, 70, 0.10) inset,
+    0 -4px 14px rgba(120, 100, 70, 0.06) !important;
+}
+
+/* --- Skeuomorphic section dividers (embossed line) --- */
+.skeuomorphic .section-divider {
+  background: transparent !important;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(184, 134, 46, 0.25) 50%, transparent 100%) !important;
+  box-shadow: 0 1px 0 rgba(255, 252, 245, 0.6);
+}
+
+.skeuomorphic .section-title-line {
+  background: linear-gradient(90deg, rgba(184, 134, 46, 0.4) 0%, transparent 100%) !important;
+}
+
+/* --- Skeuomorphic scanline off --- */
+.skeuomorphic .scanline-overlay {
+  display: none !important;
+}
+
+/* --- Skeuomorphic scrollbar (warm, tactile) --- */
+.skeuomorphic ::-webkit-scrollbar { width: 10px; }
+.skeuomorphic ::-webkit-scrollbar-track {
+  background: rgba(232, 224, 207, 0.6);
+  box-shadow: inset 0 1px 2px rgba(120, 100, 70, 0.10);
+}
+.skeuomorphic ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #D4B57E 0%, #B8862E 100%);
+  border-radius: 5px;
+  border: 1px solid rgba(255, 252, 245, 0.4);
+  box-shadow: 0 1px 0 rgba(255, 252, 245, 0.5) inset, 0 2px 4px rgba(120, 100, 70, 0.15);
+}
+.skeuomorphic ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #D4B57E 0%, #A8761E 100%);
+}
+
+/* --- Skeuomorphic skill bars (raised track, inset fill) --- */
+.skeuomorphic .skill-bar-track {
+  background: rgba(232, 224, 207, 0.7) !important;
+  box-shadow: var(--skeu-pressed) !important;
+  border: 1px solid rgba(120, 100, 70, 0.10);
+}
+
+/* --- Skeuomorphic soft-skill tags (pills, raised) --- */
+.skeuomorphic .soft-skill-tag {
+  background: linear-gradient(180deg, #FCFAF5 0%, #ECE3D1 100%) !important;
+  border: 1px solid rgba(184, 134, 46, 0.18) !important;
+  color: #5A4A2E !important;
+  box-shadow:
+    0 1px 0 rgba(255, 252, 245, 0.9) inset,
+    0 -1px 0 rgba(120, 100, 70, 0.06) inset,
+    0 2px 5px rgba(120, 100, 70, 0.10) !important;
+  transition: all 0.25s ease !important;
+}
+.skeuomorphic .soft-skill-tag:hover {
+  box-shadow:
+    0 1px 0 rgba(255, 252, 245, 1) inset,
+    0 -1px 0 rgba(120, 100, 70, 0.08) inset,
+    0 6px 14px rgba(184, 134, 46, 0.20),
+    0 0 0 1px rgba(184, 134, 46, 0.20) !important;
+  transform: translateY(-2px);
+  color: #4A3A1E !important;
+}
+
+/* --- Skeuomorphic aurora hover (warm glow, not neon) --- */
+.skeuomorphic .aurora-hover::before {
+  background: radial-gradient(circle at 50% 0%, rgba(212, 162, 76, 0.18) 0%, transparent 70%) !important;
+}
+.skeuomorphic .aurora-hover:hover::before {
+  background: radial-gradient(circle at 50% 0%, rgba(212, 162, 76, 0.32) 0%, transparent 70%) !important;
+}
+
+/* --- Skeuomorphic neon-pulse-ring (warm amber pulse) --- */
+.skeuomorphic .neon-pulse-ring {
+  box-shadow: 0 0 0 0 rgba(184, 134, 46, 0.35) !important;
+  animation: skeuomorphic-pulse 2.4s ease-out infinite !important;
+}
+@keyframes skeuomorphic-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(184, 134, 46, 0.35); }
+  70% { box-shadow: 0 0 0 14px rgba(184, 134, 46, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(184, 134, 46, 0); }
+}
+
+/* --- Skeuomorphic card shine (soft warm sweep) --- */
+.skeuomorphic .card-shine::after {
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 252, 245, 0.5) 50%, transparent 70%) !important;
+}
+
+/* --- Skeuomorphic breathing glow (gentle warm breath) --- */
+.skeuomorphic .breathing-glow {
+  animation: skeuomorphic-breathe 4s ease-in-out infinite !important;
+}
+@keyframes skeuomorphic-breathe {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(184, 134, 46, 0); }
+  50% { box-shadow: 0 0 24px 2px rgba(184, 134, 46, 0.22); }
+}
+
+/* --- Skeuomorphic command palette (raised modal) --- */
+.skeuomorphic .command-palette-dialog {
+  background: linear-gradient(180deg, #FBF9F4 0%, #F2EBDD 100%) !important;
+  border: 1px solid rgba(184, 134, 46, 0.18) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 252, 245, 0.95) inset,
+    0 24px 60px rgba(120, 100, 70, 0.28),
+    0 8px 20px rgba(120, 100, 70, 0.16) !important;
+}
+.skeuomorphic .command-palette-item:hover,
+.skeuomorphic .command-palette-item-active {
+  background: linear-gradient(180deg, #F0E6CF 0%, #E8D9B8 100%) !important;
+  color: #4A3A1E !important;
+}
+
+/* --- Skeuomorphic HUD bracket (warm, subtle) --- */
+.skeuomorphic .hud-bracket::before,
+.skeuomorphic .hud-bracket::after {
+  border-color: rgba(184, 134, 46, 0.35) !important;
+}
+
+/* --- Skeuomorphic avatar gradient border (warm gold ring) --- */
+.skeuomorphic .avatar-gradient-border {
+  background: linear-gradient(135deg, #D4A24C 0%, #B8862E 50%, #6B9B9E 100%) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 252, 245, 0.6) inset,
+    0 0 0 2px rgba(255, 252, 245, 0.4),
+    0 8px 24px rgba(184, 134, 46, 0.24) !important;
+}
+.skeuomorphic .avatar-gradient-border > .avatar-inner {
+  box-shadow: 0 1px 0 rgba(255, 252, 245, 0.5) inset !important;
+}
+
+/* --- Skeuomorphic tilt cards (deeper raised on tilt) --- */
+.skeuomorphic [data-tilt-card] {
+  box-shadow: var(--skeu-raised-lg) !important;
+}
+
+/* --- Skeuomorphic dots loading (warm amber dots) --- */
+.skeuomorphic .dots-loading span {
+  background: #B8862E !important;
+  box-shadow: 0 1px 0 rgba(255, 252, 245, 0.5);
+}
+
+/* --- Skeuomorphic glitch text (subtle warm offset, no harsh chroma) --- */
+.skeuomorphic .glitch-text::before,
+.skeuomorphic .glitch-text::after {
+  background: transparent !important;
+  text-shadow: 1px 0 rgba(184, 134, 46, 0.3), -1px 0 rgba(107, 155, 158, 0.3) !important;
+}
+
+/* --- Skeuomorphic inputs (inset/recessed fields) --- */
+.skeuomorphic input,
+.skeuomorphic textarea {
+  background: linear-gradient(180deg, #F2EBDD 0%, #F8F5EF 100%) !important;
+  border: 1px solid rgba(120, 100, 70, 0.18) !important;
+  box-shadow: var(--skeu-pressed) !important;
+  color: var(--text-primary) !important;
+}
+.skeuomorphic input::placeholder,
+.skeuomorphic textarea::placeholder {
+  color: #9A9086 !important;
+}
+.skeuomorphic input:focus,
+.skeuomorphic textarea:focus {
+  border-color: rgba(184, 134, 46, 0.45) !important;
+  box-shadow:
+    var(--skeu-pressed),
+    0 0 0 3px rgba(184, 134, 46, 0.12) !important;
+}
+
+/* --- Skeuomorphic body before (no dark grid overlay) --- */
+.skeuomorphic body::before {
+  display: none !important;
+}
+
+/* --- Skeuomorphic focus ring (warm amber) --- */
+.skeuomorphic *:focus-visible {
+  outline: 2px solid rgba(184, 134, 46, 0.55) !important;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* --- Skeuomorphic selection --- */
+.skeuomorphic ::selection {
+  background: rgba(184, 134, 46, 0.22) !important;
+  color: #3A322A !important;
+}
+
+/* --- Skeuomorphic neon underline (warm) --- */
+.skeuomorphic .neon-underline::after {
+  background: linear-gradient(90deg, #C8932E, #6B9B9E) !important;
+  box-shadow: 0 0 8px rgba(184, 134, 46, 0.3);
+}
+
+/* --- Skeuomorphic text stroke (warm emboss) --- */
+.skeuomorphic .text-stroke {
+  -webkit-text-stroke: 1px rgba(120, 100, 70, 0.3);
+}
+
+/* --- Skeuomorphic pill badges (raised) --- */
+.skeuomorphic .inline-flex.rounded-full {
+  background: linear-gradient(180deg, #FCFAF5 0%, #ECE3D1 100%) !important;
+  border: 1px solid rgba(184, 134, 46, 0.20) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 252, 245, 0.9) inset,
+    0 1px 3px rgba(120, 100, 70, 0.10) !important;
+  color: #5A4A2E !important;
+}
+.skeuomorphic .inline-flex.rounded-full:hover {
+  box-shadow:
+    0 1px 0 rgba(255, 252, 245, 1) inset,
+    0 4px 10px rgba(184, 134, 46, 0.18) !important;
+  transform: translateY(-1px);
+}
+
+/* --- Skeuomorphic section-specific cards (experience, faq, contact, etc.) --- */
+.skeuomorphic #experience .glass,
+.skeuomorphic #faq .rounded-xl.glass,
+.skeuomorphic #contact a.glass,
+.skeuomorphic #achievements .glass,
+.skeuomorphic #stats .glass {
+  background: linear-gradient(160deg, rgba(252, 250, 245, 0.94) 0%, rgba(243, 236, 224, 0.88) 100%) !important;
+  border: 1px solid rgba(255, 252, 245, 0.6) !important;
+  box-shadow: var(--skeu-raised) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.skeuomorphic #experience .glass:hover,
+.skeuomorphic #faq .rounded-xl.glass:hover,
+.skeuomorphic #contact a.glass:hover,
+.skeuomorphic #achievements .glass:hover,
+.skeuomorphic #stats .glass:hover {
+  box-shadow:
+    0 1px 0 rgba(255, 252, 245, 1) inset,
+    0 12px 28px rgba(120, 100, 70, 0.16),
+    0 0 0 1px rgba(184, 134, 46, 0.16) !important;
+  border-color: rgba(184, 134, 46, 0.24) !important;
+  transform: translateY(-2px);
+}
+
+/* --- Skeuomorphic experience timeline dot (warm gold, raised) --- */
+.skeuomorphic #experience [class*="rounded-full"][style*="neon-cyan"] {
+  background: linear-gradient(180deg, #D4A24C 0%, #B8862E 100%) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 252, 245, 0.7) inset,
+    0 0 0 3px rgba(248, 245, 239, 0.9),
+    0 4px 10px rgba(184, 134, 46, 0.35) !important;
+}
+
+/* --- Skeuomorphic SVGs (warm tone) --- */
+.skeuomorphic svg {
+  filter: drop-shadow(0 1px 0 rgba(255, 252, 245, 0.5));
+}
+.skeuomorphic button:hover svg,
+.skeuomorphic a:hover svg {
+  filter: drop-shadow(0 1px 4px rgba(184, 134, 46, 0.25));
+}
+
+/* --- Skeuomorphic cyber link (warm underline grow) --- */
+.skeuomorphic .cyber-link:hover {
+  color: #8C6A2E !important;
+  text-shadow: 0 1px 0 rgba(255, 252, 245, 0.5);
+}
+
+/* --- Skeuomorphic quote decoration (warm) --- */
+.skeuomorphic .quote-decoration {
+  color: rgba(184, 134, 46, 0.45) !important;
+}
+
+/* --- Skeuomorphic reduced motion --- */
+@media (prefers-reduced-motion: reduce) {
+  .skeuomorphic-orb,
+  .skeuomorphic-grain,
+  .skeuomorphic .breathing-glow,
+  .skeuomorphic .neon-pulse-ring,
+  .skeuomorphic .hero-name-shimmer,
+  .skeuomorphic .text-gradient-animate {
+    animation: none !important;
+  }
+  .skeuomorphic .glass-card-advanced:hover,
+  .skeuomorphic .soft-skill-tag:hover,
+  .skeuomorphic .ripple-effect:hover {
+    transform: none;
+  }
+}
+
+/* ===== END SKEUOMORFISME CAHAYA ===== */
+
 /* 3D Theme: CSS Variable Overrides */
 .theme-3d {
   --background: #050510;

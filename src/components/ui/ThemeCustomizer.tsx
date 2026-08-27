@@ -11,7 +11,7 @@ interface Preset {
   purple: string
   bg?: string
   surface?: string
-  themeMode?: 'dark' | 'light' | 'liquid-glass' | 'theme-3d'
+  themeMode?: 'dark' | 'light' | 'liquid-glass' | 'theme-3d' | 'skeuomorphic'
 }
 
 const PRESETS: Preset[] = [
@@ -23,6 +23,7 @@ const PRESETS: Preset[] = [
   { name: 'Matrix', cyan: '#00FF41', magenta: '#39FF14', purple: '#008F11', bg: '#000a00', surface: '#001100' },
   { name: 'Liquid Glass', cyan: '#C8A0FF', magenta: '#F8BBD9', purple: '#A5E6CF', themeMode: 'liquid-glass' },
   { name: '3D World', cyan: '#00F5FF', magenta: '#FF2DAA', purple: '#A78BFA', themeMode: 'theme-3d' },
+  { name: 'Cahaya', cyan: '#D4A24C', magenta: '#B8763E', purple: '#6B9B9E', themeMode: 'skeuomorphic' },
   { name: 'Rose Gold', cyan: '#E8A0BF', magenta: '#F4C2C2', purple: '#DDA0DD' },
   { name: 'Ocean', cyan: '#00ACC1', magenta: '#0097A7', purple: '#26C6DA' },
 ]
@@ -81,17 +82,21 @@ export function ThemeCustomizer() {
     // Handle theme mode switching
     if (preset.themeMode === 'liquid-glass') {
       setTheme('liquid-glass')
-      document.documentElement.classList.remove('dark', 'theme-3d')
+      document.documentElement.classList.remove('dark', 'theme-3d', 'skeuomorphic')
       document.documentElement.classList.add('liquid-glass')
     } else if (preset.themeMode === 'theme-3d') {
       setTheme('theme-3d')
-      document.documentElement.classList.remove('dark', 'liquid-glass')
+      document.documentElement.classList.remove('dark', 'liquid-glass', 'skeuomorphic')
       document.documentElement.classList.add('theme-3d')
+    } else if (preset.themeMode === 'skeuomorphic') {
+      setTheme('skeuomorphic')
+      document.documentElement.classList.remove('dark', 'liquid-glass', 'theme-3d')
+      document.documentElement.classList.add('skeuomorphic')
     } else {
-      // Restore to dark mode for non-liquid/3d presets
+      // Restore to dark mode for non-liquid/3d/skeuomorphic presets
       setTheme('dark')
       document.documentElement.classList.add('dark')
-      document.documentElement.classList.remove('liquid-glass', 'theme-3d')
+      document.documentElement.classList.remove('liquid-glass', 'theme-3d', 'skeuomorphic')
     }
 
     try { localStorage.setItem('theme-custom-colors', JSON.stringify(colors)) } catch { /* ignore */ }
@@ -104,7 +109,7 @@ export function ThemeCustomizer() {
     setActivePreset('Cyberpunk')
     setTheme('dark')
     document.documentElement.classList.add('dark')
-    document.documentElement.classList.remove('liquid-glass', 'theme-3d')
+    document.documentElement.classList.remove('liquid-glass', 'theme-3d', 'skeuomorphic')
     try { localStorage.removeItem('theme-custom-colors') } catch { /* ignore */ }
     try { localStorage.removeItem('theme-preset') } catch { /* ignore */ }
   }, [setTheme])
@@ -148,18 +153,23 @@ export function ThemeCustomizer() {
     // Restore theme class only if current theme doesn't already match
     const currentTheme = document.documentElement.classList.contains('theme-3d') ? 'theme-3d'
       : document.documentElement.classList.contains('liquid-glass') ? 'liquid-glass'
+      : document.documentElement.classList.contains('skeuomorphic') ? 'skeuomorphic'
       : document.documentElement.classList.contains('dark') ? 'dark' : null
 
     if (savedPreset && currentTheme === null) {
       const preset = PRESETS.find(p => p.name === savedPreset)
       if (preset?.themeMode === 'liquid-glass') {
         setTheme('liquid-glass')
-        document.documentElement.classList.remove('dark', 'theme-3d')
+        document.documentElement.classList.remove('dark', 'theme-3d', 'skeuomorphic')
         document.documentElement.classList.add('liquid-glass')
       } else if (preset?.themeMode === 'theme-3d') {
         setTheme('theme-3d')
-        document.documentElement.classList.remove('dark', 'liquid-glass')
+        document.documentElement.classList.remove('dark', 'liquid-glass', 'skeuomorphic')
         document.documentElement.classList.add('theme-3d')
+      } else if (preset?.themeMode === 'skeuomorphic') {
+        setTheme('skeuomorphic')
+        document.documentElement.classList.remove('dark', 'liquid-glass', 'theme-3d')
+        document.documentElement.classList.add('skeuomorphic')
       }
     }
   }, [setTheme])
@@ -223,6 +233,7 @@ export function ThemeCustomizer() {
                   const isActive = activePreset === preset.name
                   const isLiquid = preset.themeMode === 'liquid-glass'
                   const is3D = preset.themeMode === 'theme-3d'
+                  const isSkeuo = preset.themeMode === 'skeuomorphic'
                   return (
                     <button
                       key={preset.name}
@@ -244,6 +255,9 @@ export function ThemeCustomizer() {
                       )}
                       {is3D && (
                         <span className="text-[7px] text-[var(--neon-cyan)] font-mono-custom">◈ 3D</span>
+                      )}
+                      {isSkeuo && (
+                        <span className="text-[7px] text-[var(--neon-magenta)] font-mono-custom">☀ CAHAYA</span>
                       )}
                       {isActive && <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full bg-[var(--neon-cyan)]" />}
                     </button>

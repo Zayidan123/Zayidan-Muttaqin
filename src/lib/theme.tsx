@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 
-export type Theme = 'light' | 'dark' | 'theme-3d' | 'liquid-glass'
+export type Theme = 'light' | 'dark' | 'theme-3d' | 'liquid-glass' | 'skeuomorphic'
 
 interface ThemeContextValue {
   theme: Theme
@@ -11,7 +11,7 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined)
 const STORAGE_KEY = 'theme'
-const THEMES: Theme[] = ['light', 'dark', 'theme-3d', 'liquid-glass']
+const THEMES: Theme[] = ['light', 'dark', 'theme-3d', 'liquid-glass', 'skeuomorphic']
 
 function applyThemeClass(theme: Theme) {
   const html = document.documentElement
@@ -23,6 +23,8 @@ function applyThemeClass(theme: Theme) {
     html.classList.add('theme-3d')
   } else if (theme === 'liquid-glass') {
     html.classList.add('liquid-glass')
+  } else if (theme === 'skeuomorphic') {
+    html.classList.add('skeuomorphic')
   }
 }
 

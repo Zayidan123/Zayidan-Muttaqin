@@ -24,19 +24,20 @@ export function ThemeToggle() {
   }
 
   const handleToggle = () => {
-    // If currently in a special theme (3D, liquid-glass), clear the preset
+    // If currently in a special theme (3D, liquid-glass, skeuomorphic), clear the preset
     // so ThemeCustomizer won't re-apply it
-    if (theme === 'theme-3d' || theme === 'liquid-glass') {
+    if (theme === 'theme-3d' || theme === 'liquid-glass' || theme === 'skeuomorphic') {
       try { localStorage.removeItem('theme-preset') } catch { /* ignore */ }
     }
 
     // Determine target: switch between dark and light
-    const targetTheme = theme === 'light' ? 'dark' : 'light'
+    // skeuomorphic is a light theme, so toggling goes to dark
+    const targetTheme = (theme === 'light' || theme === 'skeuomorphic') ? 'dark' : 'light'
 
     // Theme transition overlay
     const overlay = document.createElement('div')
     overlay.id = 'theme-transition-overlay'
-    const overlayBg = targetTheme === 'light' ? '#ffffff' : '#050510'
+    const overlayBg = (targetTheme === 'light') ? '#ffffff' : '#050510'
     Object.assign(overlay.style, {
       position: 'fixed', inset: '0', zIndex: '9999',
       background: overlayBg, pointerEvents: 'none', opacity: '0',
@@ -49,12 +50,12 @@ export function ThemeToggle() {
     anim.onfinish = () => overlay.remove()
 
     // Clean up special theme classes
-    document.documentElement.classList.remove('theme-3d', 'liquid-glass')
+    document.documentElement.classList.remove('theme-3d', 'liquid-glass', 'skeuomorphic')
 
     setTheme(targetTheme)
   }
 
-  const isDark = theme !== 'light'
+  const isDark = theme !== 'light' && theme !== 'skeuomorphic'
 
   return (
     <button
