@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { useTheme, type Theme } from '@/lib/theme'
 import { useLanguageStore } from '@/store/language-store'
 import { useToastStore } from '@/store/toast-store'
+import { playThemeSwitchSound } from '@/lib/theme-sound'
 
 // Module-level flag — CommandPalette sets this to true when open
 let _commandPaletteOpen = false
@@ -59,6 +60,8 @@ export function useKeyboardShortcuts() {
             const label = themeLabels[nextTheme]
             const message = lang === 'en' ? `${label.emoji} ${label.en}` : `${label.emoji} ${label.id}`
             addToast(message, 'info')
+            // Play theme switch sound effect (chime per theme)
+            playThemeSwitchSound(nextTheme)
           }
           break
         case 'l':
@@ -79,6 +82,7 @@ export function useKeyboardShortcuts() {
       }
 
       // Alt+1..5: quick switch to specific theme (no conflict with 1-4 section nav)
+      // Alt+Q: open QR code share modal
       if (e.altKey && !e.metaKey && !e.ctrlKey) {
         const themeMap: Record<string, Theme> = {
           '1': 'dark',
@@ -110,6 +114,13 @@ export function useKeyboardShortcuts() {
           const label = themeLabels[target]
           const message = lang === 'en' ? `${label.emoji} ${label.en}` : `${label.emoji} ${label.id}`
           addToast(message, 'info')
+          // Play theme switch sound effect
+          playThemeSwitchSound(target)
+        }
+        // Alt+Q: open QR modal
+        if (e.key.toLowerCase() === 'q') {
+          e.preventDefault()
+          window.dispatchEvent(new CustomEvent('theme:open-qr'))
         }
       }
     }

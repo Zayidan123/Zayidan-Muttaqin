@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Palette, X, RotateCcw, Star, Download, Upload, Share2, Clock, QrCode, BarChart3 } from 'lucide-react'
+import { Palette, X, RotateCcw, Star, Download, Upload, Share2, Clock, QrCode, BarChart3, Volume2, VolumeX } from 'lucide-react'
 import QRCode from 'qrcode'
 import { useTheme, getRecentThemes, getShareableThemeUrl, getThemeUsage, getMostUsedTheme, type Theme } from '@/lib/theme'
 import { useToastStore } from '@/store/toast-store'
+import { isThemeSoundEnabled, setThemeSoundEnabled } from '@/lib/theme-sound'
 
 interface Preset {
   name: string
@@ -60,6 +61,7 @@ export function ThemeCustomizer() {
   const [themeUsage, setThemeUsage] = useState<Record<Theme, number>>({} as Record<Theme, number>)
   const [qrModalOpen, setQrModalOpen] = useState(false)
   const [qrDataUrl, setQrDataUrl] = useState<string>('')
+  const [soundEnabled, setSoundEnabled] = useState(true)
   const panelRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const hasAppliedInitialTheme = useRef(false)
@@ -80,6 +82,8 @@ export function ThemeCustomizer() {
       setRecentThemes(getRecentThemes())
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setThemeUsage(getThemeUsage())
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSoundEnabled(isThemeSoundEnabled())
     } catch { /* ignore */ }
   }, [])
 
@@ -127,6 +131,14 @@ export function ThemeCustomizer() {
     setRecentThemes(getRecentThemes())
     setThemeUsage(getThemeUsage())
   }, [setTheme])
+
+  // Toggle theme switch sound effect
+  const toggleSound = useCallback(() => {
+    const next = !soundEnabled
+    setSoundEnabled(next)
+    setThemeSoundEnabled(next)
+    addToast(next ? '🔊 Suara tema dinyakkan' : '🔇 Suara tema dimatikan', 'info')
+  }, [soundEnabled, addToast])
 
   // Generate QR code for current theme (mobile-friendly sharing)
   const openQrModal = useCallback(() => {
@@ -373,6 +385,14 @@ export function ThemeCustomizer() {
             <span className="text-sm font-display font-bold text-[var(--text-primary)] tracking-wider">THEME</span>
             <div className="flex items-center gap-1.5">
               <button
+                onClick={toggleSound}
+                className={`w-6 h-6 rounded-md flex items-center justify-center transition-colors cursor-pointer ${soundEnabled ? 'text-[var(--neon-cyan)]' : 'text-[var(--text-secondary)]'}`}
+                title={soundEnabled ? 'Matikan suara tema' : 'Nyalakan suara tema'}
+                aria-label="Toggle theme sound"
+              >
+                {soundEnabled ? <Volume2 className="h-3 w-3" /> : <VolumeX className="h-3 w-3" />}
+              </button>
+              <button
                 onClick={openQrModal}
                 className="w-6 h-6 rounded-md flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--neon-cyan)] transition-colors cursor-pointer"
                 title="QR code untuk share via mobile"
@@ -563,6 +583,48 @@ export function ThemeCustomizer() {
                     <span className="text-[9px] font-mono-custom text-[var(--neon-cyan)]">{mostUsed.count}x dipakai</span>
                   </div>
                   <p className="text-[8px] font-mono-custom text-[var(--text-secondary)]/60 mt-1">{totalSwitches}x total pergantian tema</p>
+
+                  {/* Theme usage bar chart — horizontal bars per theme */}
+                  {(() => {
+                    const themeLabels: Record<Theme, { id: string; emoji: string; color: string }> = {
+                      dark: { id: 'Gelap', emoji: '🌙', color: '#00F5FF' },
+                      light: { id: 'Terang', emoji: '☀️', color: '#0080FF' },
+                      skeuomorphic: { id: 'Cahaya', emoji: '✨', color: '#D4A24C' },
+                      'liquid-glass': { id: 'Liquid', emoji: '💧', color: '#C8A0FF' },
+                      'theme-3d': { id: '3D', emoji: '🧊', color: '#A78BFA' },
+                    }
+                    const entries = (Object.keys(themeLabels) as Theme[]).map(t => ({
+                      theme: t,
+                      count: themeUsage[t] || 0,
+                    })).filter(e => e.count > 0).sort((a, b) => b.count - a.count)
+                    const maxCount = Math.max(...entries.map(e => e.count), 1)
+                    if (entries.length === 0) return null
+                    return (
+                      <div className="mt-3 space-y-1.5">
+                        <p className="text-[8px] font-mono-custom text-[var(--text-secondary)]/60 uppercase tracking-wider">Distribusi</p>
+                        {entries.map(e => {
+                          const label = themeLabels[e.theme]
+                          const pct = (e.count / maxCount) * 100
+                          return (
+                            <div key={e.theme} className="flex items-center gap-1.5">
+                              <span className="text-[10px] w-3 text-center">{label.emoji}</span>
+                              <div className="flex-1 h-2 rounded-full bg-[var(--glass-bg)]/40 overflow-hidden">
+                                <div
+                                  className="h-full rounded-full transition-all duration-500"
+                                  style={{
+                                    width: `${pct}%`,
+                                    background: `linear-gradient(90deg, ${label.color}, ${label.color}88)`,
+                                    boxShadow: `0 0 4px ${label.color}66`,
+                                  }}
+                                />
+                              </div>
+                              <span className="text-[8px] font-mono-custom text-[var(--text-secondary)] w-5 text-right">{e.count}</span>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )
+                  })()}
                 </div>
               )
             })()}

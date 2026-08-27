@@ -71,7 +71,7 @@ export function KeyboardShortcutsHint() {
             {/* Quick Theme Switch Alt+1..5 */}
             <div className="pt-1 border-t border-[var(--glass-border)]">
               <span className="text-[10px] text-[var(--text-secondary)] block mb-1.5">{t('shortcuts.quickTheme')}</span>
-              <div className="flex gap-1.5">
+              <div className="flex gap-1.5 flex-wrap items-center">
                 {['⌥1', '⌥2', '⌥3', '⌥4', '⌥5'].map((key) => (
                   <kbd
                     key={key}
@@ -81,6 +81,12 @@ export function KeyboardShortcutsHint() {
                     {key}
                   </kbd>
                 ))}
+                <kbd
+                  className="inline-flex items-center justify-center h-6 min-w-[28px] px-1.5 rounded-md text-[9px] font-mono-custom text-[var(--neon-magenta)] border border-[var(--neon-magenta)]/20 bg-[var(--neon-magenta)]/5"
+                  title="Buka QR code share modal"
+                >
+                  ⌥Q
+                </kbd>
               </div>
             </div>
 
