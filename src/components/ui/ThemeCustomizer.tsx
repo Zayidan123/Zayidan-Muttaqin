@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Palette, X, RotateCcw } from 'lucide-react'
+import { Palette, X, RotateCcw, Star } from 'lucide-react'
 import { useTheme } from '@/lib/theme'
 
 interface Preset {
@@ -52,9 +52,34 @@ export function ThemeCustomizer() {
   // Initialize from localStorage (runs once during mount)
   const [activeColors, setActiveColors] = useState<Record<string, string>>({})
   const [activePreset, setActivePreset] = useState<string | null>(null)
+  const [favorites, setFavorites] = useState<string[]>([])
   const panelRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const hasAppliedInitialTheme = useRef(false)
+
+  // Load favorites from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('theme-favorites')
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed)) {
+          // eslint-disable-next-line react-hooks/set-state-in-effect
+          setFavorites(parsed)
+        }
+      }
+    } catch { /* ignore */ }
+  }, [])
+
+  const toggleFavorite = useCallback((presetName: string) => {
+    setFavorites(prev => {
+      const next = prev.includes(presetName)
+        ? prev.filter(n => n !== presetName)
+        : [...prev, presetName]
+      try { localStorage.setItem('theme-favorites', JSON.stringify(next)) } catch { /* ignore */ }
+      return next
+    })
+  }, [])
 
   const handleToggle = useCallback(() => {
     setOpen((prev) => !prev)
@@ -229,27 +254,49 @@ export function ThemeCustomizer() {
 
           <div className="space-y-4">
             <div>
-              <p className="text-[10px] font-mono-custom text-[var(--text-secondary)] mb-2 tracking-wider uppercase">Presets</p>
-              <div className="grid grid-cols-3 gap-1.5">
-                {PRESETS.map((preset) => {
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[10px] font-mono-custom text-[var(--text-secondary)] tracking-wider uppercase">Presets</p>
+                {favorites.length > 0 && (
+                  <span className="text-[9px] font-mono-custom text-[var(--neon-cyan)]/70">{favorites.length} ★</span>
+                )}
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {[...PRESETS].sort((a, b) => {
+                  // Favorites pinned to top
+                  const aFav = favorites.includes(a.name) ? 0 : 1
+                  const bFav = favorites.includes(b.name) ? 0 : 1
+                  return aFav - bFav
+                }).map((preset) => {
                   const isActive = activePreset === preset.name
                   const isLiquid = preset.themeMode === 'liquid-glass'
                   const is3D = preset.themeMode === 'theme-3d'
                   const isSkeuo = preset.themeMode === 'skeuomorphic'
+                  const isFav = favorites.includes(preset.name)
                   return (
                     <button
                       key={preset.name}
                       onClick={() => applyPreset(preset)}
-                      className={`group relative rounded-lg border p-1.5 text-center transition-all duration-200 cursor-pointer overflow-hidden ${
-                        isActive ? 'border-[var(--neon-cyan)]/60 shadow-[0_0_10px_var(--neon-cyan)]' : 'border-[var(--glass-border)] hover:border-[var(--glass-border)]/80'
-                      }`}
+                      className={`group relative rounded-lg border p-2 text-center transition-all duration-200 cursor-pointer overflow-hidden hover:scale-[1.04] hover:z-10 ${
+                        isActive ? 'border-[var(--neon-cyan)]/60 shadow-[0_0_12px_var(--neon-cyan)]' : 'border-[var(--glass-border)] hover:border-[var(--neon-cyan)]/40 hover:shadow-[0_0_8px_var(--neon-cyan)]/40'
+                      } ${isFav ? 'ring-1 ring-[var(--neon-cyan)]/30' : ''}`}
                     >
                       {/* Mini preview thumbnail — shows theme background character */}
                       <div
-                        className="absolute inset-0 opacity-50 group-hover:opacity-70 transition-opacity"
+                        className="absolute inset-0 opacity-50 group-hover:opacity-80 transition-opacity"
                         style={{ background: preset.previewBg }}
                         aria-hidden="true"
                       />
+                      {/* Favorite star button (top-left, click to toggle) */}
+                      <span
+                        role="button"
+                        tabIndex={0}
+                        onClick={(e) => { e.stopPropagation(); toggleFavorite(preset.name) }}
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); toggleFavorite(preset.name) } }}
+                        className={`absolute top-0.5 left-0.5 z-20 w-4 h-4 flex items-center justify-center rounded transition-all cursor-pointer ${isFav ? 'text-[var(--neon-cyan)] opacity-100' : 'text-[var(--text-secondary)] opacity-0 group-hover:opacity-60 hover:!opacity-100'}`}
+                        aria-label={isFav ? `Unstar ${preset.name}` : `Star ${preset.name}`}
+                      >
+                        <Star className={`h-2.5 w-2.5 ${isFav ? 'fill-current' : ''}`} />
+                      </span>
                       {/* Color dots overlay (kept for accent reference) */}
                       <div className="relative flex gap-0.5 mb-1 justify-center">
                         <span className="w-3 h-3 rounded-full ring-1 ring-black/20" style={{ backgroundColor: preset.cyan }} />
@@ -260,15 +307,15 @@ export function ThemeCustomizer() {
                         {preset.name}
                       </span>
                       {isLiquid && (
-                        <span className="text-[7px] text-[var(--neon-purple)] font-mono-custom">✦ NEW</span>
+                        <span className="relative text-[7px] text-[var(--neon-purple)] font-mono-custom">✦ NEW</span>
                       )}
                       {is3D && (
-                        <span className="text-[7px] text-[var(--neon-cyan)] font-mono-custom">◈ 3D</span>
+                        <span className="relative text-[7px] text-[var(--neon-cyan)] font-mono-custom">◈ 3D</span>
                       )}
                       {isSkeuo && (
-                        <span className="text-[7px] text-[var(--neon-magenta)] font-mono-custom">☀ CAHAYA</span>
+                        <span className="relative text-[7px] text-[var(--neon-magenta)] font-mono-custom">☀ CAHAYA</span>
                       )}
-                      {isActive && <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full bg-[var(--neon-cyan)]" />}
+                      {isActive && <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full bg-[var(--neon-cyan)] z-20" />}
                     </button>
                   )
                 })}

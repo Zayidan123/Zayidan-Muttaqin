@@ -62,10 +62,26 @@ export function KeyboardShortcutsHint() {
           </div>
 
           <div className="space-y-2">
-            {/* Theme */}
+            {/* Theme Cycle */}
             <div className="flex items-center justify-between">
               <span className="text-[10px] text-[var(--text-secondary)]">{t('shortcuts.theme')}</span>
               <kbd className="inline-flex items-center justify-center h-6 min-w-[24px] px-1.5 rounded-md text-[10px] font-mono-custom text-[var(--neon-cyan)] border border-[var(--neon-cyan)]/20 bg-[var(--neon-cyan)]/5">T</kbd>
+            </div>
+
+            {/* Quick Theme Switch Alt+1..5 */}
+            <div className="pt-1 border-t border-[var(--glass-border)]">
+              <span className="text-[10px] text-[var(--text-secondary)] block mb-1.5">{t('shortcuts.quickTheme')}</span>
+              <div className="flex gap-1.5">
+                {['⌥1', '⌥2', '⌥3', '⌥4', '⌥5'].map((key) => (
+                  <kbd
+                    key={key}
+                    className="inline-flex items-center justify-center h-6 min-w-[28px] px-1.5 rounded-md text-[9px] font-mono-custom text-[var(--neon-cyan)] border border-[var(--neon-cyan)]/20 bg-[var(--neon-cyan)]/5"
+                    title={key === '⌥1' ? 'Dark' : key === '⌥2' ? 'Light' : key === '⌥3' ? 'Skeuomorphic' : key === '⌥4' ? 'Liquid Glass' : '3D World'}
+                  >
+                    {key}
+                  </kbd>
+                ))}
+              </div>
             </div>
 
             {/* Language */}

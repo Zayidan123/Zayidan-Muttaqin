@@ -77,6 +77,41 @@ export function useKeyboardShortcuts() {
           document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
           break
       }
+
+      // Alt+1..5: quick switch to specific theme (no conflict with 1-4 section nav)
+      if (e.altKey && !e.metaKey && !e.ctrlKey) {
+        const themeMap: Record<string, Theme> = {
+          '1': 'dark',
+          '2': 'light',
+          '3': 'skeuomorphic',
+          '4': 'liquid-glass',
+          '5': 'theme-3d',
+        }
+        const target = themeMap[e.key]
+        if (target) {
+          e.preventDefault()
+          setTheme(target)
+          const html = document.documentElement
+          html.classList.remove('dark', 'light', 'theme-3d', 'liquid-glass', 'skeuomorphic')
+          if (target === 'dark') html.classList.add('dark')
+          else if (target === 'theme-3d') html.classList.add('theme-3d')
+          else if (target === 'liquid-glass') html.classList.add('liquid-glass')
+          else if (target === 'skeuomorphic') html.classList.add('skeuomorphic')
+          try { localStorage.removeItem('theme-preset') } catch { /* ignore */ }
+
+          const themeLabels: Record<Theme, { id: string; en: string; emoji: string }> = {
+            dark: { id: 'Tema Gelap', en: 'Dark Theme', emoji: '🌙' },
+            light: { id: 'Tema Terang', en: 'Light Theme', emoji: '☀️' },
+            skeuomorphic: { id: 'Skeuomorfisme Cahaya', en: 'Light Skeuomorphism', emoji: '✨' },
+            'liquid-glass': { id: 'Liquid Glass', en: 'Liquid Glass', emoji: '💧' },
+            'theme-3d': { id: 'Dunia 3D', en: '3D World', emoji: '🧊' },
+          }
+          const lang = typeof localStorage !== 'undefined' ? (localStorage.getItem('lang') as 'id' | 'en' | null) || 'id' : 'id'
+          const label = themeLabels[target]
+          const message = lang === 'en' ? `${label.emoji} ${label.en}` : `${label.emoji} ${label.id}`
+          addToast(message, 'info')
+        }
+      }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
