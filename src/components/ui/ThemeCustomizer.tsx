@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Palette, X, RotateCcw, Star, Download, Upload } from 'lucide-react'
-import { useTheme } from '@/lib/theme'
+import { Palette, X, RotateCcw, Star, Download, Upload, Share2, Clock } from 'lucide-react'
+import { useTheme, getRecentThemes, getShareableThemeUrl, type Theme } from '@/lib/theme'
 import { useToastStore } from '@/store/toast-store'
 
 interface Preset {
@@ -55,11 +55,12 @@ export function ThemeCustomizer() {
   const [activeColors, setActiveColors] = useState<Record<string, string>>({})
   const [activePreset, setActivePreset] = useState<string | null>(null)
   const [favorites, setFavorites] = useState<string[]>([])
+  const [recentThemes, setRecentThemes] = useState<Theme[]>([])
   const panelRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const hasAppliedInitialTheme = useRef(false)
 
-  // Load favorites from localStorage on mount
+  // Load favorites & recent from localStorage on mount
   useEffect(() => {
     try {
       const saved = localStorage.getItem('theme-favorites')
@@ -70,6 +71,9 @@ export function ThemeCustomizer() {
           setFavorites(parsed)
         }
       }
+      // Load recently used themes
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setRecentThemes(getRecentThemes())
     } catch { /* ignore */ }
   }, [])
 
@@ -82,6 +86,40 @@ export function ThemeCustomizer() {
       return next
     })
   }, [])
+
+  // Share current theme via URL (?theme=xxx) — copy to clipboard
+  const shareCurrentTheme = useCallback(() => {
+    try {
+      const currentTheme = (localStorage.getItem('theme') as Theme) || 'dark'
+      const shareUrl = getShareableThemeUrl(currentTheme)
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          addToast('🔗 Tautan tema disalin ke clipboard', 'success')
+        }).catch(() => {
+          // Fallback: select-then-prompt
+          window.prompt('Salin tautan tema ini:', shareUrl)
+        })
+      } else {
+        window.prompt('Salin tautan tema ini:', shareUrl)
+      }
+    } catch {
+      addToast('Gagal membuat tautan tema', 'error')
+    }
+  }, [addToast])
+
+  // Quick switch to a recently used theme
+  const switchToRecent = useCallback((theme: Theme) => {
+    setTheme(theme)
+    const html = document.documentElement
+    html.classList.remove('dark', 'light', 'theme-3d', 'liquid-glass', 'skeuomorphic')
+    if (theme === 'dark') html.classList.add('dark')
+    else if (theme === 'theme-3d') html.classList.add('theme-3d')
+    else if (theme === 'liquid-glass') html.classList.add('liquid-glass')
+    else if (theme === 'skeuomorphic') html.classList.add('skeuomorphic')
+    try { localStorage.removeItem('theme-preset') } catch { /* ignore */ }
+    // Refresh recent list
+    setRecentThemes(getRecentThemes())
+  }, [setTheme])
 
   // Export all theme settings (theme, favorites, custom colors, preset) as downloadable JSON
   const exportSettings = useCallback(() => {
@@ -292,6 +330,14 @@ export function ThemeCustomizer() {
             <span className="text-sm font-display font-bold text-[var(--text-primary)] tracking-wider">THEME</span>
             <div className="flex items-center gap-1.5">
               <button
+                onClick={shareCurrentTheme}
+                className="w-6 h-6 rounded-md flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--neon-cyan)] transition-colors cursor-pointer"
+                title="Share current theme via URL"
+                aria-label="Share theme"
+              >
+                <Share2 className="h-3 w-3" />
+              </button>
+              <button
                 onClick={exportSettings}
                 className="w-6 h-6 rounded-md flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--neon-cyan)] transition-colors cursor-pointer"
                 title="Export settings as JSON"
@@ -400,6 +446,44 @@ export function ThemeCustomizer() {
                 })}
               </div>
             </div>
+
+            {/* Recently Used Themes — quick access to last 4 themes used */}
+            {recentThemes.length > 1 && (
+              <div className="border-t border-[var(--glass-border)] pt-3">
+                <div className="flex items-center gap-1.5 mb-2">
+                  <Clock className="h-2.5 w-2.5 text-[var(--text-secondary)]" />
+                  <p className="text-[10px] font-mono-custom text-[var(--text-secondary)] tracking-wider uppercase">Baru Digunakan</p>
+                </div>
+                <div className="flex gap-1.5 flex-wrap">
+                  {recentThemes.map((t) => {
+                    const labels: Record<Theme, { id: string; emoji: string; bg: string }> = {
+                      dark: { id: 'Gelap', emoji: '🌙', bg: 'linear-gradient(135deg, #0A0A0F, #1A1A2E)' },
+                      light: { id: 'Terang', emoji: '☀️', bg: 'linear-gradient(135deg, #F0F4FF, #FFFFFF)' },
+                      skeuomorphic: { id: 'Cahaya', emoji: '✨', bg: 'linear-gradient(135deg, #F6F1E7, #E8DFCD)' },
+                      'liquid-glass': { id: 'Liquid', emoji: '💧', bg: 'linear-gradient(135deg, #f3e8ff, #e0f2f1)' },
+                      'theme-3d': { id: '3D', emoji: '🧊', bg: 'linear-gradient(135deg, #050510, #1a0a3a)' },
+                    }
+                    const label = labels[t]
+                    return (
+                      <button
+                        key={t}
+                        onClick={() => switchToRecent(t)}
+                        className="group flex items-center gap-1 px-2 py-1 rounded-md border border-[var(--glass-border)] hover:border-[var(--neon-cyan)]/40 transition-all cursor-pointer overflow-hidden relative"
+                        title={`Switch to ${label.id}`}
+                      >
+                        <span
+                          className="absolute inset-0 opacity-40 group-hover:opacity-70 transition-opacity"
+                          style={{ background: label.bg }}
+                          aria-hidden="true"
+                        />
+                        <span className="relative text-[10px]">{label.emoji}</span>
+                        <span className="relative text-[9px] font-mono-custom text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">{label.id}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
 
             <div className="border-t border-[var(--glass-border)] pt-3">
               <p className="text-[10px] font-mono-custom text-[var(--text-secondary)] mb-2 tracking-wider uppercase">Custom Colors</p>
