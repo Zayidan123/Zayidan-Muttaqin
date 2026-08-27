@@ -3,7 +3,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Home, User, Briefcase, Mail, Sun, Moon, Globe, Download, ArrowUp, Search, HelpCircle, Trophy, Cpu, Eye, Github } from 'lucide-react'
+import { Home, User, Briefcase, Mail, Sun, Moon, Globe, Download, ArrowUp, Search, HelpCircle, Trophy, Cpu, Eye, Github, Palette, Sparkles, Layers, Box } from 'lucide-react'
 import { useLanguageStore } from '@/store/language-store'
 import { useTheme } from '@/lib/theme'
 import { useToastStore } from '@/store/toast-store'
@@ -24,6 +24,17 @@ export function CommandPalette() {
 
   const scrollTo = useCallback((id: string) => { document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }) }, [])
 
+  const applyTheme = useCallback((nextTheme: 'dark' | 'light' | 'skeuomorphic' | 'liquid-glass' | 'theme-3d') => {
+    const html = document.documentElement
+    html.classList.remove('dark', 'light', 'theme-3d', 'liquid-glass', 'skeuomorphic')
+    if (nextTheme === 'dark') html.classList.add('dark')
+    else if (nextTheme === 'theme-3d') html.classList.add('theme-3d')
+    else if (nextTheme === 'liquid-glass') html.classList.add('liquid-glass')
+    else if (nextTheme === 'skeuomorphic') html.classList.add('skeuomorphic')
+    setTheme(nextTheme)
+    try { localStorage.removeItem('theme-preset') } catch { /* ignore */ }
+  }, [setTheme])
+
   const commands: Cmd[] = [
     { id: 'hero', labelKey: 'commandPalette.goHero', group: 'commandPalette.navGroup', icon: Home, shortcut: '1', action: () => scrollTo('hero') },
     { id: 'about', labelKey: 'commandPalette.goAbout', group: 'commandPalette.navGroup', icon: User, shortcut: '2', action: () => scrollTo('about') },
@@ -33,7 +44,17 @@ export function CommandPalette() {
     { id: 'contact', labelKey: 'commandPalette.goContact', group: 'commandPalette.navGroup', icon: Mail, shortcut: '5', action: () => scrollTo('contact') },
     { id: 'techstack', labelKey: 'commandPalette.goTechstack', group: 'commandPalette.navGroup', icon: Cpu, action: () => scrollTo('techstack') },
     { id: 'achievements', labelKey: 'commandPalette.goAchievements', group: 'commandPalette.navGroup', icon: Trophy, action: () => scrollTo('achievements') },
-    { id: 'theme', labelKey: 'commandPalette.toggleTheme', group: 'commandPalette.actionsGroup', icon: theme === 'dark' ? Sun : Moon, shortcut: 'T', action: () => { setTheme(theme === 'dark' ? 'light' : 'dark') } },
+    { id: 'theme', labelKey: 'commandPalette.toggleTheme', group: 'commandPalette.actionsGroup', icon: Palette, shortcut: 'T', action: () => {
+      const cycle = ['dark', 'light', 'skeuomorphic', 'liquid-glass', 'theme-3d'] as const
+      const idx = cycle.indexOf(theme as typeof cycle[number])
+      const next = cycle[(idx + 1) % cycle.length]
+      applyTheme(next)
+    } },
+    { id: 'theme-dark', labelKey: 'commandPalette.themeDark', group: 'commandPalette.themesGroup', icon: Moon, action: () => applyTheme('dark') },
+    { id: 'theme-light', labelKey: 'commandPalette.themeLight', group: 'commandPalette.themesGroup', icon: Sun, action: () => applyTheme('light') },
+    { id: 'theme-skeuomorphic', labelKey: 'commandPalette.themeSkeuomorphic', group: 'commandPalette.themesGroup', icon: Sparkles, action: () => applyTheme('skeuomorphic') },
+    { id: 'theme-liquid-glass', labelKey: 'commandPalette.themeLiquidGlass', group: 'commandPalette.themesGroup', icon: Layers, action: () => applyTheme('liquid-glass') },
+    { id: 'theme-3d', labelKey: 'commandPalette.theme3D', group: 'commandPalette.themesGroup', icon: Box, action: () => applyTheme('theme-3d') },
     { id: 'lang', labelKey: 'commandPalette.switchLang', group: 'commandPalette.actionsGroup', icon: Globe, shortcut: 'L', action: () => { toggleLang(); addToast(lang === 'id' ? 'Switched to English' : 'Beralih ke Bahasa Indonesia', 'info') } },
     { id: 'read-cv', labelKey: 'commandPalette.readCV', group: 'commandPalette.actionsGroup', icon: Eye, shortcut: 'V', action: () => setCvOpen(true) },
     { id: 'cv', labelKey: 'commandPalette.downloadCV', group: 'commandPalette.actionsGroup', icon: Download, action: () => { const a = document.createElement('a'); a.href = lang === 'en' ? '/CV_ZAYIDAN_MUTTAQIN_EN.pdf' : '/CV_ZAYIDAN_MUTTAQIN.pdf'; a.download = lang === 'en' ? 'CV_ZAYIDAN_MUTTAQIN_EN.pdf' : 'CV_ZAYIDAN_MUTTAQIN.pdf'; a.click() } },
@@ -63,6 +84,7 @@ export function CommandPalette() {
 
   const grouped = [
     { label: t('commandPalette.navGroup'), items: filtered.filter(c => c.group === 'commandPalette.navGroup') },
+    { label: t('commandPalette.themesGroup'), items: filtered.filter(c => c.group === 'commandPalette.themesGroup') },
     { label: t('commandPalette.actionsGroup'), items: filtered.filter(c => c.group === 'commandPalette.actionsGroup') },
   ].filter(g => g.items.length > 0)
 

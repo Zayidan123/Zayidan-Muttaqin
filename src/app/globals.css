@@ -1986,6 +1986,14 @@ html {
   border: 1px solid rgba(120, 100, 70, 0.10);
 }
 
+/* FIX: Override inline gradient on skill bar fill (hardcoded cyan neon)
+   The About component sets: linear-gradient(90deg, var(--neon-cyan), rgba(0,245,255,0.4))
+   This replaces it with a warm amber gradient matching the skeuomorphic theme. */
+.skeuomorphic .skill-bar-track > * {
+  background: linear-gradient(90deg, #C8932E 0%, #D4A24C 60%, #B8862E 100%) !important;
+  box-shadow: 0 1px 0 rgba(255, 252, 245, 0.4) inset, 0 0 8px rgba(184, 134, 46, 0.25);
+}
+
 /* --- Skeuomorphic soft-skill tags (pills, raised) --- */
 .skeuomorphic .soft-skill-tag {
   background: linear-gradient(180deg, #FCFAF5 0%, #ECE3D1 100%) !important;
@@ -2224,6 +2232,175 @@ html {
   .skeuomorphic .ripple-effect:hover {
     transform: none;
   }
+}
+
+/* ============================================================ */
+/* ===== SKEUOMORFISME CAHAYA — STYLING DETAILS (Round 2) ===== */
+/* ============================================================ */
+
+/* --- Skeuomorphic FAQ accordion (override cyan glow on open) --- */
+.skeuomorphic #faq .rounded-xl.glass {
+  background: linear-gradient(160deg, rgba(252, 250, 245, 0.95) 0%, rgba(243, 236, 224, 0.90) 100%) !important;
+  border: 1px solid rgba(255, 252, 245, 0.6) !important;
+  box-shadow: var(--skeu-raised) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.skeuomorphic #faq .rounded-xl.glass[class*="border-[var(--neon-cyan)"] {
+  border-color: rgba(184, 134, 46, 0.35) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 252, 245, 1) inset,
+    0 12px 28px rgba(184, 134, 46, 0.18),
+    0 0 0 1px rgba(184, 134, 46, 0.16) !important;
+}
+.skeuomorphic #faq button[aria-expanded="true"] span {
+  color: #8C6A2E !important;
+  text-shadow: 0 1px 0 rgba(255, 252, 245, 0.6);
+}
+.skeuomorphic #faq button[aria-expanded="true"] svg {
+  color: #B8862E !important;
+}
+
+/* --- Skeuomorphic TechStack orbit (warm gold rings instead of cyan) --- */
+.skeuomorphic .tech-3d-orbit-outer,
+.skeuomorphic .tech-3d-orbit-inner {
+  border-color: rgba(184, 134, 46, 0.22) !important;
+}
+.skeuomorphic .tech-3d-center-core {
+  background: radial-gradient(circle, rgba(212, 162, 76, 0.45) 0%, rgba(184, 134, 46, 0.15) 60%, transparent 100%) !important;
+  box-shadow:
+    0 0 24px rgba(184, 134, 46, 0.3),
+    0 1px 0 rgba(255, 252, 245, 0.6) inset !important;
+}
+.skeuomorphic .tech-3d-item {
+  background: linear-gradient(180deg, rgba(252, 250, 245, 0.95) 0%, rgba(232, 217, 184, 0.85) 100%) !important;
+  border: 1px solid rgba(184, 134, 46, 0.25) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 252, 245, 0.9) inset,
+    0 -1px 0 rgba(120, 100, 70, 0.08) inset,
+    0 4px 10px rgba(120, 100, 70, 0.14) !important;
+  color: #5A4A2E !important;
+}
+.skeuomorphic .tech-3d-item:hover {
+  box-shadow:
+    0 1px 0 rgba(255, 252, 245, 1) inset,
+    0 8px 18px rgba(184, 134, 46, 0.22),
+    0 0 0 1px rgba(184, 134, 46, 0.30) !important;
+  transform: translateY(-2px);
+}
+
+/* --- Skeuomorphic Projects section --- */
+.skeuomorphic #projects .glass-card-advanced {
+  background: linear-gradient(160deg, rgba(252, 250, 245, 0.96) 0%, rgba(240, 232, 218, 0.92) 100%) !important;
+}
+.skeuomorphic #projects .glass-card-advanced:hover {
+  border-color: rgba(184, 134, 46, 0.28) !important;
+}
+/* Projects corner brackets — warm gold */
+.skeuomorphic #projects [class*="border-[var(--neon-cyan)"] {
+  border-color: rgba(184, 134, 46, 0.5) !important;
+}
+.skeuomorphic #projects [class*="border-[var(--neon-magenta)"] {
+  border-color: rgba(184, 118, 62, 0.5) !important;
+}
+
+/* --- Skeuomorphic Achievements cards --- */
+.skeuomorphic #achievements .glass-card-advanced .text-2xl.font-display {
+  color: #B8862E !important;
+  text-shadow: 0 1px 0 rgba(255, 252, 245, 0.7), 0 2px 6px rgba(184, 134, 46, 0.2);
+}
+.skeuomorphic #achievements .glass-card-advanced:hover .text-2xl.font-display {
+  color: #8C6A2E !important;
+}
+
+/* --- Skeuomorphic Stats section --- */
+.skeuomorphic #stats .text-3xl.font-display,
+.skeuomorphic #stats .text-4xl.font-display {
+  color: #B8862E !important;
+  text-shadow: 0 1px 0 rgba(255, 252, 245, 0.7), 0 2px 8px rgba(184, 134, 46, 0.18);
+}
+
+/* --- Skeuomorphic LoadingScreen (warm amber during initial load) --- */
+.skeuomorphic .glass[style*="rgba(10, 10, 15"] {
+  background: linear-gradient(160deg, rgba(246, 241, 231, 0.97) 0%, rgba(232, 223, 205, 0.97) 100%) !important;
+}
+.skeuomorphic .font-display[style*="text-shadow"][style*="0, 245, 255"] {
+  color: #B8862E !important;
+  text-shadow: 0 0 20px rgba(184, 134, 46, 0.5), 0 0 40px rgba(184, 134, 46, 0.3), 0 0 60px rgba(184, 134, 46, 0.15) !important;
+}
+
+/* --- Skeuomorphic hero name shimmer (stronger warm gradient, more visible) --- */
+.skeuomorphic .hero-name-shimmer {
+  background: linear-gradient(
+    120deg,
+    #3A322A 0%,
+    #8C6A2E 25%,
+    #D4A24C 45%,
+    #C8932E 55%,
+    #8C6A2E 75%,
+    #3A322A 100%
+  ) !important;
+  background-size: 200% auto !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 1px 0 rgba(255, 252, 245, 0.7)) drop-shadow(0 2px 6px rgba(120, 100, 70, 0.15));
+  animation: skeuomorphic-sheen 7s linear infinite !important;
+}
+
+/* --- Skeuomorphic neon pulse ring on avatar/status (warm amber) --- */
+.skeuomorphic .absolute.inset-0.rounded-full[class*="animate-"] {
+  background: radial-gradient(circle, rgba(184, 134, 46, 0.25) 0%, transparent 70%) !important;
+}
+
+/* --- Skeuomorphic tech counter rings (warm gold) --- */
+.skeuomorphic .tech-3d-counter-outer,
+.skeuomorphic .tech-3d-counter-inner {
+  background: linear-gradient(180deg, rgba(252, 250, 245, 0.6) 0%, rgba(232, 217, 184, 0.4) 100%) !important;
+  border-color: rgba(184, 134, 46, 0.2) !important;
+  box-shadow: 0 1px 0 rgba(255, 252, 245, 0.7) inset !important;
+}
+
+/* --- Skeuomorphic focus ring on command palette search --- */
+.skeuomorphic .command-palette-dialog input:focus {
+  outline: none;
+  box-shadow: 0 1px 0 rgba(255, 252, 245, 0.6) inset !important;
+}
+
+/* --- Skeuomorphic toast notifications --- */
+.skeuomorphic .glass[class*="fixed"][class*="top-"][class*="right-"],
+.skeuomorphic [class*="toast"] {
+  background: linear-gradient(180deg, rgba(252, 250, 245, 0.96) 0%, rgba(243, 236, 224, 0.93) 100%) !important;
+  border: 1px solid rgba(184, 134, 46, 0.22) !important;
+  box-shadow: var(--skeu-raised-lg) !important;
+  color: var(--text-primary) !important;
+}
+
+/* --- Skeuomorphic section title (warm gold accent text) --- */
+.skeuomorphic .section-divider::before,
+.skeuomorphic h2.font-display {
+  color: var(--text-primary);
+}
+.skeuomorphic h2.font-display {
+  text-shadow: 0 1px 0 rgba(255, 252, 245, 0.85), 0 2px 10px rgba(120, 100, 70, 0.12) !important;
+}
+
+/* --- Skeuomorphic dialog/modal (CvReader, AdminPanel, etc.) --- */
+.skeuomorphic .glass-strong[role="dialog"],
+.skeuomorphic [role="dialog"] > .glass-strong,
+.skeuomorphic dialog .glass-strong {
+  background: linear-gradient(160deg, rgba(255, 253, 248, 0.97) 0%, rgba(243, 236, 224, 0.95) 100%) !important;
+  border: 1px solid rgba(184, 134, 46, 0.2) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 252, 245, 0.95) inset,
+    0 24px 60px rgba(120, 100, 70, 0.28),
+    0 8px 20px rgba(120, 100, 70, 0.16) !important;
+}
+
+/* --- Skeuomorphic progress bar (ScrollProgress at top) --- */
+.skeuomorphic .fixed.top-0.left-0[class*="h-[2px]"],
+.skeuomorphic .fixed.top-0[class*="z-50"][class*="origin-left"] {
+  background: linear-gradient(90deg, #C8932E 0%, #D4A24C 50%, #B8763E 100%) !important;
+  box-shadow: 0 0 8px rgba(184, 134, 46, 0.4) !important;
 }
 
 /* ===== END SKEUOMORFISME CAHAYA ===== */
