@@ -229,8 +229,8 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.json",
   verification: {
-    // Google Search Console verification token
-    google: "1-jUpyPY0B9VHEAHkNYeTlkFhEBfILgxEGfltoFiuIM",
+    // Google Search Console verification token (akun Google yang benar)
+    google: "loAF4KbeERxSYOcajj9WN__AilXKNots0QHVHJyE7jo",
   },
   other: {
     // Additional SEO meta tags
