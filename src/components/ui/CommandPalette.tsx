@@ -3,7 +3,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Home, User, Briefcase, Mail, Sun, Moon, Globe, Download, ArrowUp, Search, HelpCircle, Trophy, Cpu, Eye, Github, Palette, Sparkles, Layers, Box, Upload, FileJson } from 'lucide-react'
+import { Home, User, Briefcase, Mail, Sun, Moon, Globe, Download, ArrowUp, Search, HelpCircle, Trophy, Cpu, Eye, Github, Palette, Sparkles, Layers, Box, Upload, FileJson, QrCode } from 'lucide-react'
 import { useLanguageStore } from '@/store/language-store'
 import { useTheme } from '@/lib/theme'
 import { useToastStore } from '@/store/toast-store'
@@ -104,6 +104,10 @@ export function CommandPalette() {
         reader.readAsText(file)
       }
       input.click()
+    } },
+    { id: 'qr-share', labelKey: 'commandPalette.qrShare', group: 'commandPalette.actionsGroup', icon: QrCode, action: () => {
+      // Trigger QR modal by dispatching event that ThemeCustomizer listens to
+      window.dispatchEvent(new CustomEvent('theme:open-qr'))
     } },
   ]
 

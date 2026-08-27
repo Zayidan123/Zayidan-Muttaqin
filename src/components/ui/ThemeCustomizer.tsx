@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Palette, X, RotateCcw, Star, Download, Upload, Share2, Clock } from 'lucide-react'
-import { useTheme, getRecentThemes, getShareableThemeUrl, type Theme } from '@/lib/theme'
+import { Palette, X, RotateCcw, Star, Download, Upload, Share2, Clock, QrCode, BarChart3 } from 'lucide-react'
+import QRCode from 'qrcode'
+import { useTheme, getRecentThemes, getShareableThemeUrl, getThemeUsage, getMostUsedTheme, type Theme } from '@/lib/theme'
 import { useToastStore } from '@/store/toast-store'
 
 interface Preset {
@@ -56,11 +57,14 @@ export function ThemeCustomizer() {
   const [activePreset, setActivePreset] = useState<string | null>(null)
   const [favorites, setFavorites] = useState<string[]>([])
   const [recentThemes, setRecentThemes] = useState<Theme[]>([])
+  const [themeUsage, setThemeUsage] = useState<Record<Theme, number>>({} as Record<Theme, number>)
+  const [qrModalOpen, setQrModalOpen] = useState(false)
+  const [qrDataUrl, setQrDataUrl] = useState<string>('')
   const panelRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const hasAppliedInitialTheme = useRef(false)
 
-  // Load favorites & recent from localStorage on mount
+  // Load favorites, recent & usage from localStorage on mount
   useEffect(() => {
     try {
       const saved = localStorage.getItem('theme-favorites')
@@ -74,6 +78,8 @@ export function ThemeCustomizer() {
       // Load recently used themes
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setRecentThemes(getRecentThemes())
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setThemeUsage(getThemeUsage())
     } catch { /* ignore */ }
   }, [])
 
@@ -117,9 +123,46 @@ export function ThemeCustomizer() {
     else if (theme === 'liquid-glass') html.classList.add('liquid-glass')
     else if (theme === 'skeuomorphic') html.classList.add('skeuomorphic')
     try { localStorage.removeItem('theme-preset') } catch { /* ignore */ }
-    // Refresh recent list
+    // Refresh recent + usage list
     setRecentThemes(getRecentThemes())
+    setThemeUsage(getThemeUsage())
   }, [setTheme])
+
+  // Generate QR code for current theme (mobile-friendly sharing)
+  const openQrModal = useCallback(() => {
+    try {
+      const currentTheme = (localStorage.getItem('theme') as Theme) || 'dark'
+      const shareUrl = getShareableThemeUrl(currentTheme)
+      QRCode.toDataURL(shareUrl, { width: 200, margin: 1, color: { dark: '#0A0A0F', light: '#FFFFFF' } })
+        .then((url: string) => {
+          setQrDataUrl(url)
+          setQrModalOpen(true)
+        })
+        .catch(() => addToast('Gagal membuat QR code', 'error'))
+    } catch {
+      addToast('Gagal membuat QR code', 'error')
+    }
+  }, [addToast])
+
+  // Download QR code as PNG
+  const downloadQr = useCallback(() => {
+    if (!qrDataUrl) return
+    const a = document.createElement('a')
+    a.href = qrDataUrl
+    a.download = `zayidan-theme-qr-${Date.now()}.png`
+    a.click()
+    addToast('✓ QR code berhasil diunduh', 'success')
+  }, [qrDataUrl, addToast])
+
+  // Listen for 'theme:open-qr' event (from CommandPalette) to open QR modal
+  useEffect(() => {
+    const handler = () => {
+      if (!open) setOpen(true)
+      setTimeout(() => openQrModal(), 100)
+    }
+    window.addEventListener('theme:open-qr', handler)
+    return () => window.removeEventListener('theme:open-qr', handler)
+  }, [open, openQrModal])
 
   // Export all theme settings (theme, favorites, custom colors, preset) as downloadable JSON
   const exportSettings = useCallback(() => {
@@ -330,6 +373,14 @@ export function ThemeCustomizer() {
             <span className="text-sm font-display font-bold text-[var(--text-primary)] tracking-wider">THEME</span>
             <div className="flex items-center gap-1.5">
               <button
+                onClick={openQrModal}
+                className="w-6 h-6 rounded-md flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--neon-cyan)] transition-colors cursor-pointer"
+                title="QR code untuk share via mobile"
+                aria-label="QR code share"
+              >
+                <QrCode className="h-3 w-3" />
+              </button>
+              <button
                 onClick={shareCurrentTheme}
                 className="w-6 h-6 rounded-md flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--neon-cyan)] transition-colors cursor-pointer"
                 title="Share current theme via URL"
@@ -485,6 +536,37 @@ export function ThemeCustomizer() {
               </div>
             )}
 
+            {/* Most Used Theme stat — shows user's theme preference pattern */}
+            {(() => {
+              const mostUsed = getMostUsedTheme()
+              const totalSwitches = Object.values(themeUsage).reduce((a, b) => a + b, 0)
+              if (!mostUsed || totalSwitches < 3) return null
+              const labels: Record<Theme, { id: string; emoji: string }> = {
+                dark: { id: 'Gelap', emoji: '🌙' },
+                light: { id: 'Terang', emoji: '☀️' },
+                skeuomorphic: { id: 'Cahaya', emoji: '✨' },
+                'liquid-glass': { id: 'Liquid', emoji: '💧' },
+                'theme-3d': { id: '3D', emoji: '🧊' },
+              }
+              const label = labels[mostUsed.theme]
+              return (
+                <div className="border-t border-[var(--glass-border)] pt-3">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <BarChart3 className="h-2.5 w-2.5 text-[var(--text-secondary)]" />
+                    <p className="text-[10px] font-mono-custom text-[var(--text-secondary)] tracking-wider uppercase">Tema Favorit</p>
+                  </div>
+                  <div className="flex items-center justify-between p-2 rounded-md border border-[var(--glass-border)] bg-[var(--glass-bg)]/30">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">{label.emoji}</span>
+                      <span className="text-[10px] font-mono-custom text-[var(--text-primary)]">{label.id}</span>
+                    </div>
+                    <span className="text-[9px] font-mono-custom text-[var(--neon-cyan)]">{mostUsed.count}x dipakai</span>
+                  </div>
+                  <p className="text-[8px] font-mono-custom text-[var(--text-secondary)]/60 mt-1">{totalSwitches}x total pergantian tema</p>
+                </div>
+              )
+            })()}
+
             <div className="border-t border-[var(--glass-border)] pt-3">
               <p className="text-[10px] font-mono-custom text-[var(--text-secondary)] mb-2 tracking-wider uppercase">Custom Colors</p>
               <div className="space-y-2">
@@ -511,6 +593,54 @@ export function ThemeCustomizer() {
                 ))}
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* QR Code Modal — for mobile theme sharing */}
+      {qrModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ background: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(4px)' }}
+          onClick={() => setQrModalOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="QR Code untuk share tema"
+        >
+          <div
+            className="bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-2xl p-6 max-w-xs w-[90%] text-center shadow-[0_0_40px_rgba(0,0,0,0.5)]"
+            onClick={(e) => e.stopPropagation()}
+            style={{ background: 'var(--card)' }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-display font-bold text-[var(--text-primary)] tracking-wider">QR TEMA</span>
+              <button
+                onClick={() => setQrModalOpen(false)}
+                className="w-6 h-6 rounded-md flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+                aria-label="Tutup QR modal"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+            {qrDataUrl && (
+              <div className="flex flex-col items-center gap-3">
+                <img
+                  src={qrDataUrl}
+                  alt="QR code untuk share tema"
+                  className="w-44 h-44 rounded-lg border border-[var(--glass-border)] bg-white p-2"
+                />
+                <p className="text-[10px] font-mono-custom text-[var(--text-secondary)] leading-relaxed">
+                  Pindai dengan kamera ponsel untuk membuka portfolio dengan tema yang sama
+                </p>
+                <button
+                  onClick={downloadQr}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-mono-custom bg-[var(--neon-cyan)]/10 border border-[var(--neon-cyan)]/30 text-[var(--neon-cyan)] hover:bg-[var(--neon-cyan)]/20 transition-colors cursor-pointer"
+                >
+                  <Download className="h-3 w-3" />
+                  Unduh QR
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

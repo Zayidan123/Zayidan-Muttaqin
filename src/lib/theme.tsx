@@ -12,6 +12,7 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined)
 const STORAGE_KEY = 'theme'
 const RECENT_KEY = 'theme-recent'
+const USAGE_KEY = 'theme-usage'
 const MAX_RECENT = 4
 const THEMES: Theme[] = ['light', 'dark', 'theme-3d', 'liquid-glass', 'skeuomorphic']
 
@@ -77,6 +78,39 @@ export function pushRecentTheme(theme: Theme) {
   } catch { /* ignore */ }
 }
 
+// Track theme usage counts (for 'most used' stat in ThemeCustomizer)
+export function incrementThemeUsage(theme: Theme) {
+  if (typeof window === 'undefined') return
+  try {
+    const raw = localStorage.getItem(USAGE_KEY)
+    const usage: Record<string, number> = raw ? JSON.parse(raw) : {}
+    usage[theme] = (usage[theme] || 0) + 1
+    localStorage.setItem(USAGE_KEY, JSON.stringify(usage))
+  } catch { /* ignore */ }
+}
+
+export function getThemeUsage(): Record<Theme, number> {
+  if (typeof window === 'undefined') return {} as Record<Theme, number>
+  try {
+    const raw = localStorage.getItem(USAGE_KEY)
+    const usage = raw ? JSON.parse(raw) : {}
+    return usage as Record<Theme, number>
+  } catch { return {} as Record<Theme, number> }
+}
+
+export function getMostUsedTheme(): { theme: Theme; count: number } | null {
+  const usage = getThemeUsage()
+  let max: Theme | null = null
+  let maxCount = 0
+  ;(Object.keys(usage) as Theme[]).forEach(t => {
+    if (usage[t] > maxCount) {
+      max = t
+      maxCount = usage[t]
+    }
+  })
+  return max ? { theme: max, count: maxCount } : null
+}
+
 export function getRecentThemes(): Theme[] {
   if (typeof window === 'undefined') return []
   try {
@@ -114,8 +148,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         } catch {
           // ignore localStorage failures
         }
-        // Track in recent themes
+        // Track in recent themes + usage stats
         pushRecentTheme(nextTheme)
+        incrementThemeUsage(nextTheme)
         applyThemeClass(nextTheme)
       },
     }),
