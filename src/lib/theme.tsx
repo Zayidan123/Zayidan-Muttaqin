@@ -13,8 +13,19 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined)
 const STORAGE_KEY = 'theme'
 const RECENT_KEY = 'theme-recent'
 const USAGE_KEY = 'theme-usage'
+const CUSTOM_PRESETS_KEY = 'theme-custom-presets'
 const MAX_RECENT = 4
 const THEMES: Theme[] = ['light', 'dark', 'theme-3d', 'liquid-glass', 'skeuomorphic']
+
+// User-created custom preset (saved color combination)
+export interface CustomPreset {
+  id: string
+  name: string
+  cyan: string
+  magenta: string
+  purple: string
+  createdAt: string
+}
 
 function applyThemeClass(theme: Theme) {
   const html = document.documentElement
@@ -253,4 +264,85 @@ export function useTheme() {
     throw new Error('useTheme must be used within ThemeProvider')
   }
   return context
+}
+
+// ===== Custom Preset Creator — save user's custom color combinations =====
+export function getCustomPresets(): CustomPreset[] {
+  if (typeof window === 'undefined') return []
+  try {
+    const raw = localStorage.getItem(CUSTOM_PRESETS_KEY)
+    if (!raw) return []
+    const parsed = JSON.parse(raw)
+    if (!Array.isArray(parsed)) return []
+    return parsed.filter((p: unknown): p is CustomPreset => {
+      const preset = p as CustomPreset
+      return typeof preset?.id === 'string' &&
+        typeof preset?.name === 'string' &&
+        typeof preset?.cyan === 'string' &&
+        typeof preset?.magenta === 'string' &&
+        typeof preset?.purple === 'string'
+    })
+  } catch { return [] }
+}
+
+export function saveCustomPreset(preset: Omit<CustomPreset, 'id' | 'createdAt'>): CustomPreset {
+  const newPreset: CustomPreset = {
+    ...preset,
+    id: `custom-${Date.now()}`,
+    createdAt: new Date().toISOString(),
+  }
+  if (typeof window === 'undefined') return newPreset
+  try {
+    const existing = getCustomPresets()
+    existing.push(newPreset)
+    localStorage.setItem(CUSTOM_PRESETS_KEY, JSON.stringify(existing))
+  } catch { /* ignore */ }
+  return newPreset
+}
+
+export function deleteCustomPreset(id: string) {
+  if (typeof window === 'undefined') return
+  try {
+    const existing = getCustomPresets().filter(p => p.id !== id)
+    localStorage.setItem(CUSTOM_PRESETS_KEY, JSON.stringify(existing))
+  } catch { /* ignore */ }
+}
+
+// ===== Import schedule from JSON =====
+export function importScheduleFromJson(jsonString: string): { success: boolean; message: string } {
+  if (typeof window === 'undefined') return { success: false, message: 'Server-side' }
+  try {
+    const parsed = JSON.parse(jsonString)
+    if (!Array.isArray(parsed)) {
+      return { success: false, message: 'JSON harus berupa array slot' }
+    }
+    const validated: ScheduleSlot[] = []
+    for (const item of parsed) {
+      if (typeof item?.startHour !== 'number' ||
+          typeof item?.theme !== 'string' ||
+          !THEMES.includes(item.theme as Theme) ||
+          typeof item?.labelId !== 'string') {
+        return { success: false, message: `Slot tidak valid: ${JSON.stringify(item).substring(0, 60)}` }
+      }
+      validated.push({
+        startHour: item.startHour,
+        theme: item.theme,
+        labelId: item.labelId,
+        labelEn: typeof item.labelEn === 'string' ? item.labelEn : item.labelId,
+      })
+    }
+    if (validated.length === 0) {
+      return { success: false, message: 'Tidak ada slot valid' }
+    }
+    validated.sort((a, b) => a.startHour - b.startHour)
+    saveCustomSchedule(validated)
+    return { success: true, message: `${validated.length} slot berhasil diimport` }
+  } catch (e) {
+    return { success: false, message: 'JSON tidak valid: ' + (e as Error).message }
+  }
+}
+
+export function exportScheduleToJson(): string {
+  const schedule = getCustomSchedule()
+  return JSON.stringify(schedule, null, 2)
 }

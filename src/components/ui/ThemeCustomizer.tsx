@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Palette, X, RotateCcw, Star, Download, Upload, Share2, Clock, QrCode, BarChart3, Volume2, VolumeX, Trash2, CalendarClock, Pencil, Save, ImageDown } from 'lucide-react'
+import { Palette, X, RotateCcw, Star, Download, Upload, Share2, Clock, QrCode, BarChart3, Volume2, VolumeX, Trash2, CalendarClock, Pencil, Save, ImageDown, BookmarkPlus, FileJson } from 'lucide-react'
 import QRCode from 'qrcode'
-import { useTheme, getRecentThemes, getShareableThemeUrl, getThemeUsage, getMostUsedTheme, resetThemeUsage, isThemeScheduleEnabled, setThemeScheduleEnabled, getScheduledTheme, getScheduleInfo, getCustomSchedule, saveCustomSchedule, resetCustomSchedule, type ScheduleSlot, type Theme } from '@/lib/theme'
+import { useTheme, getRecentThemes, getShareableThemeUrl, getThemeUsage, getMostUsedTheme, resetThemeUsage, isThemeScheduleEnabled, setThemeScheduleEnabled, getScheduledTheme, getScheduleInfo, getCustomSchedule, saveCustomSchedule, resetCustomSchedule, getCustomPresets, saveCustomPreset, deleteCustomPreset, importScheduleFromJson, exportScheduleToJson, type ScheduleSlot, type CustomPreset, type Theme } from '@/lib/theme'
 import { useToastStore } from '@/store/toast-store'
 import { isThemeSoundEnabled, setThemeSoundEnabled } from '@/lib/theme-sound'
 
@@ -66,6 +66,9 @@ export function ThemeCustomizer() {
   const [scheduledLabel, setScheduledLabel] = useState<{ labelId: string; labelEn: string } | null>(null)
   const [editingSchedule, setEditingSchedule] = useState(false)
   const [editableSlots, setEditableSlots] = useState<ScheduleSlot[]>([])
+  const [customPresets, setCustomPresets] = useState<CustomPreset[]>([])
+  const [showSavePresetDialog, setShowSavePresetDialog] = useState(false)
+  const [newPresetName, setNewPresetName] = useState('')
   const panelRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const hasAppliedInitialTheme = useRef(false)
@@ -90,6 +93,8 @@ export function ThemeCustomizer() {
       setSoundEnabled(isThemeSoundEnabled())
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setScheduleEnabled(isThemeScheduleEnabled())
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setCustomPresets(getCustomPresets())
       const scheduled = getScheduledTheme()
       if (scheduled) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -288,6 +293,84 @@ export function ThemeCustomizer() {
       addToast('📊 Chart usage berhasil diexport', 'success')
     } catch {
       addToast('Gagal export chart', 'error')
+    }
+  }, [addToast])
+
+  // Save current custom colors as a named preset
+  const handleSavePreset = useCallback(() => {
+    const name = newPresetName.trim()
+    if (!name) {
+      addToast('Nama preset tidak boleh kosong', 'error')
+      return
+    }
+    if (name.length > 30) {
+      addToast('Nama preset maksimal 30 karakter', 'error')
+      return
+    }
+    const cyan = (activeColors.cyan || '#00F5FF')
+    const magenta = (activeColors.magenta || '#FF00AA')
+    const purple = (activeColors.purple || '#8B5CF6')
+    saveCustomPreset({ name, cyan, magenta, purple })
+    setCustomPresets(getCustomPresets())
+    setNewPresetName('')
+    setShowSavePresetDialog(false)
+    addToast(`✓ Preset "${name}" tersimpan`, 'success')
+  }, [newPresetName, activeColors, addToast])
+
+  // Apply a custom preset
+  const applyCustomPreset = useCallback((preset: CustomPreset) => {
+    applyColor('--neon-cyan', preset.cyan)
+    applyColor('--neon-magenta', preset.magenta)
+    applyColor('--neon-purple', preset.purple)
+    setActiveColors({ cyan: preset.cyan, magenta: preset.magenta, purple: preset.purple })
+    setActivePreset(preset.name)
+    try { localStorage.setItem('theme-custom-colors', JSON.stringify({ cyan: preset.cyan, magenta: preset.magenta, purple: preset.purple })) } catch { /* ignore */ }
+    try { localStorage.setItem('theme-preset', preset.name) } catch { /* ignore */ }
+    addToast(`✓ Preset "${preset.name}" diterapkan`, 'success')
+  }, [addToast])
+
+  // Delete a custom preset
+  const handleDeletePreset = useCallback((id: string, name: string) => {
+    deleteCustomPreset(id)
+    setCustomPresets(getCustomPresets())
+    addToast(`Preset "${name}" dihapus`, 'info')
+  }, [addToast])
+
+  // Import schedule from JSON file
+  const scheduleFileRef = useRef<HTMLInputElement>(null)
+  const handleImportSchedule = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const result = importScheduleFromJson(e.target?.result as string)
+      if (result.success) {
+        // Refresh scheduler view
+        const scheduled = getScheduledTheme()
+        if (scheduled) setScheduledLabel({ labelId: scheduled.labelId, labelEn: scheduled.labelEn })
+        addToast(`✓ ${result.message}`, 'success')
+      } else {
+        addToast(`Gagal import: ${result.message}`, 'error')
+      }
+    }
+    reader.readAsText(file)
+    event.target.value = ''
+  }, [addToast])
+
+  // Export current schedule as JSON file
+  const handleExportSchedule = useCallback(() => {
+    try {
+      const json = exportScheduleToJson()
+      const blob = new Blob([json], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `zayidan-theme-schedule-${Date.now()}.json`
+      a.click()
+      URL.revokeObjectURL(url)
+      addToast('✓ Jadwal tema berhasil diexport', 'success')
+    } catch {
+      addToast('Gagal export jadwal', 'error')
     }
   }, [addToast])
 
@@ -958,6 +1041,117 @@ export function ThemeCustomizer() {
                     <span className="text-[9px] font-mono-custom text-[var(--text-secondary)] w-14 text-right">{(activeColors[key] || def).toUpperCase()}</span>
                   </div>
                 ))}
+              </div>
+
+              {/* Save current colors as preset button */}
+              <button
+                onClick={() => setShowSavePresetDialog(true)}
+                className="w-full flex items-center justify-center gap-1.5 px-2 py-1.5 mt-2 rounded-md text-[10px] font-mono-custom bg-[var(--neon-cyan)]/10 border border-[var(--neon-cyan)]/30 text-[var(--neon-cyan)] hover:bg-[var(--neon-cyan)]/20 transition-colors cursor-pointer"
+                title="Simpan warna saat ini sebagai preset"
+              >
+                <BookmarkPlus className="h-3 w-3" />
+                Simpan sebagai Preset
+              </button>
+
+              {/* Save preset dialog */}
+              {showSavePresetDialog && (
+                <div className="mt-2 p-2 rounded-md border border-[var(--neon-magenta)]/20 bg-[var(--glass-bg)]/40 space-y-1.5">
+                  <p className="text-[9px] font-mono-custom text-[var(--text-secondary)] uppercase">Nama Preset:</p>
+                  <input
+                    type="text"
+                    value={newPresetName}
+                    onChange={(e) => setNewPresetName(e.target.value)}
+                    maxLength={30}
+                    placeholder="cth: Mood Senja"
+                    className="w-full px-2 py-1 rounded border border-[var(--glass-border)] bg-[var(--background)] text-[var(--text-primary)] text-[10px] font-mono-custom"
+                    onKeyDown={(e) => { if (e.key === 'Enter') handleSavePreset(); if (e.key === 'Escape') setShowSavePresetDialog(false) }}
+                    autoFocus
+                  />
+                  <div className="flex gap-1">
+                    <button
+                      onClick={handleSavePreset}
+                      className="flex-1 flex items-center justify-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-mono-custom bg-[var(--neon-cyan)]/10 border border-[var(--neon-cyan)]/30 text-[var(--neon-cyan)] hover:bg-[var(--neon-cyan)]/20 transition-colors cursor-pointer"
+                    >
+                      <Save className="h-2.5 w-2.5" /> Simpan
+                    </button>
+                    <button
+                      onClick={() => { setShowSavePresetDialog(false); setNewPresetName('') }}
+                      className="px-1.5 py-0.5 rounded text-[9px] font-mono-custom border border-[var(--glass-border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+                    >
+                      Batal
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Custom Presets — user-saved color combinations */}
+            {customPresets.length > 0 && (
+              <div className="border-t border-[var(--glass-border)] pt-3">
+                <div className="flex items-center gap-1.5 mb-2">
+                  <BookmarkPlus className="h-2.5 w-2.5 text-[var(--text-secondary)]" />
+                  <p className="text-[10px] font-mono-custom text-[var(--text-secondary)] tracking-wider uppercase">Preset Saya ({customPresets.length})</p>
+                </div>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {customPresets.map((preset) => {
+                    const isActive = activePreset === preset.name
+                    return (
+                      <div
+                        key={preset.id}
+                        className={`group relative rounded-lg border p-1.5 text-center transition-all cursor-pointer overflow-hidden ${isActive ? 'border-[var(--neon-cyan)]/60 shadow-[0_0_10px_var(--neon-cyan)]' : 'border-[var(--glass-border)] hover:border-[var(--neon-cyan)]/40'}`}
+                        onClick={() => applyCustomPreset(preset)}
+                      >
+                        <div className="relative flex gap-0.5 mb-1 justify-center">
+                          <span className="w-3 h-3 rounded-full ring-1 ring-black/20" style={{ backgroundColor: preset.cyan }} />
+                          <span className="w-3 h-3 rounded-full ring-1 ring-black/20" style={{ backgroundColor: preset.magenta }} />
+                          <span className="w-3 h-3 rounded-full ring-1 ring-black/20" style={{ backgroundColor: preset.purple }} />
+                        </div>
+                        <span className="relative text-[9px] font-mono-custom text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors leading-tight block truncate">
+                          {preset.name}
+                        </span>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleDeletePreset(preset.id, preset.name) }}
+                          className="absolute top-0.5 right-0.5 w-3 h-3 rounded flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--neon-magenta)] transition-colors cursor-pointer"
+                          aria-label={`Hapus preset ${preset.name}`}
+                        >
+                          <X className="h-2 w-2" />
+                        </button>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Import/Export Schedule JSON */}
+            <div className="border-t border-[var(--glass-border)] pt-3">
+              <div className="flex items-center gap-1.5 mb-2">
+                <FileJson className="h-2.5 w-2.5 text-[var(--text-secondary)]" />
+                <p className="text-[10px] font-mono-custom text-[var(--text-secondary)] tracking-wider uppercase">Jadwal JSON</p>
+              </div>
+              <div className="flex gap-1.5">
+                <button
+                  onClick={() => scheduleFileRef.current?.click()}
+                  className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-md text-[9px] font-mono-custom bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-secondary)] hover:text-[var(--neon-cyan)] hover:border-[var(--neon-cyan)]/30 transition-colors cursor-pointer"
+                  title="Import jadwal dari JSON"
+                >
+                  <Upload className="h-2.5 w-2.5" /> Import
+                </button>
+                <input
+                  ref={scheduleFileRef}
+                  type="file"
+                  accept="application/json,.json"
+                  onChange={handleImportSchedule}
+                  className="hidden"
+                  aria-hidden="true"
+                />
+                <button
+                  onClick={handleExportSchedule}
+                  className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-md text-[9px] font-mono-custom bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-secondary)] hover:text-[var(--neon-cyan)] hover:border-[var(--neon-cyan)]/30 transition-colors cursor-pointer"
+                  title="Export jadwal ke JSON"
+                >
+                  <Download className="h-2.5 w-2.5" /> Export
+                </button>
               </div>
             </div>
           </div>
