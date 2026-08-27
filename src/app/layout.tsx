@@ -229,8 +229,8 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.json",
   verification: {
-    // Google Search Console — user dapat menambahkan token setelah verifikasi
-    // google: "google-site-verification-token-anda-disini",
+    // Google Search Console verification token
+    google: "1-jUpyPY0B9VHEAHkNYeTlkFhEBfILgxEGfltoFiuIM",
   },
   other: {
     // Additional SEO meta tags
