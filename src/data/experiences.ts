@@ -11,8 +11,33 @@ interface ExperienceEntry {
 
 export const experiences: ExperienceEntry[] = [
   {
+    id: 5,
+    period: { start: "2026-08", end: null },
+    role: { id: "Staf Sales Promotion Boy", en: "Sales Promotion Boy Staff" },
+    company: { id: "Lapangan / Outdoor", en: "Field / Outdoor" },
+    description: {
+      id: [
+        "Menyapa pengunjung dengan ramah dan menawarkan produk snack yang dijual.",
+        "Memberikan penjelasan terkait varian rasa, keunggulan, komposisi, atau promo harga spesial dari snack tersebut.",
+        "Membujuk dan meyakinkan pelanggan untuk membeli produk dalam jumlah lebih banyak atau mencoba varian rasa baru.",
+        "Menjawab rasa penasaran konsumen seputar produk dengan ramah dan solutif.",
+        "Mendengarkan tanggapan, kritik, atau saran dari konsumen mengenai rasa atau kemasan snack.",
+        "Mencatat jumlah penjualan harian, sisa stok, serta respons pasar untuk diserahkan kepada supervisor atau tim.",
+      ],
+      en: [
+        "Greeted visitors warmly and offered the snack products for sale.",
+        "Explained flavor variants, product advantages, ingredients, and special price promotions to customers.",
+        "Persuaded and convinced customers to purchase products in larger quantities or try new flavor variants.",
+        "Addressed customer curiosity about products in a friendly and solution-oriented manner.",
+        "Listened to feedback, criticism, and suggestions from consumers regarding flavor or packaging.",
+        "Recorded daily sales amounts, remaining stock, and market responses to be submitted to the supervisor or team.",
+      ],
+    },
+    tags: { id: ["Sales Promotion", "Layanan Pelanggan", "Pengetahuan Produk", "Laporan Penjualan"], en: ["Sales Promotion", "Customer Service", "Product Knowledge", "Sales Reporting"] },
+  },
+  {
     id: 1,
-    period: { start: "2026-04", end: null },
+    period: { start: "2026-04", end: "2026-07" },
     role: { id: "Store Associate / Sales Clerk", en: "Store Associate / Sales Clerk" },
     company: { id: "Toko Sinta (SH GROSIR)", en: "Toko Sinta (SH GROSIR)" },
     description: {

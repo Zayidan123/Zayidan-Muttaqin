@@ -248,14 +248,50 @@ export const CvReader: React.FC = () => {
                     </h2>
                     
                     <div className="space-y-6">
-                      {/* Job 1 */}
+                      {/* Job 1 — Most Recent: Sales Promotion Boy Staff */}
+                      <div>
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
+                          <h3 className="font-semibold text-sm text-[var(--text-primary)] print:text-black">
+                            {lang === 'id' ? 'Staf Sales Promotion Boy' : 'Sales Promotion Boy Staff'}
+                          </h3>
+                          <span className="text-xs font-mono-custom text-[var(--neon-magenta)] print:text-zinc-600">
+                            {lang === 'id' ? 'Agustus 2026 – Sekarang' : 'August 2026 – Present'}
+                          </span>
+                        </div>
+                        <p className="text-xs text-[var(--text-secondary)] mb-3 print:text-zinc-600 italic">
+                          {lang === 'id' ? 'Lapangan / Outdoor' : 'Field / Outdoor'}
+                        </p>
+                        <ul className="list-disc list-outside pl-4 space-y-1.5 text-xs text-[var(--text-secondary)] print:text-zinc-800">
+                          {lang === 'id' ? (
+                            <>
+                              <li>Menyapa pengunjung dengan ramah dan menawarkan produk snack yang dijual.</li>
+                              <li>Memberikan penjelasan terkait varian rasa, keunggulan, komposisi, atau promo harga spesial dari snack tersebut.</li>
+                              <li>Membujuk dan meyakinkan pelanggan untuk membeli produk dalam jumlah lebih banyak atau mencoba varian rasa baru.</li>
+                              <li>Menjawab rasa penasaran konsumen seputar produk dengan ramah dan solutif.</li>
+                              <li>Mendengarkan tanggapan, kritik, atau saran dari konsumen mengenai rasa atau kemasan snack.</li>
+                              <li>Mencatat jumlah penjualan harian, sisa stok, serta respons pasar untuk diserahkan kepada supervisor atau tim.</li>
+                            </>
+                          ) : (
+                            <>
+                              <li>Greeted visitors warmly and offered the snack products for sale.</li>
+                              <li>Explained flavor variants, product advantages, ingredients, and special price promotions to customers.</li>
+                              <li>Persuaded and convinced customers to purchase products in larger quantities or try new flavor variants.</li>
+                              <li>Addressed customer curiosity about products in a friendly and solution-oriented manner.</li>
+                              <li>Listened to feedback, criticism, and suggestions from consumers regarding flavor or packaging.</li>
+                              <li>Recorded daily sales amounts, remaining stock, and market responses to be submitted to the supervisor or team.</li>
+                            </>
+                          )}
+                        </ul>
+                      </div>
+
+                      {/* Job 2 — Store Associate */}
                       <div>
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
                           <h3 className="font-semibold text-sm text-[var(--text-primary)] print:text-black">
                             Store Associate / Sales Clerk
                           </h3>
                           <span className="text-xs font-mono-custom text-[var(--neon-magenta)] print:text-zinc-600">
-                            {lang === 'id' ? 'April 2026 – Sekarang' : 'April 2026 – Present'}
+                            {lang === 'id' ? 'April 2026 – Juli 2026' : 'April 2026 – July 2026'}
                           </span>
                         </div>
                         <p className="text-xs text-[var(--text-secondary)] mb-3 print:text-zinc-600 italic">
@@ -282,7 +318,7 @@ export const CvReader: React.FC = () => {
                         </ul>
                       </div>
 
-                      {/* Job 2 */}
+                      {/* Job 3 — Store Manager */}
                       <div>
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
                           <h3 className="font-semibold text-sm text-[var(--text-primary)] print:text-black">
@@ -320,7 +356,7 @@ export const CvReader: React.FC = () => {
                         </ul>
                       </div>
 
-                      {/* Job 3 */}
+                      {/* Job 4 — Jewelry Sales Associate */}
                       <div>
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
                           <h3 className="font-semibold text-sm text-[var(--text-primary)] print:text-black">
@@ -352,7 +388,7 @@ export const CvReader: React.FC = () => {
                         </ul>
                       </div>
 
-                      {/* Job 4 */}
+                      {/* Job 5 — Sales Promotion Boy (Ramadan Event) */}
                       <div>
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
                           <h3 className="font-semibold text-sm text-[var(--text-primary)] print:text-black">
