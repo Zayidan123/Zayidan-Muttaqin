@@ -156,9 +156,9 @@ export const CvReader: React.FC = () => {
                   
                   {/* Resume Header */}
                   <div className="text-center md:text-left border-b border-[var(--glass-border)] pb-6 mb-6 print:border-zinc-200">
-                    <h1 className="font-display text-2xl md:text-3xl font-extrabold text-[var(--text-primary)] tracking-wide mb-1 uppercase print:text-black">
+                    <h2 className="font-display text-2xl md:text-3xl font-extrabold text-[var(--text-primary)] tracking-wide mb-1 uppercase print:text-black" style={{ fontSize: '1.875rem' }}>
                       Zayidan Muttaqin
-                    </h1>
+                    </h2>
                     <p className="text-sm font-mono-custom text-[var(--neon-cyan)] font-semibold mb-4 print:text-zinc-700 uppercase tracking-widest">
                       {lang === 'id' ? 'Penjualan, Kepemimpinan, Komunikasi' : 'Sales, Leadership, Communication'}
                     </p>

@@ -225,6 +225,14 @@ export function Hero() {
       <div className="absolute bottom-8 right-8 w-8 h-8 border-b-2 border-r-2 border-[var(--neon-magenta)] opacity-30 hidden sm:block" />
 
       {/* Content */}
+      {/* SEO: visually-hidden description for search engines (keyword-rich) */}
+      <p className="sr-only" aria-hidden="false">
+        Zayidan Muttaqin — portfolio profesional Sales, Leadership, dan Communication Expert di Banyuwangi, Indonesia.
+        Berpengalaman sebagai Sales Promotion Boy, Store Associate, Sales Clerk, Store Manager, dan Pramuniaga.
+        Keahlian: Customer Service, Visual Merchandising, Stock Logistics, Retail Management, Negotiation, Communication,
+        Video Editing (CapCut), Graphic Design (Canva), AI Prompting, Financial Markets, Python Programming.
+        Tersedia untuk peluang kerja freelance, remote, maupun full-time di Banyuwangi dan sekitarnya.
+      </p>
       <motion.div 
         className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 transition-transform duration-300 ease-out" 
         style={{ transform: `translate(${mousePos.x * -8}px, ${mousePos.y * -8}px)`, y }}

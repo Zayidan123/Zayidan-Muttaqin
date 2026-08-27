@@ -34,8 +34,8 @@ export function LoadingScreen() {
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center gap-8">
-        {/* ZAYIDAN text */}
-        <motion.h1
+        {/* ZAYIDAN text — div instead of h1 to maintain single h1 per page for SEO */}
+        <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6 }}
@@ -44,9 +44,11 @@ export function LoadingScreen() {
             color: 'var(--neon-cyan, #00F5FF)',
             textShadow: '0 0 20px rgba(0, 245, 255, 0.5), 0 0 40px rgba(0, 245, 255, 0.3), 0 0 60px rgba(0, 245, 255, 0.15)',
           }}
+          role="presentation"
+          aria-hidden="true"
         >
           ZAYIDAN
-        </motion.h1>
+        </motion.div>
 
         {/* Loading bar */}
         <div className="w-48 sm:w-64 h-[2px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>

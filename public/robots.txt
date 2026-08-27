@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://zayidan-muttaqin.vercel.app/sitemap.xml

@@ -1,12 +1,16 @@
 {
-  "name": "Zayidan Muttaqin — Portfolio",
+  "name": "Zayidan Muttaqin — Sales & Leadership Portfolio",
   "short_name": "ZM Portfolio",
-  "description": "Sales · Leadership · Communication Expert",
+  "description": "Portfolio profesional Zayidan Muttaqin — Sales Promotion Boy, Store Associate, & Store Manager di Banyuwangi, Indonesia. Disiplin, teliti, bertanggung jawab, dan adaptif.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#050510",
   "theme_color": "#00F5FF",
   "orientation": "portrait-primary",
+  "lang": "id-ID",
+  "dir": "ltr",
+  "categories": ["business", "productivity", "portfolio"],
   "icons": [
     {
       "src": "/icons/icon-192.png",
@@ -19,6 +23,29 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Pengalaman Kerja",
+      "short_name": "Pengalaman",
+      "description": "Lihat pengalaman kerja Zayidan Muttaqin",
+      "url": "/#experience",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Proyek",
+      "short_name": "Proyek",
+      "description": "Lihat proyek pribadi Zayidan Muttaqin",
+      "url": "/#projects",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Kontak",
+      "short_name": "Kontak",
+      "description": "Hubungi Zayidan Muttaqin",
+      "url": "/#contact",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }
