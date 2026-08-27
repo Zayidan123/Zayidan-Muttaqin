@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Palette, X, RotateCcw, Star, Download, Upload, Share2, Clock, QrCode, BarChart3, Volume2, VolumeX, Trash2, CalendarClock } from 'lucide-react'
+import { Palette, X, RotateCcw, Star, Download, Upload, Share2, Clock, QrCode, BarChart3, Volume2, VolumeX, Trash2, CalendarClock, Pencil, Save, ImageDown } from 'lucide-react'
 import QRCode from 'qrcode'
-import { useTheme, getRecentThemes, getShareableThemeUrl, getThemeUsage, getMostUsedTheme, resetThemeUsage, isThemeScheduleEnabled, setThemeScheduleEnabled, getScheduledTheme, getScheduleInfo, type Theme } from '@/lib/theme'
+import { useTheme, getRecentThemes, getShareableThemeUrl, getThemeUsage, getMostUsedTheme, resetThemeUsage, isThemeScheduleEnabled, setThemeScheduleEnabled, getScheduledTheme, getScheduleInfo, getCustomSchedule, saveCustomSchedule, resetCustomSchedule, type ScheduleSlot, type Theme } from '@/lib/theme'
 import { useToastStore } from '@/store/toast-store'
 import { isThemeSoundEnabled, setThemeSoundEnabled } from '@/lib/theme-sound'
 
@@ -64,6 +64,8 @@ export function ThemeCustomizer() {
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [scheduleEnabled, setScheduleEnabled] = useState(false)
   const [scheduledLabel, setScheduledLabel] = useState<{ labelId: string; labelEn: string } | null>(null)
+  const [editingSchedule, setEditingSchedule] = useState(false)
+  const [editableSlots, setEditableSlots] = useState<ScheduleSlot[]>([])
   const panelRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const hasAppliedInitialTheme = useRef(false)
@@ -180,6 +182,114 @@ export function ThemeCustomizer() {
       addToast('🕐 Scheduler dimatikan', 'info')
     }
   }, [scheduleEnabled, setTheme, addToast])
+
+  // Start editing custom schedule — load current schedule into editableSlots
+  const startEditSchedule = useCallback(() => {
+    setEditableSlots(getCustomSchedule().map(s => ({ ...s })))
+    setEditingSchedule(true)
+  }, [])
+
+  // Save custom schedule to localStorage
+  const saveEditSchedule = useCallback(() => {
+    // Sort by startHour ascending
+    const sorted = [...editableSlots].sort((a, b) => a.startHour - b.startHour)
+    saveCustomSchedule(sorted)
+    setEditingSchedule(false)
+    // Refresh scheduled label
+    const scheduled = getScheduledTheme()
+    if (scheduled) setScheduledLabel({ labelId: scheduled.labelId, labelEn: scheduled.labelEn })
+    addToast('✓ Jadwal tema tersimpan', 'success')
+  }, [editableSlots, addToast])
+
+  // Cancel editing
+  const cancelEditSchedule = useCallback(() => {
+    setEditingSchedule(false)
+    setEditableSlots([])
+  }, [])
+
+  // Reset schedule to default
+  const resetEditSchedule = useCallback(() => {
+    resetCustomSchedule()
+    setEditingSchedule(false)
+    setEditableSlots([])
+    const scheduled = getScheduledTheme()
+    if (scheduled) setScheduledLabel({ labelId: scheduled.labelId, labelEn: scheduled.labelEn })
+    addToast('🕐 Jadwal direset ke default', 'info')
+  }, [addToast])
+
+  // Update a slot field
+  const updateSlot = useCallback((idx: number, field: keyof ScheduleSlot, value: string | number) => {
+    setEditableSlots(prev => prev.map((s, i) => i === idx ? { ...s, [field]: value } : s))
+  }, [])
+
+  // Add a new slot
+  const addSlot = useCallback(() => {
+    setEditableSlots(prev => [...prev, { startHour: 0, theme: 'dark', labelId: 'Baru', labelEn: 'New' }])
+  }, [])
+
+  // Remove a slot
+  const removeSlot = useCallback((idx: number) => {
+    setEditableSlots(prev => prev.filter((_, i) => i !== idx))
+  }, [])
+
+  // Export usage chart as PNG (render to canvas then download)
+  const exportChartPng = useCallback(() => {
+    try {
+      const usage = getThemeUsage()
+      const entries = (Object.keys(usage) as Theme[]).map(t => ({ theme: t, count: usage[t] || 0 })).filter(e => e.count > 0)
+      if (entries.length === 0) {
+        addToast('Belum ada data untuk diexport', 'error')
+        return
+      }
+      const max = Math.max(...entries.map(e => e.count), 1)
+      const W = 480, H = 240, pad = 40, barH = 24, gap = 8
+      const canvas = document.createElement('canvas')
+      canvas.width = W
+      canvas.height = pad * 2 + entries.length * (barH + gap)
+      const ctx = canvas.getContext('2d')
+      if (!ctx) { addToast('Gagal membuat canvas', 'error'); return }
+      // Background
+      ctx.fillStyle = '#0A0A0F'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      // Title
+      ctx.fillStyle = '#00F5FF'
+      ctx.font = 'bold 14px monospace'
+      ctx.fillText('THEME USAGE STATS', pad, 24)
+      // Bars
+      const themeColors: Record<Theme, string> = {
+        dark: '#00F5FF', light: '#0080FF', skeuomorphic: '#D4A24C', 'liquid-glass': '#C8A0FF', 'theme-3d': '#A78BFA',
+      }
+      const themeEmojis: Record<Theme, string> = {
+        dark: 'Dark', light: 'Light', skeuomorphic: 'Cahaya', 'liquid-glass': 'Liquid', 'theme-3d': '3D',
+      }
+      entries.forEach((e, i) => {
+        const y = pad + i * (barH + gap)
+        const barW = (e.count / max) * (W - pad * 3)
+        // Track
+        ctx.fillStyle = 'rgba(255,255,255,0.08)'
+        ctx.fillRect(pad, y, W - pad * 2, barH)
+        // Bar
+        ctx.fillStyle = themeColors[e.theme]
+        ctx.fillRect(pad, y, barW, barH)
+        // Label
+        ctx.fillStyle = '#F0F0FF'
+        ctx.font = '11px monospace'
+        ctx.fillText(themeEmojis[e.theme], pad + 4, y + 15)
+        // Count
+        ctx.fillStyle = '#8888AA'
+        ctx.font = '10px monospace'
+        ctx.fillText(`${e.count}x`, W - pad + 4, y + 15)
+      })
+      // Download
+      const a = document.createElement('a')
+      a.href = canvas.toDataURL('image/png')
+      a.download = `zayidan-theme-usage-${Date.now()}.png`
+      a.click()
+      addToast('📊 Chart usage berhasil diexport', 'success')
+    } catch {
+      addToast('Gagal export chart', 'error')
+    }
+  }, [addToast])
 
   // Generate QR code for current theme (mobile-friendly sharing)
   const openQrModal = useCallback(() => {
@@ -687,33 +797,142 @@ export function ThemeCustomizer() {
                   <CalendarClock className="h-2.5 w-2.5 text-[var(--text-secondary)]" />
                   <p className="text-[10px] font-mono-custom text-[var(--text-secondary)] tracking-wider uppercase">Jadwal Otomatis</p>
                 </div>
-                <button
-                  onClick={toggleScheduler}
-                  className={`relative w-7 h-3.5 rounded-full transition-colors cursor-pointer ${scheduleEnabled ? 'bg-[var(--neon-cyan)]/60' : 'bg-[var(--glass-border)]'}`}
-                  role="switch"
-                  aria-checked={scheduleEnabled}
-                  aria-label="Toggle theme scheduler"
-                >
-                  <span
-                    className={`absolute top-0.5 w-2.5 h-2.5 rounded-full bg-white transition-transform ${scheduleEnabled ? 'translate-x-3.5' : 'translate-x-0.5'}`}
-                  />
-                </button>
+                <div className="flex items-center gap-1">
+                  {!editingSchedule && (
+                    <button
+                      onClick={startEditSchedule}
+                      className="w-5 h-5 rounded flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--neon-cyan)] transition-colors cursor-pointer"
+                      title="Edit jadwal kustom"
+                      aria-label="Edit custom schedule"
+                    >
+                      <Pencil className="h-2.5 w-2.5" />
+                    </button>
+                  )}
+                  <button
+                    onClick={toggleScheduler}
+                    className={`relative w-7 h-3.5 rounded-full transition-colors cursor-pointer ${scheduleEnabled ? 'bg-[var(--neon-cyan)]/60' : 'bg-[var(--glass-border)]'}`}
+                    role="switch"
+                    aria-checked={scheduleEnabled}
+                    aria-label="Toggle theme scheduler"
+                  >
+                    <span
+                      className={`absolute top-0.5 w-2.5 h-2.5 rounded-full bg-white transition-transform ${scheduleEnabled ? 'translate-x-3.5' : 'translate-x-0.5'}`}
+                    />
+                  </button>
+                </div>
               </div>
-              {scheduleEnabled && scheduledLabel && (
-                <div className="mt-2 p-2 rounded-md border border-[var(--neon-cyan)]/20 bg-[var(--neon-cyan)]/5">
-                  <p className="text-[9px] font-mono-custom text-[var(--text-secondary)] mb-1">Periode saat ini:</p>
-                  <p className="text-[10px] font-mono-custom text-[var(--neon-cyan)]">{scheduledLabel.labelId}</p>
-                  <div className="mt-2 space-y-0.5">
-                    {getScheduleInfo().map((s, i) => (
-                      <div key={i} className="flex items-center justify-between text-[8px] font-mono-custom">
-                        <span className="text-[var(--text-secondary)]/70">{s.labelId}</span>
-                        <span className="text-[var(--text-secondary)]">{s.theme}</span>
-                      </div>
-                    ))}
+
+              {/* Edit mode — custom time slots editor */}
+              {editingSchedule ? (
+                <div className="mt-2 p-2 rounded-md border border-[var(--neon-magenta)]/20 bg-[var(--glass-bg)]/40 space-y-2">
+                  <p className="text-[9px] font-mono-custom text-[var(--text-secondary)] uppercase">Edit Slot:</p>
+                  {editableSlots.map((slot, idx) => (
+                    <div key={idx} className="flex items-center gap-1 text-[9px] font-mono-custom">
+                      <input
+                        type="number"
+                        min={0}
+                        max={23}
+                        value={slot.startHour}
+                        onChange={(e) => updateSlot(idx, 'startHour', Math.max(0, Math.min(23, parseInt(e.target.value) || 0)))}
+                        className="w-7 px-1 py-0.5 rounded border border-[var(--glass-border)] bg-[var(--background)] text-[var(--text-primary)] text-center"
+                        aria-label={`Start hour slot ${idx + 1}`}
+                      />
+                      <span className="text-[var(--text-secondary)]">:00</span>
+                      <select
+                        value={slot.theme}
+                        onChange={(e) => updateSlot(idx, 'theme', e.target.value)}
+                        className="flex-1 px-1 py-0.5 rounded border border-[var(--glass-border)] bg-[var(--background)] text-[var(--text-primary)] text-[9px]"
+                        aria-label={`Theme slot ${idx + 1}`}
+                      >
+                        <option value="dark">Dark</option>
+                        <option value="light">Light</option>
+                        <option value="skeuomorphic">Cahaya</option>
+                        <option value="liquid-glass">Liquid</option>
+                        <option value="theme-3d">3D</option>
+                      </select>
+                      <input
+                        type="text"
+                        value={slot.labelId}
+                        onChange={(e) => updateSlot(idx, 'labelId', e.target.value)}
+                        className="w-12 px-1 py-0.5 rounded border border-[var(--glass-border)] bg-[var(--background)] text-[var(--text-primary)] text-[8px]"
+                        aria-label={`Label slot ${idx + 1}`}
+                        placeholder="Label"
+                      />
+                      <button
+                        onClick={() => removeSlot(idx)}
+                        className="w-4 h-4 rounded flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--neon-magenta)] transition-colors cursor-pointer"
+                        aria-label={`Remove slot ${idx + 1}`}
+                      >
+                        <X className="h-2.5 w-2.5" />
+                      </button>
+                    </div>
+                  ))}
+                  <div className="flex items-center gap-1 pt-1">
+                    <button
+                      onClick={addSlot}
+                      className="flex-1 px-1.5 py-0.5 rounded text-[8px] font-mono-custom border border-[var(--glass-border)] text-[var(--text-secondary)] hover:text-[var(--neon-cyan)] hover:border-[var(--neon-cyan)]/30 transition-colors cursor-pointer"
+                    >
+                      + Tambah Slot
+                    </button>
+                    <button
+                      onClick={saveEditSchedule}
+                      className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[8px] font-mono-custom bg-[var(--neon-cyan)]/10 border border-[var(--neon-cyan)]/30 text-[var(--neon-cyan)] hover:bg-[var(--neon-cyan)]/20 transition-colors cursor-pointer"
+                      title="Simpan jadwal"
+                    >
+                      <Save className="h-2.5 w-2.5" /> Simpan
+                    </button>
+                    <button
+                      onClick={cancelEditSchedule}
+                      className="px-1.5 py-0.5 rounded text-[8px] font-mono-custom border border-[var(--glass-border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+                    >
+                      Batal
+                    </button>
+                    <button
+                      onClick={resetEditSchedule}
+                      className="w-4 h-4 rounded flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--neon-magenta)] transition-colors cursor-pointer"
+                      title="Reset ke default"
+                      aria-label="Reset schedule to default"
+                    >
+                      <RotateCcw className="h-2.5 w-2.5" />
+                    </button>
                   </div>
                 </div>
+              ) : (
+                /* View mode — show current schedule */
+                scheduleEnabled && scheduledLabel && (
+                  <div className="mt-2 p-2 rounded-md border border-[var(--neon-cyan)]/20 bg-[var(--neon-cyan)]/5">
+                    <p className="text-[9px] font-mono-custom text-[var(--text-secondary)] mb-1">Periode saat ini:</p>
+                    <p className="text-[10px] font-mono-custom text-[var(--neon-cyan)]">{scheduledLabel.labelId}</p>
+                    <div className="mt-2 space-y-0.5">
+                      {getScheduleInfo().map((s, i) => (
+                        <div key={i} className="flex items-center justify-between text-[8px] font-mono-custom">
+                          <span className="text-[var(--text-secondary)]/70">{s.labelId}</span>
+                          <span className="text-[var(--text-secondary)]">{s.theme}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
               )}
             </div>
+
+            {/* Export usage chart as PNG */}
+            {(() => {
+              const total = Object.values(themeUsage).reduce((a, b) => a + b, 0)
+              if (total < 1) return null
+              return (
+                <div className="border-t border-[var(--glass-border)] pt-3">
+                  <button
+                    onClick={exportChartPng}
+                    className="w-full flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-md text-[10px] font-mono-custom bg-[var(--neon-cyan)]/10 border border-[var(--neon-cyan)]/30 text-[var(--neon-cyan)] hover:bg-[var(--neon-cyan)]/20 transition-colors cursor-pointer"
+                    title="Export usage chart sebagai PNG"
+                  >
+                    <ImageDown className="h-3 w-3" />
+                    Export Chart PNG
+                  </button>
+                </div>
+              )
+            })()}
 
             <div className="border-t border-[var(--glass-border)] pt-3">
               <p className="text-[10px] font-mono-custom text-[var(--text-secondary)] mb-2 tracking-wider uppercase">Custom Colors</p>
