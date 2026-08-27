@@ -239,7 +239,6 @@ export const metadata: Metadata = {
     "revisit-after": "7 days",
     "rating": "general",
     "distribution": "global",
-    "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
     "geo.region": "ID-JI",
     "geo.placename": "Banyuwangi",
     "geo.position": "-8.2192;114.3691",
@@ -266,10 +265,6 @@ export default function RootLayout({
     <html lang="id" suppressHydrationWarning className={`dark ${inter.variable} ${orbitron.variable} ${jetbrainsMono.variable}`}>
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <link rel="canonical" href={SITE_URL} />
-        <link rel="alternate" hrefLang="id-ID" href={SITE_URL} />
-        <link rel="alternate" hrefLang="en-US" href={SITE_URL} />
-        <link rel="alternate" hrefLang="x-default" href={SITE_URL} />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
         <link rel="icon" type="image/png" href="/icons/icon-192.png" sizes="192x192" />
         <link rel="icon" type="image/png" href="/icons/icon-512.png" sizes="512x512" />
