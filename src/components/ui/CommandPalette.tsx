@@ -3,7 +3,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Home, User, Briefcase, Mail, Sun, Moon, Globe, Download, ArrowUp, Search, HelpCircle, Trophy, Cpu, Eye, Github, Palette, Sparkles, Layers, Box } from 'lucide-react'
+import { Home, User, Briefcase, Mail, Sun, Moon, Globe, Download, ArrowUp, Search, HelpCircle, Trophy, Cpu, Eye, Github, Palette, Sparkles, Layers, Box, Upload, FileJson } from 'lucide-react'
 import { useLanguageStore } from '@/store/language-store'
 import { useTheme } from '@/lib/theme'
 import { useToastStore } from '@/store/toast-store'
@@ -59,6 +59,52 @@ export function CommandPalette() {
     { id: 'read-cv', labelKey: 'commandPalette.readCV', group: 'commandPalette.actionsGroup', icon: Eye, shortcut: 'V', action: () => setCvOpen(true) },
     { id: 'cv', labelKey: 'commandPalette.downloadCV', group: 'commandPalette.actionsGroup', icon: Download, action: () => { const a = document.createElement('a'); a.href = lang === 'en' ? '/CV_ZAYIDAN_MUTTAQIN_EN.pdf' : '/CV_ZAYIDAN_MUTTAQIN.pdf'; a.download = lang === 'en' ? 'CV_ZAYIDAN_MUTTAQIN_EN.pdf' : 'CV_ZAYIDAN_MUTTAQIN.pdf'; a.click() } },
     { id: 'top', labelKey: 'commandPalette.scrollTop', group: 'commandPalette.actionsGroup', icon: ArrowUp, action: () => window.scrollTo({ top: 0, behavior: 'smooth' }) },
+    { id: 'export-settings', labelKey: 'commandPalette.exportSettings', group: 'commandPalette.actionsGroup', icon: Download, action: () => {
+      try {
+        const settings = {
+          version: 1, exportedAt: new Date().toISOString(),
+          theme: localStorage.getItem('theme') || 'dark',
+          themePreset: localStorage.getItem('theme-preset'),
+          themeFavorites: JSON.parse(localStorage.getItem('theme-favorites') || '[]'),
+          themeCustomColors: JSON.parse(localStorage.getItem('theme-custom-colors') || '{}'),
+          lang: localStorage.getItem('lang') || 'id',
+        }
+        const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `zayidan-theme-settings-${Date.now()}.json`
+        a.click()
+        URL.revokeObjectURL(url)
+        addToast('⚙️ Pengaturan tema berhasil diexport', 'success')
+      } catch { addToast('Gagal export pengaturan', 'error') }
+    } },
+    { id: 'import-settings', labelKey: 'commandPalette.importSettings', group: 'commandPalette.actionsGroup', icon: Upload, action: () => {
+      const input = document.createElement('input')
+      input.type = 'file'
+      input.accept = 'application/json,.json'
+      input.onchange = (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0]
+        if (!file) return
+        const reader = new FileReader()
+        reader.onload = (ev) => {
+          try {
+            const settings = JSON.parse(ev.target?.result as string)
+            if (settings.theme && ['dark', 'light', 'theme-3d', 'liquid-glass', 'skeuomorphic'].includes(settings.theme)) {
+              localStorage.setItem('theme', settings.theme)
+            }
+            if (settings.themePreset) localStorage.setItem('theme-preset', settings.themePreset)
+            if (Array.isArray(settings.themeFavorites)) localStorage.setItem('theme-favorites', JSON.stringify(settings.themeFavorites))
+            if (settings.themeCustomColors && typeof settings.themeCustomColors === 'object') localStorage.setItem('theme-custom-colors', JSON.stringify(settings.themeCustomColors))
+            if (settings.lang) localStorage.setItem('lang', settings.lang)
+            addToast('✓ Pengaturan tema berhasil diimport. Memuat ulang...', 'success')
+            setTimeout(() => window.location.reload(), 800)
+          } catch { addToast('File JSON tidak valid', 'error') }
+        }
+        reader.readAsText(file)
+      }
+      input.click()
+    } },
   ]
 
   useEffect(() => {
@@ -103,10 +149,25 @@ export function CommandPalette() {
           {grouped.map(group => (
             <div key={group.label}>
               <div className="px-4 py-1.5 text-[10px] font-mono-custom text-[var(--text-secondary)] uppercase tracking-wider">{group.label}</div>
-              {group.items.map(item => { gi++; const idx = gi; const Icon = item.icon; return (
+              {group.items.map(item => { gi++; const idx = gi; const Icon = item.icon; const isThemeCmd = item.group === 'commandPalette.themesGroup' && item.id !== 'theme'; return (
                 <div key={item.id} data-cmd className={`command-palette-item ${idx === activeIndex ? 'command-palette-item-active' : ''}`} onClick={() => { item.action(); setOpen(false) }} onMouseEnter={() => setActiveIndex(idx)}>
                   <Icon className="h-4 w-4 text-[var(--text-secondary)] shrink-0" />
                   <span className="flex-1 text-sm text-[var(--text-primary)]">{t(item.labelKey)}</span>
+                  {/* Theme preview swatch on hover for theme commands */}
+                  {isThemeCmd && (
+                    <span
+                      className="hidden md:inline-block w-4 h-4 rounded-full ring-1 ring-[var(--glass-border)] opacity-50 group-hover:opacity-100 transition-opacity"
+                      style={{
+                        background: item.id === 'theme-dark' ? 'linear-gradient(135deg, #0A0A0F, #1A1A2E)'
+                          : item.id === 'theme-light' ? 'linear-gradient(135deg, #F0F4FF, #FFFFFF)'
+                          : item.id === 'theme-skeuomorphic' ? 'linear-gradient(135deg, #F6F1E7, #E8DFCD)'
+                          : item.id === 'theme-liquid-glass' ? 'linear-gradient(135deg, #f3e8ff, #e0f2f1)'
+                          : item.id === 'theme-3d' ? 'linear-gradient(135deg, #050510, #1a0a3a)'
+                          : 'transparent'
+                      }}
+                      aria-hidden="true"
+                    />
+                  )}
                   {item.shortcut && <kbd className="px-1.5 py-0.5 rounded text-[10px] font-mono-custom text-[var(--text-secondary)] bg-[var(--glass-bg)] border border-[var(--glass-border)]">{item.shortcut}</kbd>}
                 </div>
               )})}

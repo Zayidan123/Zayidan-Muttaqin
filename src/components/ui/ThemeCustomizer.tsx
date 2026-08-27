@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Palette, X, RotateCcw, Star } from 'lucide-react'
+import { Palette, X, RotateCcw, Star, Download, Upload } from 'lucide-react'
 import { useTheme } from '@/lib/theme'
+import { useToastStore } from '@/store/toast-store'
 
 interface Preset {
   name: string
@@ -47,6 +48,7 @@ function applyPresetColors(preset: Preset) {
 
 export function ThemeCustomizer() {
   const { setTheme } = useTheme()
+  const { addToast } = useToastStore()
   const [open, setOpen] = useState(false)
 
   // Initialize from localStorage (runs once during mount)
@@ -80,6 +82,59 @@ export function ThemeCustomizer() {
       return next
     })
   }, [])
+
+  // Export all theme settings (theme, favorites, custom colors, preset) as downloadable JSON
+  const exportSettings = useCallback(() => {
+    try {
+      const settings = {
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        theme: localStorage.getItem('theme') || 'dark',
+        themePreset: localStorage.getItem('theme-preset'),
+        themeFavorites: JSON.parse(localStorage.getItem('theme-favorites') || '[]'),
+        themeCustomColors: JSON.parse(localStorage.getItem('theme-custom-colors') || '{}'),
+        lang: localStorage.getItem('lang') || 'id',
+      }
+      const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `zayidan-theme-settings-${Date.now()}.json`
+      a.click()
+      URL.revokeObjectURL(url)
+      addToast('⚙️ Pengaturan tema berhasil diexport', 'success')
+    } catch (e) {
+      addToast('Gagal export pengaturan', 'error')
+    }
+  }, [addToast])
+
+  // Import theme settings from uploaded JSON file
+  const importSettings = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      try {
+        const settings = JSON.parse(e.target?.result as string)
+        if (settings.theme && ['dark', 'light', 'theme-3d', 'liquid-glass', 'skeuomorphic'].includes(settings.theme)) {
+          localStorage.setItem('theme', settings.theme)
+        }
+        if (settings.themePreset) localStorage.setItem('theme-preset', settings.themePreset)
+        if (Array.isArray(settings.themeFavorites)) localStorage.setItem('theme-favorites', JSON.stringify(settings.themeFavorites))
+        if (settings.themeCustomColors && typeof settings.themeCustomColors === 'object') localStorage.setItem('theme-custom-colors', JSON.stringify(settings.themeCustomColors))
+        if (settings.lang) localStorage.setItem('lang', settings.lang)
+        addToast('✓ Pengaturan tema berhasil diimport. Memuat ulang...', 'success')
+        setTimeout(() => window.location.reload(), 800)
+      } catch (err) {
+        addToast('File JSON tidak valid', 'error')
+      }
+    }
+    reader.readAsText(file)
+    // Reset input so same file can be re-uploaded
+    event.target.value = ''
+  }, [addToast])
+
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleToggle = useCallback(() => {
     setOpen((prev) => !prev)
@@ -236,6 +291,30 @@ export function ThemeCustomizer() {
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm font-display font-bold text-[var(--text-primary)] tracking-wider">THEME</span>
             <div className="flex items-center gap-1.5">
+              <button
+                onClick={exportSettings}
+                className="w-6 h-6 rounded-md flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--neon-cyan)] transition-colors cursor-pointer"
+                title="Export settings as JSON"
+                aria-label="Export theme settings"
+              >
+                <Download className="h-3 w-3" />
+              </button>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="w-6 h-6 rounded-md flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--neon-cyan)] transition-colors cursor-pointer"
+                title="Import settings from JSON"
+                aria-label="Import theme settings"
+              >
+                <Upload className="h-3 w-3" />
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="application/json,.json"
+                onChange={importSettings}
+                className="hidden"
+                aria-hidden="true"
+              />
               <button
                 onClick={resetTheme}
                 className="w-6 h-6 rounded-md flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--neon-cyan)] transition-colors cursor-pointer"
