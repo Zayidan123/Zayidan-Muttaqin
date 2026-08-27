@@ -12,20 +12,22 @@ interface Preset {
   bg?: string
   surface?: string
   themeMode?: 'dark' | 'light' | 'liquid-glass' | 'theme-3d' | 'skeuomorphic'
+  // Mini preview gradient swatch shown on the preset card (CSS background value)
+  previewBg: string
 }
 
 const PRESETS: Preset[] = [
-  { name: 'Cyberpunk', cyan: '#00F5FF', magenta: '#FF00AA', purple: '#8B5CF6' },
-  { name: 'Bloomberg', cyan: '#00C853', magenta: '#FFB300', purple: '#FF6D00', bg: '#0a0f0a', surface: '#111a11' },
-  { name: 'Midnight', cyan: '#00BCD4', magenta: '#2979FF', purple: '#3D5AFE' },
-  { name: 'Sunset', cyan: '#FF6B6B', magenta: '#FFA07A', purple: '#FFD700' },
-  { name: 'Aurora', cyan: '#00E676', magenta: '#E040FB', purple: '#7C4DFF' },
-  { name: 'Matrix', cyan: '#00FF41', magenta: '#39FF14', purple: '#008F11', bg: '#000a00', surface: '#001100' },
-  { name: 'Liquid Glass', cyan: '#C8A0FF', magenta: '#F8BBD9', purple: '#A5E6CF', themeMode: 'liquid-glass' },
-  { name: '3D World', cyan: '#00F5FF', magenta: '#FF2DAA', purple: '#A78BFA', themeMode: 'theme-3d' },
-  { name: 'Cahaya', cyan: '#D4A24C', magenta: '#B8763E', purple: '#6B9B9E', themeMode: 'skeuomorphic' },
-  { name: 'Rose Gold', cyan: '#E8A0BF', magenta: '#F4C2C2', purple: '#DDA0DD' },
-  { name: 'Ocean', cyan: '#00ACC1', magenta: '#0097A7', purple: '#26C6DA' },
+  { name: 'Cyberpunk', cyan: '#00F5FF', magenta: '#FF00AA', purple: '#8B5CF6', previewBg: 'linear-gradient(135deg, #0A0A0F 0%, #1A1A2E 50%, #0A0A0F 100%)' },
+  { name: 'Bloomberg', cyan: '#00C853', magenta: '#FFB300', purple: '#FF6D00', bg: '#0a0f0a', surface: '#111a11', previewBg: 'linear-gradient(135deg, #0a0f0a 0%, #111a11 50%, #0a0f0a 100%)' },
+  { name: 'Midnight', cyan: '#00BCD4', magenta: '#2979FF', purple: '#3D5AFE', previewBg: 'linear-gradient(135deg, #050510 0%, #0F0F3A 50%, #050510 100%)' },
+  { name: 'Sunset', cyan: '#FF6B6B', magenta: '#FFA07A', purple: '#FFD700', previewBg: 'linear-gradient(135deg, #2a0f0a 0%, #3a1a0a 50%, #2a0f0a 100%)' },
+  { name: 'Aurora', cyan: '#00E676', magenta: '#E040FB', purple: '#7C4DFF', previewBg: 'linear-gradient(135deg, #0a1a0f 0%, #1a0a2a 50%, #0a1a0f 100%)' },
+  { name: 'Matrix', cyan: '#00FF41', magenta: '#39FF14', purple: '#008F11', bg: '#000a00', surface: '#001100', previewBg: 'linear-gradient(135deg, #000a00 0%, #001100 50%, #000a00 100%)' },
+  { name: 'Liquid Glass', cyan: '#C8A0FF', magenta: '#F8BBD9', purple: '#A5E6CF', themeMode: 'liquid-glass', previewBg: 'linear-gradient(135deg, #f3e8ff 0%, #fce7f3 50%, #e0f2f1 100%)' },
+  { name: '3D World', cyan: '#00F5FF', magenta: '#FF2DAA', purple: '#A78BFA', themeMode: 'theme-3d', previewBg: 'linear-gradient(135deg, #050510 0%, #1a0a3a 50%, #050510 100%)' },
+  { name: 'Cahaya', cyan: '#D4A24C', magenta: '#B8763E', purple: '#6B9B9E', themeMode: 'skeuomorphic', previewBg: 'linear-gradient(135deg, #F6F1E7 0%, #EFE8DA 50%, #E8DFCD 100%)' },
+  { name: 'Rose Gold', cyan: '#E8A0BF', magenta: '#F4C2C2', purple: '#DDA0DD', previewBg: 'linear-gradient(135deg, #2a1a1f 0%, #3a2025 50%, #2a1a1f 100%)' },
+  { name: 'Ocean', cyan: '#00ACC1', magenta: '#0097A7', purple: '#26C6DA', previewBg: 'linear-gradient(135deg, #0a1a2a 0%, #0a2a3a 50%, #0a1a2a 100%)' },
 ]
 
 const DEFAULT_COLORS = { cyan: '#00F5FF', magenta: '#FF00AA', purple: '#8B5CF6' }
@@ -238,16 +240,23 @@ export function ThemeCustomizer() {
                     <button
                       key={preset.name}
                       onClick={() => applyPreset(preset)}
-                      className={`group relative rounded-lg border p-1.5 text-center transition-all duration-200 cursor-pointer ${
+                      className={`group relative rounded-lg border p-1.5 text-center transition-all duration-200 cursor-pointer overflow-hidden ${
                         isActive ? 'border-[var(--neon-cyan)]/60 shadow-[0_0_10px_var(--neon-cyan)]' : 'border-[var(--glass-border)] hover:border-[var(--glass-border)]/80'
                       }`}
                     >
-                      <div className="flex gap-0.5 mb-1 justify-center">
-                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: preset.cyan }} />
-                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: preset.magenta }} />
-                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: preset.purple }} />
+                      {/* Mini preview thumbnail — shows theme background character */}
+                      <div
+                        className="absolute inset-0 opacity-50 group-hover:opacity-70 transition-opacity"
+                        style={{ background: preset.previewBg }}
+                        aria-hidden="true"
+                      />
+                      {/* Color dots overlay (kept for accent reference) */}
+                      <div className="relative flex gap-0.5 mb-1 justify-center">
+                        <span className="w-3 h-3 rounded-full ring-1 ring-black/20" style={{ backgroundColor: preset.cyan }} />
+                        <span className="w-3 h-3 rounded-full ring-1 ring-black/20" style={{ backgroundColor: preset.magenta }} />
+                        <span className="w-3 h-3 rounded-full ring-1 ring-black/20" style={{ backgroundColor: preset.purple }} />
                       </div>
-                      <span className="text-[9px] font-mono-custom text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors leading-tight block">
+                      <span className="relative text-[9px] font-mono-custom text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors leading-tight block">
                         {preset.name}
                       </span>
                       {isLiquid && (

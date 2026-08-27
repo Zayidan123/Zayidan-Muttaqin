@@ -2,6 +2,7 @@
 import { useEffect } from 'react'
 import { useTheme, type Theme } from '@/lib/theme'
 import { useLanguageStore } from '@/store/language-store'
+import { useToastStore } from '@/store/toast-store'
 
 // Module-level flag — CommandPalette sets this to true when open
 let _commandPaletteOpen = false
@@ -15,6 +16,7 @@ const THEME_CYCLE: Theme[] = ['dark', 'light', 'skeuomorphic', 'liquid-glass', '
 export function useKeyboardShortcuts() {
   const { theme, setTheme } = useTheme()
   const { toggleLang } = useLanguageStore()
+  const { addToast } = useToastStore()
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -44,6 +46,19 @@ export function useKeyboardShortcuts() {
 
             // Clear custom preset so ThemeCustomizer won't restore old one
             try { localStorage.removeItem('theme-preset') } catch { /* ignore */ }
+
+            // Show toast feedback so user knows which theme is now active
+            const themeLabels: Record<Theme, { id: string; en: string; emoji: string }> = {
+              dark: { id: 'Tema Gelap', en: 'Dark Theme', emoji: '🌙' },
+              light: { id: 'Tema Terang', en: 'Light Theme', emoji: '☀️' },
+              skeuomorphic: { id: 'Skeuomorfisme Cahaya', en: 'Light Skeuomorphism', emoji: '✨' },
+              'liquid-glass': { id: 'Liquid Glass', en: 'Liquid Glass', emoji: '💧' },
+              'theme-3d': { id: 'Dunia 3D', en: '3D World', emoji: '🧊' },
+            }
+            const lang = typeof localStorage !== 'undefined' ? (localStorage.getItem('lang') as 'id' | 'en' | null) || 'id' : 'id'
+            const label = themeLabels[nextTheme]
+            const message = lang === 'en' ? `${label.emoji} ${label.en}` : `${label.emoji} ${label.id}`
+            addToast(message, 'info')
           }
           break
         case 'l':
@@ -65,5 +80,5 @@ export function useKeyboardShortcuts() {
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [theme, setTheme, toggleLang])
+  }, [theme, setTheme, toggleLang, addToast])
 }
