@@ -120,7 +120,7 @@ export function About() {
                     src="/zayidan-photo.png"
                     alt="Zayidan Muttaqin - Sales, Leadership, Communication"
                     fill
-                    priority
+                    sizes="(max-width: 640px) 256px, (max-width: 1024px) 288px, 320px"
                     className="object-cover transition-all duration-700 hover:scale-105"
                   />
                 </div>
@@ -166,7 +166,7 @@ export function About() {
               transition={{ duration: 0.5, delay: 0.5 }}
               className="w-full max-w-sm"
             >
-              <div className="p-5 rounded-xl glass border border-[var(--glass-border)] glass-noise">
+              <div className="p-5 rounded-xl glass glass-depth lift-3d border border-[var(--glass-border)] glass-noise">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center border border-[var(--neon-cyan)]/30 bg-[var(--neon-cyan)]/10">
                     <Award className="h-5 w-5 text-[var(--neon-cyan)]" />
@@ -218,7 +218,7 @@ export function About() {
                     transition={{ duration: 0.5, delay: 0.5 + idx * 0.15 }}
                   >
                     <TiltCard className="transition-[box-shadow_0.3s]">
-                    <div className={`p-4 rounded-xl glass border ${borderMap[skill.color]} transition-[box-shadow_0.3s]`}>
+                    <div className={`p-4 rounded-xl glass glass-depth border ${borderMap[skill.color]} transition-[box-shadow_0.3s]`}>
                       <Icon className={`h-6 w-6 ${iconColorMap[skill.color]} mb-2`} />
                       <h3 className="font-display text-xs sm:text-sm font-semibold text-[var(--text-primary)] mb-1">
                         {t(skill.titleKey)}
@@ -243,7 +243,7 @@ export function About() {
               initial={{ opacity: 0, y: 20 }}
               animate={skillsInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="p-6 rounded-xl glass border border-[var(--glass-border)]"
+              className="p-6 rounded-xl glass glass-depth lift-3d border border-[var(--glass-border)]"
             >
               <h3 className="font-display text-sm sm:text-base font-bold text-[var(--neon-cyan)] mb-5 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[var(--neon-cyan)] shadow-[var(--glow-cyan)]" />
@@ -289,7 +289,7 @@ export function About() {
               initial={{ opacity: 0, y: 20 }}
               animate={skillsInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="p-6 rounded-xl glass border border-[var(--glass-border)]"
+              className="p-6 rounded-xl glass glass-depth lift-3d border border-[var(--glass-border)]"
             >
               <h3 className="font-display text-sm sm:text-base font-bold text-[var(--neon-magenta)] mb-5 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[var(--neon-magenta)] shadow-[var(--glow-magenta)]" />
@@ -319,7 +319,7 @@ export function About() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="mt-10 flex justify-center"
           >
-            <div className="p-6 rounded-xl glass border border-[var(--glass-border)]">
+            <div className="p-6 rounded-xl glass glass-depth lift-3d border border-[var(--glass-border)]">
               <SkillRadar
                 skills={hardSkills.map(s => ({
                   name: t(s.key).split('(')[0].trim().substring(0, 12),

@@ -98,8 +98,8 @@ export function Stats() {
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: idx * 0.15 }}
               >
-                <TiltCard className="transition-[box-shadow_0.3s]" maxTilt={6}>
-                <div className={`relative p-5 sm:p-6 rounded-xl glass border ${colors.border} glass-hover-glow glass-noise transition-[box-shadow_0.3s]`}>
+                <TiltCard className="transition-[box-shadow_0.3s]" maxTilt={6} glare>
+                <div className={`tilt-glare-host relative p-5 sm:p-6 rounded-xl glass glass-depth border ${colors.border} glass-hover-glow glass-noise transition-[box-shadow_0.3s]`}>
                   <div className="flex flex-col items-center text-center gap-3">
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center border ${colors.border} bg-[var(--glass-bg)]`}>
                       <Icon className={`h-5 w-5 ${colors.icon}`} />

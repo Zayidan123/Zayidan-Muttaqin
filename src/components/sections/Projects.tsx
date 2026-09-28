@@ -6,6 +6,7 @@ import { Github, ExternalLink } from 'lucide-react'
 import { useLanguageStore } from '@/store/language-store'
 import { projects } from '@/data/projects'
 import { ScrambleText } from '@/components/ui/ScrambleText'
+import { TiltCard } from '@/components/ui/TiltCard'
 
 export function Projects() {
   const { t, lang } = useLanguageStore()
@@ -36,12 +37,16 @@ export function Projects() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: 0.2 + idx * 0.15 }}
-                className="relative p-5 sm:p-6 rounded-xl glass border border-[var(--glass-border)] glass-card-advanced group flex flex-col"
               >
-                <div className="absolute -top-px -left-px w-4 h-4 border-t-2 border-l-2 border-[var(--neon-cyan)] opacity-60 group-hover:opacity-100 transition-opacity" />
-                <div className="absolute -top-px -right-px w-4 h-4 border-t-2 border-r-2 border-[var(--neon-magenta)] opacity-60 group-hover:opacity-100 transition-opacity" />
-                <div className="absolute -bottom-px -left-px w-4 h-4 border-b-2 border-l-2 border-[var(--neon-magenta)] opacity-60 group-hover:opacity-100 transition-opacity" />
-                <div className="absolute -bottom-px -right-px w-4 h-4 border-b-2 border-r-2 border-[var(--neon-cyan)] opacity-60 group-hover:opacity-100 transition-opacity" />
+              <TiltCard
+                maxTilt={7}
+                glare
+                className="tilt-glare-host relative p-5 sm:p-6 rounded-xl glass glass-depth border border-[var(--glass-border)] glass-card-advanced group flex flex-col h-full"
+              >
+                <div className="absolute -top-px -left-px w-4 h-4 border-t-2 border-l-2 border-[var(--neon-cyan)] opacity-60 group-hover:opacity-100 transition-opacity z-[6]" />
+                <div className="absolute -top-px -right-px w-4 h-4 border-t-2 border-r-2 border-[var(--neon-magenta)] opacity-60 group-hover:opacity-100 transition-opacity z-[6]" />
+                <div className="absolute -bottom-px -left-px w-4 h-4 border-b-2 border-l-2 border-[var(--neon-magenta)] opacity-60 group-hover:opacity-100 transition-opacity z-[6]" />
+                <div className="absolute -bottom-px -right-px w-4 h-4 border-b-2 border-r-2 border-[var(--neon-cyan)] opacity-60 group-hover:opacity-100 transition-opacity z-[6]" />
 
                 <h3 className="font-display text-base sm:text-lg font-semibold text-[var(--text-primary)] mb-2">
                   {project.title}
@@ -86,6 +91,7 @@ export function Projects() {
                     </a>
                   )}
                 </div>
+              </TiltCard>
               </motion.div>
             )
           })}

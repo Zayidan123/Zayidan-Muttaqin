@@ -28,6 +28,7 @@ import { AmbientSound } from '@/components/ui/AmbientSound'
 import { LiquidGlassBackground, SparkleField } from '@/components/ui/LiquidGlassBackground'
 import { Theme3DBackground } from '@/components/ui/Theme3DBackground'
 import { SkeuomorphicBackground } from '@/components/ui/SkeuomorphicBackground'
+import { WebGL3DBackground } from '@/components/ui/WebGL3DBackground'
 import { ThemeCustomizer } from '@/components/ui/ThemeCustomizer'
 import { ScrollSpy } from '@/components/ui/ScrollSpy'
 import { AdminPanel } from '@/components/ui/AdminPanel'
@@ -53,6 +54,11 @@ export function PortfolioPage() {
       <ScrollProgress />
       <LightModeBackground />
       <DarkModeBackground />
+      {/* Modern 3D WebGL scene — the signature layer of the default experience.
+          Lazy-loads three.js on the client; other themes keep their own backgrounds. */}
+      <WebGL3DBackground />
+      {/* Depth-of-field vignette: makes content pop above the 3D scene */}
+      <div className="dark depth-vignette fixed inset-0 pointer-events-none z-0" aria-hidden="true" />
       <LiquidGlassBackground />
       <SparkleField />
       <Theme3DBackground />

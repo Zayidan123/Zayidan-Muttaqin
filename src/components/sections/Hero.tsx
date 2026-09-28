@@ -3,12 +3,13 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import Image from 'next/image'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { Download, MapPin, Eye } from 'lucide-react'
+import { Download, MapPin, Eye, Briefcase, Sparkles, TrendingUp } from 'lucide-react'
 import { ParticleBackground } from '@/components/ui/ParticleBackground'
 import { NeonButton } from '@/components/ui/NeonButton'
 import { useLanguageStore } from '@/store/language-store'
 import { useCvStore } from '@/store/cv-store'
 import { useTheme } from '@/lib/theme'
+import { useTilt } from '@/hooks/useTilt'
 
 export function Hero() {
   const { t, lang } = useLanguageStore()
@@ -29,6 +30,9 @@ export function Hero() {
   const parallaxRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: parallaxRef, offset: ["start end", "end start"] })
   const y = useTransform(scrollYProgress, [0, 1], [-15, 15])
+
+  // 3D tilt for the photo card
+  const tilt = useTilt(10)
 
   // Multi-line typing effect refs
   const lineIndexRef = useRef(0)
@@ -139,8 +143,8 @@ export function Hero() {
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
       ref={parallaxRef}
     >
-      {/* Particle Background */}
-      <ParticleBackground />
+      {/* Particle background — on dark theme the WebGL 3D scene takes over */}
+      {mounted && !isDark && <ParticleBackground />}
 
       {/* ===== HERO-SPECIFIC LIGHT MODE ANIMATED ELEMENTS ===== */}
       {mounted && !isDark && (
@@ -218,12 +222,6 @@ export function Hero() {
         />
       )}
 
-      {/* HUD Corner Brackets */}
-      <div className="absolute top-8 left-8 w-8 h-8 border-t-2 border-l-2 border-[var(--neon-cyan)] opacity-30 hidden sm:block" />
-      <div className="absolute top-8 right-8 w-8 h-8 border-t-2 border-r-2 border-[var(--neon-cyan)] opacity-30 hidden sm:block" />
-      <div className="absolute bottom-8 left-8 w-8 h-8 border-b-2 border-l-2 border-[var(--neon-magenta)] opacity-30 hidden sm:block" />
-      <div className="absolute bottom-8 right-8 w-8 h-8 border-b-2 border-r-2 border-[var(--neon-magenta)] opacity-30 hidden sm:block" />
-
       {/* Content */}
       {/* SEO: visually-hidden description for search engines (keyword-rich) */}
       <p className="sr-only" aria-hidden="false">
@@ -250,7 +248,7 @@ export function Hero() {
               {t('hero.greeting')}
             </motion.p>
 
-            {/* Name with glitch effect */}
+            {/* Name with glitch intro, then modern gradient */}
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -258,7 +256,7 @@ export function Hero() {
               className={`font-display text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-6 ${!glitchDone ? 'glitch-text' : ''}`}
               data-text={t('hero.name')}
             >
-              <span className="hero-name-shimmer">{t('hero.name')}</span>
+              <span className={`hero-name-shimmer ${glitchDone ? 'title-gradient-3d' : ''}`}>{t('hero.name')}</span>
             </motion.h1>
 
             {/* Badges */}
@@ -287,7 +285,7 @@ export function Hero() {
               transition={{ duration: 0.6, delay: 0.9 }}
               className="mb-8"
             >
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-mono-custom text-[var(--text-secondary)] glass border border-[var(--glass-border)] tracking-wider">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-mono-custom text-[var(--text-secondary)] glass glass-depth-sm border border-[var(--glass-border)] tracking-wider">
                 <MapPin className="h-3 w-3 text-[var(--neon-cyan)]" />
                 {t('hero.location')}
               </span>
@@ -300,59 +298,86 @@ export function Hero() {
               transition={{ duration: 0.6, delay: 1.0 }}
               className="flex w-full flex-col flex-wrap items-stretch justify-center gap-3 sm:flex-row sm:items-center sm:justify-start sm:gap-4 lg:justify-start"
             >
-              <NeonButton variant="primary" onClick={() => scrollTo('contact')} className="w-full sm:w-auto">
+              <NeonButton variant="primary" onClick={() => scrollTo('contact')} className="w-full sm:w-auto btn-depth">
                 {t('hero.ctaContact')}
               </NeonButton>
-              <NeonButton variant="secondary" onClick={() => setCvOpen(true)} className="w-full sm:w-auto">
+              <NeonButton variant="secondary" onClick={() => setCvOpen(true)} className="w-full sm:w-auto btn-depth">
                 <Eye className="h-4 w-4" />
                 {t('hero.readCV')}
               </NeonButton>
-              <NeonButton variant="secondary" href={lang === 'en' ? "/CV_ZAYIDAN_MUTTAQIN_EN.pdf" : "/CV_ZAYIDAN_MUTTAQIN.pdf"} download className="w-full sm:w-auto">
+              <NeonButton variant="secondary" href={lang === 'en' ? "/CV_ZAYIDAN_MUTTAQIN_EN.pdf" : "/CV_ZAYIDAN_MUTTAQIN.pdf"} download className="w-full sm:w-auto btn-depth">
                 <Download className="h-4 w-4" />
                 {t('hero.downloadCV')}
               </NeonButton>
             </motion.div>
           </div>
 
-          {/* Right Column: Cyber Avatar Frame */}
+          {/* Right Column: Modern 3D Photo Card */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.5 }}
             className="order-first lg:order-none lg:col-span-5 mb-8 lg:mb-0 flex justify-center items-center w-full"
           >
-            <div className="relative w-60 h-60 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-[320px] lg:h-[320px] xl:w-[360px] xl:h-[360px] shrink-0">
-              {/* HUD Brackets */}
-              <div className="absolute -top-2 -left-2 w-6 h-6 border-t-2 border-l-2 border-[var(--neon-cyan)] z-10" />
-              <div className="absolute -top-2 -right-2 w-6 h-6 border-t-2 border-r-2 border-[var(--neon-cyan)] z-10" />
-              <div className="absolute -bottom-2 -left-2 w-6 h-6 border-b-2 border-l-2 border-[var(--neon-magenta)] z-10" />
-              <div className="absolute -bottom-2 -right-2 w-6 h-6 border-b-2 border-r-2 border-[var(--neon-magenta)] z-10" />
+            <div className="hero-3d-stage relative w-60 h-60 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-[320px] lg:h-[320px] xl:w-[360px] xl:h-[360px] shrink-0">
+              {/* Ambient aura glow behind the card */}
+              <div className="hero-3d-aura" aria-hidden="true" />
 
-              {/* Glowing decorative circles */}
-              <div className="absolute -inset-4 rounded-full border border-[var(--neon-cyan)]/10 animate-[spin_25s_linear_infinite]" />
-              <div className="absolute -inset-8 rounded-full border border-[var(--neon-magenta)]/5 animate-[spin_35s_linear_infinite_reverse]" />
+              {/* The tilt card itself */}
+              <div
+                ref={tilt.ref}
+                onMouseMove={tilt.handleMouseMove}
+                onMouseLeave={tilt.handleMouseLeave}
+                className="hero-3d-card relative w-full h-full rounded-3xl"
+              >
+                {/* Gradient Border and Photo */}
+                <div className="avatar-gradient-border w-full h-full rounded-3xl overflow-hidden p-[3px] glass-depth">
+                  <div className="avatar-inner w-full h-full rounded-3xl overflow-hidden bg-zinc-950/80 relative">
+                    <Image
+                      src="/zayidan-photo.png"
+                      alt="Zayidan Muttaqin — Sales & Leadership Professional di Banyuwangi"
+                      fill
+                      priority
+                      sizes="(max-width: 640px) 240px, (max-width: 1024px) 320px, 360px"
+                      className="object-cover transition-transform duration-700 hover:scale-105"
+                    />
+                    {/* Soft depth gradient at the bottom of the photo */}
+                    <div
+                      className="absolute inset-x-0 bottom-0 h-1/3 pointer-events-none z-[5]"
+                      style={{ background: 'linear-gradient(to top, rgba(5,5,16,0.55), transparent)' }}
+                      aria-hidden="true"
+                    />
+                  </div>
+                </div>
 
-              {/* Gradient Border and Avatar */}
-              <div className="avatar-gradient-border w-full h-full rounded-2xl overflow-hidden p-[3px]">
-                <div className="avatar-inner w-full h-full rounded-2xl overflow-hidden bg-zinc-950/80 relative">
-                  <Image
-                    src="/zayidan-photo.png"
-                    alt="Zayidan Muttaqin"
-                    fill
-                    priority
-                    className="object-cover transition-all duration-700 hover:scale-105"
-                  />
-                  {/* Digital scanner line effect via Framer Motion */}
-                  <motion.div
-                    animate={{ top: ['0%', '100%', '0%'] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                    className="absolute left-0 right-0 h-[2px] bg-[var(--neon-cyan)] shadow-[0_0_8px_var(--neon-cyan)] z-10"
-                  />
+                {/* Glare overlay — light reflection follows the cursor */}
+                <div className="tilt-glare rounded-3xl" aria-hidden="true" />
+
+                {/* Floating glass chips — layered in real Z-space */}
+                <div className="chip-3d chip-3d-a" aria-hidden="true">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+                  </span>
+                  <span className="text-[var(--text-primary)] font-medium">{t('footer.online')}</span>
+                </div>
+
+                <div className="chip-3d chip-3d-b" aria-hidden="true">
+                  <TrendingUp className="h-3.5 w-3.5 text-[var(--neon-cyan)]" />
+                  <span className="text-[var(--text-primary)] font-medium">
+                    {t('stats.experience.value')} {t('stats.experience.label')}
+                  </span>
+                </div>
+
+                <div className="chip-3d chip-3d-c" aria-hidden="true">
+                  <Sparkles className="h-3.5 w-3.5 text-[var(--neon-magenta)]" />
+                  <span className="text-[var(--text-primary)] font-medium">{t('footer.tagline')}</span>
                 </div>
               </div>
 
-              {/* Outer pulsing border overlay */}
-              <div className="absolute inset-0 rounded-2xl border-2 border-[var(--neon-cyan)]/20 pointer-events-none animate-pulse z-10" />
+              {/* Orbiting accent rings (outside the tilt card, subtle) */}
+              <div className="absolute -inset-6 rounded-full border border-[var(--neon-cyan)]/8 pointer-events-none animate-[spin_40s_linear_infinite]" aria-hidden="true" />
+              <div className="absolute -inset-10 rounded-full border border-[var(--neon-magenta)]/5 pointer-events-none animate-[spin_55s_linear_infinite_reverse]" aria-hidden="true" />
             </div>
           </motion.div>
         </div>

@@ -4,9 +4,9 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { PortfolioPage } from "./page";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
-const orbitron = Orbitron({ subsets: ["latin"], variable: "--font-display" });
-const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
+const orbitron = Orbitron({ subsets: ["latin"], variable: "--font-display", display: "swap" });
+const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 
 // Canonical site URL — used for SEO, sitemap, structured data
 const SITE_URL = "https://zayidan-muttaqin.vercel.app";
@@ -114,6 +114,84 @@ const breadcrumbJsonLd = JSON.stringify({
   ]
 });
 
+// ProfilePage schema — tells Google this URL is a profile/about-me page
+// (implements E-E-A-T signals for personal brands)
+const profilePageJsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  "dateModified": "2026-09-29",
+  "mainEntity": {
+    "@type": "Person",
+    "name": "Zayidan Muttaqin",
+    "alternateName": ["Zayidan", "ZayM1122"],
+    "url": SITE_URL,
+    "image": `${SITE_URL}/zayidan-photo.png`,
+    "description": "Sales, Leadership, dan Communication Expert berbasis di Banyuwangi dengan 3+ tahun pengalaman penjualan retail dan kepemimpinan tim.",
+    "jobTitle": "Sales Promotion Boy Staff & Sales Professional",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Banyuwangi",
+      "addressRegion": "Jawa Timur",
+      "addressCountry": "ID"
+    },
+    "sameAs": [
+      "https://www.linkedin.com/in/zayidan-muttaqin/",
+      "https://github.com/Zayidan123",
+      "https://t.me/ZayM1122",
+      "https://www.instagram.com/zayidan1122"
+    ]
+  }
+});
+
+// FAQPage schema — mirrors the visible FAQ section, eligible for FAQ rich
+// results (expandable Q&A directly in Google Search)
+const faqPageJsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Apa pengalaman kerja Zayidan Muttaqin?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Zayidan Muttaqin memiliki pengalaman 3+ tahun di bidang penjualan ritel dan kepemimpinan tim. Fokus utamanya adalah mencapai target penjualan sambil membangun hubungan jangka panjang dengan pelanggan."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Apakah Zayidan Muttaqin terbuka untuk proyek freelance?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ya, selalu terbuka untuk proyek freelance dan kolaborasi. Silakan hubungi melalui formulir kontak di website untuk mendiskusikan kebutuhan proyek Anda."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Bagaimana cara menghubungi Zayidan Muttaqin?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Anda dapat menghubungi melalui formulir kontak di website, email, atau LinkedIn. Biasanya merespons dalam 24 jam."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Teknologi apa yang dikuasai Zayidan Muttaqin?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Menguasai operasi komputer, editing video (CapCut), desain grafis (Canva), AI Prompting, dan berbagai platform keuangan digital (saham, forex, crypto), serta dasar Python dan software development."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Apakah Zayidan Muttaqin bisa bekerja remote?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Tentu saja. Berpengalaman dalam kolaborasi remote dan terbiasa menggunakan berbagai alat komunikasi digital untuk koordinasi tim yang efektif."
+      }
+    }
+  ]
+});
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -202,10 +280,10 @@ export const metadata: Metadata = {
     siteName: "Zayidan Muttaqin Portfolio",
     images: [
       {
-        url: "/zayidan-photo.png",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Zayidan Muttaqin — Sales & Leadership Professional",
+        alt: "Zayidan Muttaqin — Sales & Leadership Professional di Banyuwangi, Indonesia",
         type: "image/png",
       },
     ],
@@ -216,7 +294,14 @@ export const metadata: Metadata = {
     creator: "@zayidan1122",
     title: "Zayidan Muttaqin — Sales & Leadership Portfolio",
     description: "Sales Promotion Boy · Store Associate · Store Manager — Banyuwangi, Indonesia. Disiplin, teliti, bertanggung jawab, dan adaptif.",
-    images: ["/zayidan-photo.png"],
+    images: [
+      {
+        url: "/twitter-image.png",
+        width: 1200,
+        height: 600,
+        alt: "Zayidan Muttaqin — Sales & Leadership Portfolio",
+      },
+    ],
   },
   icons: {
     icon: [
@@ -276,6 +361,8 @@ export default function RootLayout({
         <script id="structured-data-person" type="application/ld+json" dangerouslySetInnerHTML={{ __html: personJsonLd }} />
         <script id="structured-data-website" type="application/ld+json" dangerouslySetInnerHTML={{ __html: websiteJsonLd }} />
         <script id="structured-data-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }} />
+        <script id="structured-data-profile-page" type="application/ld+json" dangerouslySetInnerHTML={{ __html: profilePageJsonLd }} />
+        <script id="structured-data-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqPageJsonLd }} />
       </head>
       <body className="antialiased min-h-screen w-full overflow-x-hidden bg-[var(--background)] text-[var(--foreground)] transition-colors duration-300">
         <ThemeProvider>
