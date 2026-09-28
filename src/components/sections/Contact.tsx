@@ -127,22 +127,22 @@ export function Contact() {
   return (
     <section id="contact" className="relative py-20 sm:py-28 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto" ref={ref}>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6 }} className="mb-12 sm:mb-16">
+        <motion.div initial={{ opacity: 0, y: 20, rotateX: 18, transformPerspective: 900 }} animate={inView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}} transition={{ duration: 0.6 }} className="mb-12 sm:mb-16">
           <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2"><ScrambleText text={t('contact.title')} /></h2>
           <div className="section-title-line" />
           <p className="mt-4 text-sm sm:text-base text-[var(--text-secondary)] max-w-xl">{t('contact.subtitle')}</p>
         </motion.div>
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 lg:gap-12">
-          <motion.div initial={{ opacity: 0, x: -30 }} animate={inView ? { opacity: 1, x: 0 } : {}} transition={{ duration: 0.6, delay: 0.2 }} className="lg:col-span-2 space-y-4 relative">
+          <motion.div initial={{ opacity: 0, x: -30, rotateY: 10, transformPerspective: 900 }} animate={inView ? { opacity: 1, x: 0, rotateY: 0, transformPerspective: 900 } : {}} transition={{ duration: 0.6, delay: 0.2 }} className="lg:col-span-2 space-y-4 relative">
             {contactInfo.map((item) => {
               const Icon = item.key === 'email' && copiedField === 'email' ? Check : item.key === 'phone' && copiedField === 'phone' ? Check : item.icon
               return (
                 <a key={item.key} href={item.isShare || item.key === 'cv' ? undefined : item.href} download={item.key === 'cv' ? undefined : ('download' in item && item.download ? true : undefined)} target={item.href?.startsWith('http') ? '_blank' : undefined} rel={item.href?.startsWith('http') ? 'noopener noreferrer' : undefined}
                   onClick={(e) => { if (item.copyable) { e.preventDefault(); handleCopy(item.copyValue!, item.key) } else if (item.isShare) { e.preventDefault(); handleShare() } else if (item.key === 'cv') { e.preventDefault(); setCvOpen(true) } }}
-                  className={`flex items-start gap-4 p-4 rounded-xl glass border border-[var(--glass-border)] glass-card-advanced transition-all duration-300 group${item.isShare ? ' share-profile-btn cursor-pointer' : ''}`}
+                  className={`flex items-start gap-4 p-4 rounded-xl glass glass-depth border border-[var(--glass-border)] glass-card-advanced transition-all duration-300 group${item.isShare ? ' share-profile-btn cursor-pointer' : ''}`}
                   style={{ '--hover-glow': item.color } as React.CSSProperties}
                   onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = `0 0 20px ${item.color}33` }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = 'none' }}>
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.removeProperty('box-shadow') }}>
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border" style={{ color: item.color, borderColor: `${item.color}33`, backgroundColor: `${item.color}0D` }}><Icon className="h-5 w-5" /></div>
                   <div><p className="text-xs text-[var(--text-secondary)] mb-0.5">{item.label}</p><p className="text-sm font-mono-custom font-medium" style={{ color: item.color }}>{item.value || t('contact.share')}</p></div>
                   {item.isShare && <ExternalLink className="h-4 w-4 text-[var(--text-secondary)]/40 ml-auto mt-1 shrink-0" />}
@@ -157,10 +157,10 @@ export function Contact() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.5 }}
-                className="flex items-center gap-4 p-4 rounded-xl glass border border-[var(--glass-border)] glass-card-advanced transition-all duration-300 group"
+                className="flex items-center gap-4 p-4 rounded-xl glass glass-depth border border-[var(--glass-border)] glass-card-advanced transition-all duration-300 group"
                 style={{ '--hover-glow': 'var(--neon-cyan)' } as React.CSSProperties}
                 onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '0 0 20px var(--neon-cyan)33' }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = 'none' }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.removeProperty('box-shadow') }}
               >
                 <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border" style={{ color: 'var(--neon-cyan)', borderColor: 'rgba(0,245,255,0.2)', backgroundColor: 'rgba(0,245,255,0.05)' }}>
                   <QrCode className="h-5 w-5" />
@@ -193,8 +193,8 @@ export function Contact() {
               </div>
             )}
           </motion.div>
-          <motion.div initial={{ opacity: 0, x: 30 }} animate={inView ? { opacity: 1, x: 0 } : {}} transition={{ duration: 0.6, delay: 0.3 }} className="lg:col-span-3 space-y-6">
-            <TiltCard maxTilt={4}><div className="relative p-6 sm:p-8 rounded-xl glass border border-[var(--glass-border)] glass-noise">
+          <motion.div initial={{ opacity: 0, x: 30, rotateY: -10, transformPerspective: 900 }} animate={inView ? { opacity: 1, x: 0, rotateY: 0, transformPerspective: 900 } : {}} transition={{ duration: 0.6, delay: 0.3 }} className="lg:col-span-3 space-y-6">
+            <TiltCard maxTilt={4}><div className="relative p-6 sm:p-8 rounded-xl glass glass-depth border border-[var(--glass-border)] glass-noise">
               <div className="absolute -top-px -left-px w-5 h-5 border-t-2 border-l-2 border-[var(--neon-cyan)]" /><div className="absolute -top-px -right-px w-5 h-5 border-t-2 border-r-2 border-[var(--neon-magenta)]" /><div className="absolute -bottom-px -left-px w-5 h-5 border-b-2 border-l-2 border-[var(--neon-magenta)]" /><div className="absolute -bottom-px -right-px w-5 h-5 border-b-2 border-r-2 border-[var(--neon-cyan)]" />
               {formStatus === 'success' ? (
                 <div className="flex flex-col items-center justify-center py-12 gap-4">
@@ -223,8 +223,8 @@ export function Contact() {
 
             {/* Feature 1: Interactive Location Map */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
+              initial={{ opacity: 0, y: 20, rotateX: 18, transformPerspective: 900 }}
+              animate={inView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
               transition={{ duration: 0.6, delay: 0.5 }}
               className="map-card relative p-4 sm:p-5 rounded-xl glass border border-[var(--glass-border)] overflow-hidden transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,245,255,0.15)] hover:border-[var(--neon-cyan)]/30"
             >

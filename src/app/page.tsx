@@ -12,8 +12,6 @@ import { Experience } from '@/components/sections/Experience'
 import { Projects } from '@/components/sections/Projects'
 import { FAQ } from '@/components/sections/FAQ'
 import { Contact } from '@/components/sections/Contact'
-import { LightModeBackground } from '@/components/ui/LightModeBackground'
-import { DarkModeBackground } from '@/components/ui/DarkModeBackground'
 import { ScrollProgress } from '@/components/ui/ScrollProgress'
 import { FloatingBackToTop } from '@/components/ui/FloatingBackToTop'
 import { WhatsAppFloatingButton } from '@/components/ui/WhatsAppFloatingButton'
@@ -25,11 +23,7 @@ import { KeyboardShortcutsHint } from '@/components/ui/KeyboardShortcutsHint'
 import { KonamiEasterEgg } from '@/components/ui/KonamiEasterEgg'
 import { CursorGlow } from '@/components/ui/CursorGlow'
 import { AmbientSound } from '@/components/ui/AmbientSound'
-import { LiquidGlassBackground, SparkleField } from '@/components/ui/LiquidGlassBackground'
-import { Theme3DBackground } from '@/components/ui/Theme3DBackground'
-import { SkeuomorphicBackground } from '@/components/ui/SkeuomorphicBackground'
 import { WebGL3DBackground } from '@/components/ui/WebGL3DBackground'
-import { ThemeCustomizer } from '@/components/ui/ThemeCustomizer'
 import { ScrollSpy } from '@/components/ui/ScrollSpy'
 import { AdminPanel } from '@/components/ui/AdminPanel'
 import { AnalyticsTracker } from '@/components/ui/AnalyticsTracker'
@@ -52,17 +46,12 @@ export function PortfolioPage() {
     <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden">
       <LoadingScreen />
       <ScrollProgress />
-      <LightModeBackground />
-      <DarkModeBackground />
-      {/* Modern 3D WebGL scene — the signature layer of the default experience.
-          Lazy-loads three.js on the client; other themes keep their own backgrounds. */}
+      {/* Unified modern 3D WebGL scene — the signature layer of the whole site.
+          Runs in BOTH themes (Gelap & Terang): lazy-loads three.js on the
+          client and re-tints lighting/particles in place when the theme flips. */}
       <WebGL3DBackground />
       {/* Depth-of-field vignette: makes content pop above the 3D scene */}
-      <div className="dark depth-vignette fixed inset-0 pointer-events-none z-0" aria-hidden="true" />
-      <LiquidGlassBackground />
-      <SparkleField />
-      <Theme3DBackground />
-      <SkeuomorphicBackground />
+      <div className="depth-vignette fixed inset-0 pointer-events-none z-0" aria-hidden="true" />
       <Navbar />
       <main className="flex-1 relative z-[1]">
         <Hero />
@@ -87,7 +76,6 @@ export function PortfolioPage() {
       <WhatsAppFloatingButton />
       <ScrollSpy />
       <AmbientSound />
-      <ThemeCustomizer />
       <Toast />
       <CommandPalette />
       <CvReader />

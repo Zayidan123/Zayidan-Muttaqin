@@ -21,8 +21,8 @@ export function Experience() {
       <motion.div className="max-w-4xl mx-auto" style={{ y }} ref={ref}>
         {/* Section Title */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
+          initial={{ opacity: 0, y: 20, rotateX: 18, transformPerspective: 900 }}
+          animate={inView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
           transition={{ duration: 0.6 }}
           className="mb-12 sm:mb-16"
         >
@@ -53,8 +53,8 @@ export function Experience() {
               return (
                 <motion.div
                   key={exp.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={inView ? { opacity: 1, y: 0 } : {}}
+                  initial={{ opacity: 0, y: 30, rotateX: 22, transformPerspective: 900 }}
+                  animate={inView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
                   transition={{ duration: 0.6, delay: 0.2 + idx * 0.15 }}
                   className={`relative flex items-start gap-6 sm:gap-0 ${
                     isLeft ? 'sm:flex-row' : 'sm:flex-row-reverse'

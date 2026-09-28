@@ -31,8 +31,8 @@ export function Footer() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
+          initial={{ opacity: 0, y: 20, rotateX: 18, transformPerspective: 900 }}
+          animate={inView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
           transition={{ duration: 0.6 }}
           className="flex flex-col md:flex-row items-center justify-between gap-6"
         >
@@ -64,7 +64,7 @@ export function Footer() {
                 className={`group w-9 h-9 sm:w-10 sm:h-10 rounded-lg glass flex items-center justify-center text-[var(--text-secondary)] hover:text-[${social.hoverColor}] hover:border-[${social.hoverBorder}]/30 hover:shadow-[${social.hoverGlow}] transition-all duration-300 hover:scale-110`}
                 style={{ '--hover-color': social.hoverColor } as React.CSSProperties}
                 onMouseEnter={(e) => { const el = e.currentTarget as HTMLElement; el.style.color = social.hoverColor; el.style.borderColor = social.hoverColor + '4D'; el.style.boxShadow = `0 0 15px ${social.hoverColor}33` }}
-                onMouseLeave={(e) => { const el = e.currentTarget as HTMLElement; el.style.color = ''; el.style.borderColor = ''; el.style.boxShadow = 'none' }}
+                onMouseLeave={(e) => { const el = e.currentTarget as HTMLElement; el.style.color = ''; el.style.borderColor = ''; el.style.removeProperty('box-shadow') }}
                 aria-label={social.label}
               >
                 <social.icon className="h-4 w-4" />

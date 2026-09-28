@@ -3,7 +3,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Home, User, Briefcase, Mail, Sun, Moon, Globe, Download, ArrowUp, Search, HelpCircle, Trophy, Cpu, Eye, Github, Palette, Sparkles, Layers, Box, Upload, FileJson, QrCode } from 'lucide-react'
+import { Home, User, Briefcase, Mail, Sun, Moon, Globe, Download, ArrowUp, Search, HelpCircle, Trophy, Cpu, Eye, Github, Palette, Upload } from 'lucide-react'
 import { useLanguageStore } from '@/store/language-store'
 import { useTheme } from '@/lib/theme'
 import { useToastStore } from '@/store/toast-store'
@@ -24,15 +24,8 @@ export function CommandPalette() {
 
   const scrollTo = useCallback((id: string) => { document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }) }, [])
 
-  const applyTheme = useCallback((nextTheme: 'dark' | 'light' | 'skeuomorphic' | 'liquid-glass' | 'theme-3d') => {
-    const html = document.documentElement
-    html.classList.remove('dark', 'light', 'theme-3d', 'liquid-glass', 'skeuomorphic')
-    if (nextTheme === 'dark') html.classList.add('dark')
-    else if (nextTheme === 'theme-3d') html.classList.add('theme-3d')
-    else if (nextTheme === 'liquid-glass') html.classList.add('liquid-glass')
-    else if (nextTheme === 'skeuomorphic') html.classList.add('skeuomorphic')
+  const applyTheme = useCallback((nextTheme: 'dark' | 'light') => {
     setTheme(nextTheme)
-    try { localStorage.removeItem('theme-preset') } catch { /* ignore */ }
   }, [setTheme])
 
   const commands: Cmd[] = [
@@ -45,16 +38,10 @@ export function CommandPalette() {
     { id: 'techstack', labelKey: 'commandPalette.goTechstack', group: 'commandPalette.navGroup', icon: Cpu, action: () => scrollTo('techstack') },
     { id: 'achievements', labelKey: 'commandPalette.goAchievements', group: 'commandPalette.navGroup', icon: Trophy, action: () => scrollTo('achievements') },
     { id: 'theme', labelKey: 'commandPalette.toggleTheme', group: 'commandPalette.actionsGroup', icon: Palette, shortcut: 'T', action: () => {
-      const cycle = ['dark', 'light', 'skeuomorphic', 'liquid-glass', 'theme-3d'] as const
-      const idx = cycle.indexOf(theme as typeof cycle[number])
-      const next = cycle[(idx + 1) % cycle.length]
-      applyTheme(next)
+      applyTheme(theme === 'dark' ? 'light' : 'dark')
     } },
     { id: 'theme-dark', labelKey: 'commandPalette.themeDark', group: 'commandPalette.themesGroup', icon: Moon, action: () => applyTheme('dark') },
     { id: 'theme-light', labelKey: 'commandPalette.themeLight', group: 'commandPalette.themesGroup', icon: Sun, action: () => applyTheme('light') },
-    { id: 'theme-skeuomorphic', labelKey: 'commandPalette.themeSkeuomorphic', group: 'commandPalette.themesGroup', icon: Sparkles, action: () => applyTheme('skeuomorphic') },
-    { id: 'theme-liquid-glass', labelKey: 'commandPalette.themeLiquidGlass', group: 'commandPalette.themesGroup', icon: Layers, action: () => applyTheme('liquid-glass') },
-    { id: 'theme-3d', labelKey: 'commandPalette.theme3D', group: 'commandPalette.themesGroup', icon: Box, action: () => applyTheme('theme-3d') },
     { id: 'lang', labelKey: 'commandPalette.switchLang', group: 'commandPalette.actionsGroup', icon: Globe, shortcut: 'L', action: () => { toggleLang(); addToast(lang === 'id' ? 'Switched to English' : 'Beralih ke Bahasa Indonesia', 'info') } },
     { id: 'read-cv', labelKey: 'commandPalette.readCV', group: 'commandPalette.actionsGroup', icon: Eye, shortcut: 'V', action: () => setCvOpen(true) },
     { id: 'cv', labelKey: 'commandPalette.downloadCV', group: 'commandPalette.actionsGroup', icon: Download, action: () => { const a = document.createElement('a'); a.href = lang === 'en' ? '/CV_ZAYIDAN_MUTTAQIN_EN.pdf' : '/CV_ZAYIDAN_MUTTAQIN.pdf'; a.download = lang === 'en' ? 'CV_ZAYIDAN_MUTTAQIN_EN.pdf' : 'CV_ZAYIDAN_MUTTAQIN.pdf'; a.click() } },
@@ -62,21 +49,18 @@ export function CommandPalette() {
     { id: 'export-settings', labelKey: 'commandPalette.exportSettings', group: 'commandPalette.actionsGroup', icon: Download, action: () => {
       try {
         const settings = {
-          version: 1, exportedAt: new Date().toISOString(),
+          version: 2, exportedAt: new Date().toISOString(),
           theme: localStorage.getItem('theme') || 'dark',
-          themePreset: localStorage.getItem('theme-preset'),
-          themeFavorites: JSON.parse(localStorage.getItem('theme-favorites') || '[]'),
-          themeCustomColors: JSON.parse(localStorage.getItem('theme-custom-colors') || '{}'),
           lang: localStorage.getItem('lang') || 'id',
         }
         const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' })
         const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
-        a.download = `zayidan-theme-settings-${Date.now()}.json`
+        a.download = `zayidan-settings-${Date.now()}.json`
         a.click()
         URL.revokeObjectURL(url)
-        addToast('⚙️ Pengaturan tema berhasil diexport', 'success')
+        addToast('Pengaturan berhasil diexport', 'success')
       } catch { addToast('Gagal export pengaturan', 'error') }
     } },
     { id: 'import-settings', labelKey: 'commandPalette.importSettings', group: 'commandPalette.actionsGroup', icon: Upload, action: () => {
@@ -90,24 +74,19 @@ export function CommandPalette() {
         reader.onload = (ev) => {
           try {
             const settings = JSON.parse(ev.target?.result as string)
-            if (settings.theme && ['dark', 'light', 'theme-3d', 'liquid-glass', 'skeuomorphic'].includes(settings.theme)) {
+            // Accept both new (v2) and legacy (v1) exports; legacy theme values
+            // are simply ignored unless they are light/dark
+            if (settings.theme === 'dark' || settings.theme === 'light') {
               localStorage.setItem('theme', settings.theme)
             }
-            if (settings.themePreset) localStorage.setItem('theme-preset', settings.themePreset)
-            if (Array.isArray(settings.themeFavorites)) localStorage.setItem('theme-favorites', JSON.stringify(settings.themeFavorites))
-            if (settings.themeCustomColors && typeof settings.themeCustomColors === 'object') localStorage.setItem('theme-custom-colors', JSON.stringify(settings.themeCustomColors))
             if (settings.lang) localStorage.setItem('lang', settings.lang)
-            addToast('✓ Pengaturan tema berhasil diimport. Memuat ulang...', 'success')
+            addToast('Pengaturan berhasil diimport. Memuat ulang...', 'success')
             setTimeout(() => window.location.reload(), 800)
           } catch { addToast('File JSON tidak valid', 'error') }
         }
         reader.readAsText(file)
       }
       input.click()
-    } },
-    { id: 'qr-share', labelKey: 'commandPalette.qrShare', group: 'commandPalette.actionsGroup', icon: QrCode, action: () => {
-      // Trigger QR modal by dispatching event that ThemeCustomizer listens to
-      window.dispatchEvent(new CustomEvent('theme:open-qr'))
     } },
   ]
 
@@ -162,12 +141,9 @@ export function CommandPalette() {
                     <span
                       className="hidden md:inline-block w-4 h-4 rounded-full ring-1 ring-[var(--glass-border)] opacity-50 group-hover:opacity-100 transition-opacity"
                       style={{
-                        background: item.id === 'theme-dark' ? 'linear-gradient(135deg, #0A0A0F, #1A1A2E)'
-                          : item.id === 'theme-light' ? 'linear-gradient(135deg, #F0F4FF, #FFFFFF)'
-                          : item.id === 'theme-skeuomorphic' ? 'linear-gradient(135deg, #F6F1E7, #E8DFCD)'
-                          : item.id === 'theme-liquid-glass' ? 'linear-gradient(135deg, #f3e8ff, #e0f2f1)'
-                          : item.id === 'theme-3d' ? 'linear-gradient(135deg, #050510, #1a0a3a)'
-                          : 'transparent'
+                        background: item.id === 'theme-dark'
+                          ? 'linear-gradient(135deg, #0A0A0F, #1A1A2E)'
+                          : 'linear-gradient(135deg, #F0F4FF, #FFFFFF)',
                       }}
                       aria-hidden="true"
                     />

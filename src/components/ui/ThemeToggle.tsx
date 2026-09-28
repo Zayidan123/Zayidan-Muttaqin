@@ -24,20 +24,12 @@ export function ThemeToggle() {
   }
 
   const handleToggle = () => {
-    // If currently in a special theme (3D, liquid-glass, skeuomorphic), clear the preset
-    // so ThemeCustomizer won't re-apply it
-    if (theme === 'theme-3d' || theme === 'liquid-glass' || theme === 'skeuomorphic') {
-      try { localStorage.removeItem('theme-preset') } catch { /* ignore */ }
-    }
+    const targetTheme = theme === 'dark' ? 'light' : 'dark'
 
-    // Determine target: switch between dark and light
-    // skeuomorphic is a light theme, so toggling goes to dark
-    const targetTheme = (theme === 'light' || theme === 'skeuomorphic') ? 'dark' : 'light'
-
-    // Theme transition overlay
+    // Theme transition overlay — a soft flash that masks the palette swap
     const overlay = document.createElement('div')
     overlay.id = 'theme-transition-overlay'
-    const overlayBg = (targetTheme === 'light') ? '#ffffff' : '#050510'
+    const overlayBg = targetTheme === 'light' ? '#ffffff' : '#050510'
     Object.assign(overlay.style, {
       position: 'fixed', inset: '0', zIndex: '9999',
       background: overlayBg, pointerEvents: 'none', opacity: '0',
@@ -49,22 +41,35 @@ export function ThemeToggle() {
     )
     anim.onfinish = () => overlay.remove()
 
-    // Clean up special theme classes
-    document.documentElement.classList.remove('theme-3d', 'liquid-glass', 'skeuomorphic')
-
     setTheme(targetTheme)
   }
 
-  const isDark = theme !== 'light' && theme !== 'skeuomorphic'
+  const isDark = theme === 'dark'
 
   return (
     <button
       onClick={handleToggle}
-      className="relative w-9 h-9 rounded-lg glass flex items-center justify-center transition-all duration-300 hover:shadow-[var(--glow-cyan)] group cursor-pointer"
+      className="relative w-9 h-9 rounded-lg glass flex items-center justify-center transition-all duration-300 hover:shadow-[var(--glow-cyan)] group cursor-pointer [perspective:200px]"
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      title={isDark ? 'Tema Terang' : 'Tema Gelap'}
     >
-      <Sun className="h-4 w-4 absolute transition-all duration-300 text-[var(--neon-cyan)] group-hover:rotate-90 group-hover:scale-110" style={{ opacity: isDark ? 0 : 1 }} />
-      <Moon className="h-4 w-4 absolute transition-all duration-300 text-[var(--neon-cyan)] group-hover:-rotate-12 group-hover:scale-110" style={{ opacity: isDark ? 1 : 0 }} />
+      {/* 3D flip: sun and moon swap with a rotateY turn */}
+      <Sun
+        className="h-4 w-4 absolute transition-all duration-500 text-[var(--neon-cyan)] group-hover:rotate-90 group-hover:scale-110"
+        style={{
+          opacity: isDark ? 0 : 1,
+          transform: isDark ? 'rotateY(90deg) scale(0.6)' : 'rotateY(0deg) scale(1)',
+          transformStyle: 'preserve-3d',
+        }}
+      />
+      <Moon
+        className="h-4 w-4 absolute transition-all duration-500 text-[var(--neon-cyan)] group-hover:-rotate-12 group-hover:scale-110"
+        style={{
+          opacity: isDark ? 1 : 0,
+          transform: isDark ? 'rotateY(0deg) scale(1)' : 'rotateY(-90deg) scale(0.6)',
+          transformStyle: 'preserve-3d',
+        }}
+      />
     </button>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 import { useEffect } from 'react'
-import { useTheme, type Theme } from '@/lib/theme'
+import { useTheme } from '@/lib/theme'
 import { useLanguageStore } from '@/store/language-store'
 import { useToastStore } from '@/store/toast-store'
 import { playThemeSwitchSound } from '@/lib/theme-sound'
@@ -11,8 +11,10 @@ export function setCommandPaletteOpen(open: boolean) {
   _commandPaletteOpen = open
 }
 
-// Full theme cycle order for the 'T' shortcut
-const THEME_CYCLE: Theme[] = ['dark', 'light', 'skeuomorphic', 'liquid-glass', 'theme-3d']
+const THEME_LABELS = {
+  dark: { id: 'Tema Gelap', en: 'Dark Theme', emoji: '🌙' },
+  light: { id: 'Tema Terang', en: 'Light Theme', emoji: '☀️' },
+} as const
 
 export function useKeyboardShortcuts() {
   const { theme, setTheme } = useTheme()
@@ -20,6 +22,16 @@ export function useKeyboardShortcuts() {
   const { addToast } = useToastStore()
 
   useEffect(() => {
+    const switchTheme = (target: 'dark' | 'light') => {
+      setTheme(target)
+      const lang = typeof localStorage !== 'undefined' ? (localStorage.getItem('lang') as 'id' | 'en' | null) || 'id' : 'id'
+      const label = THEME_LABELS[target]
+      const message = lang === 'en' ? `${label.emoji} ${label.en}` : `${label.emoji} ${label.id}`
+      addToast(message, 'info')
+      // Play theme switch sound effect (chime per theme)
+      playThemeSwitchSound(target)
+    }
+
     const handler = (e: KeyboardEvent) => {
       // Don't trigger when typing in inputs
       const tag = (e.target as HTMLElement).tagName
@@ -29,40 +41,8 @@ export function useKeyboardShortcuts() {
 
       switch (e.key.toLowerCase()) {
         case 't':
-          // Cycle through all 5 themes: dark → light → skeuomorphic → liquid-glass → theme-3d → dark...
-          {
-            const currentIdx = THEME_CYCLE.indexOf(theme)
-            const nextIdx = currentIdx === -1 ? 0 : (currentIdx + 1) % THEME_CYCLE.length
-            const nextTheme = THEME_CYCLE[nextIdx]
-            setTheme(nextTheme)
-
-            // Clean up special theme classes when switching (applyThemeClass handles the target class,
-            // but we need to clear any others since ThemeCustomizer applies classes directly)
-            const html = document.documentElement
-            html.classList.remove('dark', 'light', 'theme-3d', 'liquid-glass', 'skeuomorphic')
-            if (nextTheme === 'dark') html.classList.add('dark')
-            else if (nextTheme === 'theme-3d') html.classList.add('theme-3d')
-            else if (nextTheme === 'liquid-glass') html.classList.add('liquid-glass')
-            else if (nextTheme === 'skeuomorphic') html.classList.add('skeuomorphic')
-
-            // Clear custom preset so ThemeCustomizer won't restore old one
-            try { localStorage.removeItem('theme-preset') } catch { /* ignore */ }
-
-            // Show toast feedback so user knows which theme is now active
-            const themeLabels: Record<Theme, { id: string; en: string; emoji: string }> = {
-              dark: { id: 'Tema Gelap', en: 'Dark Theme', emoji: '🌙' },
-              light: { id: 'Tema Terang', en: 'Light Theme', emoji: '☀️' },
-              skeuomorphic: { id: 'Skeuomorfisme Cahaya', en: 'Light Skeuomorphism', emoji: '✨' },
-              'liquid-glass': { id: 'Liquid Glass', en: 'Liquid Glass', emoji: '💧' },
-              'theme-3d': { id: 'Dunia 3D', en: '3D World', emoji: '🧊' },
-            }
-            const lang = typeof localStorage !== 'undefined' ? (localStorage.getItem('lang') as 'id' | 'en' | null) || 'id' : 'id'
-            const label = themeLabels[nextTheme]
-            const message = lang === 'en' ? `${label.emoji} ${label.en}` : `${label.emoji} ${label.id}`
-            addToast(message, 'info')
-            // Play theme switch sound effect (chime per theme)
-            playThemeSwitchSound(nextTheme)
-          }
+          // Toggle the two themes: Gelap ↔ Terang
+          switchTheme(theme === 'dark' ? 'light' : 'dark')
           break
         case 'l':
           toggleLang()
@@ -81,46 +61,16 @@ export function useKeyboardShortcuts() {
           break
       }
 
-      // Alt+1..5: quick switch to specific theme (no conflict with 1-4 section nav)
-      // Alt+Q: open QR code share modal
+      // Alt+1/2: quick switch to a specific theme (no conflict with 1-4 section nav)
       if (e.altKey && !e.metaKey && !e.ctrlKey) {
-        const themeMap: Record<string, Theme> = {
+        const themeMap: Record<string, 'dark' | 'light'> = {
           '1': 'dark',
           '2': 'light',
-          '3': 'skeuomorphic',
-          '4': 'liquid-glass',
-          '5': 'theme-3d',
         }
         const target = themeMap[e.key]
         if (target) {
           e.preventDefault()
-          setTheme(target)
-          const html = document.documentElement
-          html.classList.remove('dark', 'light', 'theme-3d', 'liquid-glass', 'skeuomorphic')
-          if (target === 'dark') html.classList.add('dark')
-          else if (target === 'theme-3d') html.classList.add('theme-3d')
-          else if (target === 'liquid-glass') html.classList.add('liquid-glass')
-          else if (target === 'skeuomorphic') html.classList.add('skeuomorphic')
-          try { localStorage.removeItem('theme-preset') } catch { /* ignore */ }
-
-          const themeLabels: Record<Theme, { id: string; en: string; emoji: string }> = {
-            dark: { id: 'Tema Gelap', en: 'Dark Theme', emoji: '🌙' },
-            light: { id: 'Tema Terang', en: 'Light Theme', emoji: '☀️' },
-            skeuomorphic: { id: 'Skeuomorfisme Cahaya', en: 'Light Skeuomorphism', emoji: '✨' },
-            'liquid-glass': { id: 'Liquid Glass', en: 'Liquid Glass', emoji: '💧' },
-            'theme-3d': { id: 'Dunia 3D', en: '3D World', emoji: '🧊' },
-          }
-          const lang = typeof localStorage !== 'undefined' ? (localStorage.getItem('lang') as 'id' | 'en' | null) || 'id' : 'id'
-          const label = themeLabels[target]
-          const message = lang === 'en' ? `${label.emoji} ${label.en}` : `${label.emoji} ${label.id}`
-          addToast(message, 'info')
-          // Play theme switch sound effect
-          playThemeSwitchSound(target)
-        }
-        // Alt+Q: open QR modal
-        if (e.key.toLowerCase() === 'q') {
-          e.preventDefault()
-          window.dispatchEvent(new CustomEvent('theme:open-qr'))
+          switchTheme(target)
         }
       }
     }

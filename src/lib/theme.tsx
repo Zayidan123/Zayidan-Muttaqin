@@ -2,7 +2,23 @@
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 
-export type Theme = 'light' | 'dark' | 'theme-3d' | 'liquid-glass' | 'skeuomorphic'
+/**
+ * Unified two-theme system — Terang (light) & Gelap (dark).
+ *
+ * Both themes share the same modern 3D design language; the whole site
+ * (backgrounds, cards, buttons, animations) adapts to the active theme.
+ *
+ * Resolution order:
+ *  1. `?theme=` / `#theme=` URL param (shareable links)
+ *  2. localStorage (`theme`)
+ *  3. OS preference (`prefers-color-scheme`) — the site follows the system
+ *     until the visitor explicitly picks a theme.
+ *
+ * Legacy themes from the old 5-theme system are mapped gracefully so
+ * returning visitors never see a broken state.
+ */
+
+export type Theme = 'light' | 'dark'
 
 interface ThemeContextValue {
   theme: Theme
@@ -11,35 +27,26 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined)
 const STORAGE_KEY = 'theme'
-const RECENT_KEY = 'theme-recent'
-const USAGE_KEY = 'theme-usage'
-const CUSTOM_PRESETS_KEY = 'theme-custom-presets'
-const MAX_RECENT = 4
-const THEMES: Theme[] = ['light', 'dark', 'theme-3d', 'liquid-glass', 'skeuomorphic']
+const THEMES: Theme[] = ['light', 'dark']
 
-// User-created custom preset (saved color combination)
-export interface CustomPreset {
-  id: string
-  name: string
-  cyan: string
-  magenta: string
-  purple: string
-  createdAt: string
+// Legacy theme → nearest new theme (keeps old localStorage values working)
+const LEGACY_THEME_MAP: Record<string, Theme> = {
+  'theme-3d': 'dark',
+  'liquid-glass': 'dark',
+  'skeuomorphic': 'light',
+}
+
+export function normalizeTheme(value: string | null | undefined): Theme | null {
+  if (!value) return null
+  if ((THEMES as string[]).includes(value)) return value as Theme
+  return LEGACY_THEME_MAP[value] ?? null
 }
 
 function applyThemeClass(theme: Theme) {
   const html = document.documentElement
-  html.classList.remove(...THEMES)
-
-  if (theme === 'dark') {
-    html.classList.add('dark')
-  } else if (theme === 'theme-3d') {
-    html.classList.add('theme-3d')
-  } else if (theme === 'liquid-glass') {
-    html.classList.add('liquid-glass')
-  } else if (theme === 'skeuomorphic') {
-    html.classList.add('skeuomorphic')
-  }
+  // Also strip legacy classes in case a visitor still has one applied
+  html.classList.remove('dark', 'light', 'theme-3d', 'liquid-glass', 'skeuomorphic')
+  html.classList.add(theme)
 }
 
 function getStoredTheme(): Theme {
@@ -51,9 +58,10 @@ function getStoredTheme(): Theme {
   try {
     const url = new URL(window.location.href)
     const hashTheme = url.searchParams.get('theme') || window.location.hash.replace(/^#theme=/, '').replace(/^#/, '')
-    if (hashTheme && THEMES.includes(hashTheme as Theme)) {
+    const normalized = normalizeTheme(hashTheme)
+    if (normalized) {
       // Persist to localStorage so it sticks after URL is cleared
-      try { localStorage.setItem(STORAGE_KEY, hashTheme) } catch { /* ignore */ }
+      try { localStorage.setItem(STORAGE_KEY, normalized) } catch { /* ignore */ }
       // Clean the URL (remove theme param) so refresh doesn't keep overriding
       if (url.searchParams.has('theme')) {
         url.searchParams.delete('theme')
@@ -61,171 +69,22 @@ function getStoredTheme(): Theme {
       } else if (window.location.hash.includes('theme=')) {
         window.history.replaceState({}, '', window.location.pathname + window.location.search)
       }
-      return hashTheme as Theme
+      return normalized
     }
   } catch { /* ignore URL parse errors */ }
 
-  // Priority 2: localStorage
-  const stored = localStorage.getItem(STORAGE_KEY)
-  if (stored && THEMES.includes(stored as Theme)) {
-    return stored as Theme
-  }
+  // Priority 2: localStorage (legacy values migrated transparently)
+  try {
+    const stored = normalizeTheme(localStorage.getItem(STORAGE_KEY))
+    if (stored) return stored
+  } catch { /* ignore */ }
+
+  // Priority 3: follow the OS preference
+  try {
+    if (window.matchMedia('(prefers-color-scheme: light)').matches) return 'light'
+  } catch { /* ignore */ }
 
   return 'dark'
-}
-
-// Track recently used themes (for quick access in ThemeCustomizer)
-export function pushRecentTheme(theme: Theme) {
-  if (typeof window === 'undefined') return
-  try {
-    const raw = localStorage.getItem(RECENT_KEY)
-    let recent: Theme[] = raw ? JSON.parse(raw) : []
-    // Remove if already present, then prepend
-    recent = recent.filter(t => t !== theme)
-    recent.unshift(theme)
-    // Cap at MAX_RECENT
-    recent = recent.slice(0, MAX_RECENT)
-    localStorage.setItem(RECENT_KEY, JSON.stringify(recent))
-  } catch { /* ignore */ }
-}
-
-// Track theme usage counts (for 'most used' stat in ThemeCustomizer)
-export function incrementThemeUsage(theme: Theme) {
-  if (typeof window === 'undefined') return
-  try {
-    const raw = localStorage.getItem(USAGE_KEY)
-    const usage: Record<string, number> = raw ? JSON.parse(raw) : {}
-    usage[theme] = (usage[theme] || 0) + 1
-    localStorage.setItem(USAGE_KEY, JSON.stringify(usage))
-  } catch { /* ignore */ }
-}
-
-export function getThemeUsage(): Record<Theme, number> {
-  if (typeof window === 'undefined') return {} as Record<Theme, number>
-  try {
-    const raw = localStorage.getItem(USAGE_KEY)
-    const usage = raw ? JSON.parse(raw) : {}
-    return usage as Record<Theme, number>
-  } catch { return {} as Record<Theme, number> }
-}
-
-export function getMostUsedTheme(): { theme: Theme; count: number } | null {
-  const usage = getThemeUsage()
-  let max: Theme | null = null
-  let maxCount = 0
-  ;(Object.keys(usage) as Theme[]).forEach(t => {
-    if (usage[t] > maxCount) {
-      max = t
-      maxCount = usage[t]
-    }
-  })
-  return max ? { theme: max, count: maxCount } : null
-}
-
-// Reset all theme usage stats (for 'reset stats' button in ThemeCustomizer)
-export function resetThemeUsage() {
-  if (typeof window === 'undefined') return
-  try {
-    localStorage.removeItem(USAGE_KEY)
-    localStorage.removeItem(RECENT_KEY)
-  } catch { /* ignore */ }
-}
-
-// Theme scheduler — auto-switch theme based on time of day
-const SCHEDULE_KEY = 'theme-schedule-enabled'
-const SCHEDULE_CUSTOM_KEY = 'theme-schedule-custom'
-export interface ScheduleSlot {
-  startHour: number
-  theme: Theme
-  labelId: string
-  labelEn: string
-}
-const DEFAULT_SCHEDULE: ScheduleSlot[] = [
-  { startHour: 6, theme: 'light', labelId: 'Pagi (06-12)', labelEn: 'Morning (6-12)' },
-  { startHour: 12, theme: 'skeuomorphic', labelId: 'Siang (12-17)', labelEn: 'Afternoon (12-17)' },
-  { startHour: 17, theme: 'liquid-glass', labelId: 'Sore (17-19)', labelEn: 'Evening (17-19)' },
-  { startHour: 19, theme: 'dark', labelId: 'Malam (19-06)', labelEn: 'Night (19-6)' },
-]
-
-export function isThemeScheduleEnabled(): boolean {
-  if (typeof window === 'undefined') return false
-  try {
-    return localStorage.getItem(SCHEDULE_KEY) === '1'
-  } catch { return false }
-}
-
-export function setThemeScheduleEnabled(enabled: boolean) {
-  if (typeof window === 'undefined') return
-  try {
-    localStorage.setItem(SCHEDULE_KEY, enabled ? '1' : '0')
-  } catch { /* ignore */ }
-}
-
-// Get custom schedule from localStorage, or fallback to default
-export function getCustomSchedule(): ScheduleSlot[] {
-  if (typeof window === 'undefined') return DEFAULT_SCHEDULE
-  try {
-    const raw = localStorage.getItem(SCHEDULE_CUSTOM_KEY)
-    if (!raw) return DEFAULT_SCHEDULE
-    const parsed = JSON.parse(raw)
-    if (!Array.isArray(parsed) || parsed.length === 0) return DEFAULT_SCHEDULE
-    // Validate structure
-    return parsed.filter((s: unknown): s is ScheduleSlot => {
-      const slot = s as ScheduleSlot
-      return typeof slot?.startHour === 'number' &&
-        typeof slot?.theme === 'string' &&
-        THEMES.includes(slot.theme) &&
-        typeof slot?.labelId === 'string'
-    })
-  } catch { return DEFAULT_SCHEDULE }
-}
-
-export function saveCustomSchedule(schedule: ScheduleSlot[]) {
-  if (typeof window === 'undefined') return
-  try {
-    localStorage.setItem(SCHEDULE_CUSTOM_KEY, JSON.stringify(schedule))
-  } catch { /* ignore */ }
-}
-
-export function resetCustomSchedule() {
-  if (typeof window === 'undefined') return
-  try {
-    localStorage.removeItem(SCHEDULE_CUSTOM_KEY)
-  } catch { /* ignore */ }
-}
-
-// Get the theme that should be active based on current hour
-export function getScheduledTheme(date: Date = new Date()): { theme: Theme; labelId: string; labelEn: string } | null {
-  const schedule = getCustomSchedule()
-  const hour = date.getHours()
-  let match = schedule[schedule.length - 1] // default to last (night)
-  for (const entry of schedule) {
-    if (hour >= entry.startHour) match = entry
-  }
-  return { theme: match.theme, labelId: match.labelId, labelEn: match.labelEn }
-}
-
-export function getScheduleInfo(): ScheduleSlot[] {
-  return getCustomSchedule()
-}
-
-export function getRecentThemes(): Theme[] {
-  if (typeof window === 'undefined') return []
-  try {
-    const raw = localStorage.getItem(RECENT_KEY)
-    const recent: Theme[] = raw ? JSON.parse(raw) : []
-    return recent.filter(t => THEMES.includes(t))
-  } catch { return [] }
-}
-
-// Generate a shareable URL with theme embedded
-export function getShareableThemeUrl(theme: Theme): string {
-  if (typeof window === 'undefined') return ''
-  const url = new URL(window.location.href)
-  url.searchParams.set('theme', theme)
-  // Clear hash to avoid confusion
-  url.hash = ''
-  return url.toString()
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
@@ -235,20 +94,33 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     applyThemeClass(theme)
   }, [theme])
 
+  // Follow live OS theme changes while the visitor hasn't explicitly chosen
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-color-scheme: light)')
+    const onChange = (e: MediaQueryListEvent) => {
+      try {
+        if (!localStorage.getItem(STORAGE_KEY)) {
+          const next: Theme = e.matches ? 'light' : 'dark'
+          setThemeState(next)
+          applyThemeClass(next)
+        }
+      } catch { /* ignore */ }
+    }
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+
   const value = useMemo(
     () => ({
       theme,
       setTheme: (nextTheme: Theme) => {
-        if (!THEMES.includes(nextTheme)) return
+        if (!(THEMES as string[]).includes(nextTheme)) return
         setThemeState(nextTheme)
         try {
           localStorage.setItem(STORAGE_KEY, nextTheme)
         } catch {
           // ignore localStorage failures
         }
-        // Track in recent themes + usage stats
-        pushRecentTheme(nextTheme)
-        incrementThemeUsage(nextTheme)
         applyThemeClass(nextTheme)
       },
     }),
@@ -264,85 +136,4 @@ export function useTheme() {
     throw new Error('useTheme must be used within ThemeProvider')
   }
   return context
-}
-
-// ===== Custom Preset Creator — save user's custom color combinations =====
-export function getCustomPresets(): CustomPreset[] {
-  if (typeof window === 'undefined') return []
-  try {
-    const raw = localStorage.getItem(CUSTOM_PRESETS_KEY)
-    if (!raw) return []
-    const parsed = JSON.parse(raw)
-    if (!Array.isArray(parsed)) return []
-    return parsed.filter((p: unknown): p is CustomPreset => {
-      const preset = p as CustomPreset
-      return typeof preset?.id === 'string' &&
-        typeof preset?.name === 'string' &&
-        typeof preset?.cyan === 'string' &&
-        typeof preset?.magenta === 'string' &&
-        typeof preset?.purple === 'string'
-    })
-  } catch { return [] }
-}
-
-export function saveCustomPreset(preset: Omit<CustomPreset, 'id' | 'createdAt'>): CustomPreset {
-  const newPreset: CustomPreset = {
-    ...preset,
-    id: `custom-${Date.now()}`,
-    createdAt: new Date().toISOString(),
-  }
-  if (typeof window === 'undefined') return newPreset
-  try {
-    const existing = getCustomPresets()
-    existing.push(newPreset)
-    localStorage.setItem(CUSTOM_PRESETS_KEY, JSON.stringify(existing))
-  } catch { /* ignore */ }
-  return newPreset
-}
-
-export function deleteCustomPreset(id: string) {
-  if (typeof window === 'undefined') return
-  try {
-    const existing = getCustomPresets().filter(p => p.id !== id)
-    localStorage.setItem(CUSTOM_PRESETS_KEY, JSON.stringify(existing))
-  } catch { /* ignore */ }
-}
-
-// ===== Import schedule from JSON =====
-export function importScheduleFromJson(jsonString: string): { success: boolean; message: string } {
-  if (typeof window === 'undefined') return { success: false, message: 'Server-side' }
-  try {
-    const parsed = JSON.parse(jsonString)
-    if (!Array.isArray(parsed)) {
-      return { success: false, message: 'JSON harus berupa array slot' }
-    }
-    const validated: ScheduleSlot[] = []
-    for (const item of parsed) {
-      if (typeof item?.startHour !== 'number' ||
-          typeof item?.theme !== 'string' ||
-          !THEMES.includes(item.theme as Theme) ||
-          typeof item?.labelId !== 'string') {
-        return { success: false, message: `Slot tidak valid: ${JSON.stringify(item).substring(0, 60)}` }
-      }
-      validated.push({
-        startHour: item.startHour,
-        theme: item.theme,
-        labelId: item.labelId,
-        labelEn: typeof item.labelEn === 'string' ? item.labelEn : item.labelId,
-      })
-    }
-    if (validated.length === 0) {
-      return { success: false, message: 'Tidak ada slot valid' }
-    }
-    validated.sort((a, b) => a.startHour - b.startHour)
-    saveCustomSchedule(validated)
-    return { success: true, message: `${validated.length} slot berhasil diimport` }
-  } catch (e) {
-    return { success: false, message: 'JSON tidak valid: ' + (e as Error).message }
-  }
-}
-
-export function exportScheduleToJson(): string {
-  const schedule = getCustomSchedule()
-  return JSON.stringify(schedule, null, 2)
 }

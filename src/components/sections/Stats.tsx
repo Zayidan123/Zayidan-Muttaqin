@@ -77,8 +77,8 @@ export function Stats() {
     <section id="stats" className="relative py-16 sm:py-20 px-4 sm:px-6 lg:px-8" ref={parallaxRef}>
       <motion.div className="max-w-6xl mx-auto" style={{ y }} ref={ref}>
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
+          initial={{ opacity: 0, y: 20, rotateX: 18, transformPerspective: 900 }}
+          animate={inView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
           transition={{ duration: 0.6 }}
           className="mb-10 sm:mb-14 text-center"
         >
@@ -94,8 +94,8 @@ export function Stats() {
             return (
               <motion.div
                 key={item.valueKey}
-                initial={{ opacity: 0, y: 30 }}
-                animate={inView ? { opacity: 1, y: 0 } : {}}
+                initial={{ opacity: 0, y: 30, rotateX: 22, transformPerspective: 900 }}
+                animate={inView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
                 transition={{ duration: 0.6, delay: idx * 0.15 }}
               >
                 <TiltCard className="transition-[box-shadow_0.3s]" maxTilt={6} glare>

@@ -25,8 +25,8 @@ export function FAQ() {
     <section id="faq" className="relative py-20 sm:py-28 px-4 sm:px-6 lg:px-8" ref={parallaxRef}>
       <motion.div className="max-w-3xl mx-auto" style={{ y }} ref={ref}>
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
+          initial={{ opacity: 0, y: 20, rotateX: 18, transformPerspective: 900 }}
+          animate={inView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
           transition={{ duration: 0.6 }}
           className="mb-12 sm:mb-16 text-center"
         >
@@ -45,8 +45,8 @@ export function FAQ() {
             return (
               <motion.div
                 key={key}
-                initial={{ opacity: 0, y: 15 }}
-                animate={inView ? { opacity: 1, y: 0 } : {}}
+                initial={{ opacity: 0, y: 15, rotateX: 18, transformPerspective: 900 }}
+                animate={inView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
                 transition={{ duration: 0.4, delay: 0.1 + idx * 0.08 }}
               >
                 <div

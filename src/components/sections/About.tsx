@@ -88,8 +88,8 @@ export function About() {
       <motion.div className="max-w-6xl mx-auto" style={{ y }} ref={ref}>
         {/* Section Title */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
+          initial={{ opacity: 0, y: 20, rotateX: 18, transformPerspective: 900 }}
+          animate={inView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
           transition={{ duration: 0.6 }}
           className="mb-12 sm:mb-16"
         >
@@ -102,8 +102,8 @@ export function About() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           {/* Avatar + Education */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={inView ? { opacity: 1, x: 0 } : {}}
+            initial={{ opacity: 0, x: -30, rotateY: 10, transformPerspective: 900 }}
+            animate={inView ? { opacity: 1, x: 0, rotateY: 0, transformPerspective: 900 } : {}}
             transition={{ duration: 0.6, delay: 0.2 }}
             className="flex flex-col items-center lg:items-start gap-6"
           >
@@ -131,8 +131,8 @@ export function About() {
 
             {/* Education Card */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
+              initial={{ opacity: 0, y: 20, rotateX: 18, transformPerspective: 900 }}
+              animate={inView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
               transition={{ duration: 0.5, delay: 0.4 }}
               className="w-full max-w-sm"
             >
@@ -161,8 +161,8 @@ export function About() {
 
             {/* Certifications */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
+              initial={{ opacity: 0, y: 20, rotateX: 18, transformPerspective: 900 }}
+              animate={inView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
               transition={{ duration: 0.5, delay: 0.5 }}
               className="w-full max-w-sm"
             >
@@ -194,8 +194,8 @@ export function About() {
 
           {/* Text Content */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={inView ? { opacity: 1, x: 0 } : {}}
+            initial={{ opacity: 0, x: 30, rotateY: -10, transformPerspective: 900 }}
+            animate={inView ? { opacity: 1, x: 0, rotateY: 0, transformPerspective: 900 } : {}}
             transition={{ duration: 0.6, delay: 0.3 }}
             className="space-y-6"
           >
@@ -213,8 +213,8 @@ export function About() {
                 return (
                   <motion.div
                     key={skill.titleKey}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={inView ? { opacity: 1, y: 0 } : {}}
+                    initial={{ opacity: 0, y: 20, rotateX: 18, transformPerspective: 900 }}
+                    animate={inView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
                     transition={{ duration: 0.5, delay: 0.5 + idx * 0.15 }}
                   >
                     <TiltCard className="transition-[box-shadow_0.3s]">
@@ -240,8 +240,8 @@ export function About() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Hard Skills - single column to prevent text overlap */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={skillsInView ? { opacity: 1, y: 0 } : {}}
+              initial={{ opacity: 0, y: 20, rotateX: 18, transformPerspective: 900 }}
+              animate={skillsInView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
               transition={{ duration: 0.6, delay: 0.1 }}
               className="p-6 rounded-xl glass glass-depth lift-3d border border-[var(--glass-border)]"
             >
@@ -286,8 +286,8 @@ export function About() {
 
             {/* Soft Skills */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={skillsInView ? { opacity: 1, y: 0 } : {}}
+              initial={{ opacity: 0, y: 20, rotateX: 18, transformPerspective: 900 }}
+              animate={skillsInView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
               transition={{ duration: 0.6, delay: 0.2 }}
               className="p-6 rounded-xl glass glass-depth lift-3d border border-[var(--glass-border)]"
             >
@@ -299,8 +299,8 @@ export function About() {
                 {softSkills.map((key, idx) => (
                   <motion.span
                     key={key}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={skillsInView ? { opacity: 1, scale: 1 } : {}}
+                    initial={{ opacity: 0, scale: 0.8, rotateX: 16, transformPerspective: 900 }}
+                    animate={skillsInView ? { opacity: 1, scale: 1, rotateX: 0, transformPerspective: 900 } : {}}
                     transition={{ duration: 0.3, delay: 0.3 + idx * 0.06 }}
                     className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs sm:text-sm text-[var(--text-primary)] border border-[var(--glass-border)] bg-[var(--glass-bg)]/50 hover:border-[var(--neon-magenta)]/30 hover:text-[var(--neon-magenta)] transition-all duration-300 cursor-default soft-skill-tag"
                   >
@@ -314,8 +314,8 @@ export function About() {
 
           {/* Skills Radar Chart */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={skillsInView ? { opacity: 1, y: 0 } : {}}
+            initial={{ opacity: 0, y: 20, rotateX: 18, transformPerspective: 900 }}
+            animate={skillsInView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
             transition={{ duration: 0.6, delay: 0.4 }}
             className="mt-10 flex justify-center"
           >

@@ -94,13 +94,18 @@
   --neon-purple: #6D28D9;
   --dark-base: #F0F4FF;
   --dark-surface: #FFFFFF;
-  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-bg: rgba(255, 255, 255, 0.72);
   --glass-border: rgba(100, 120, 200, 0.15);
   --glow-cyan: 0 0 20px rgba(0, 128, 255, 0.25);
   --glow-magenta: 0 0 20px rgba(204, 0, 136, 0.25);
   --text-primary: #0A0A1A;
   --text-secondary: #444466;
   --scanline-opacity: 0;
+
+  /* 3D depth tokens — Terang (light) */
+  --glass-edge-light: rgba(255, 255, 255, 0.9);
+  --shadow-soft-1: rgba(30, 42, 90, 0.10);
+  --shadow-soft-2: rgba(30, 42, 90, 0.20);
 }
 
 /* ===== DARK MODE (Default) ===== */
@@ -150,6 +155,11 @@
   --text-primary: #F0F0FF;
   --text-secondary: #8888AA;
   --scanline-opacity: 0.03;
+
+  /* 3D depth tokens — Gelap (dark) */
+  --glass-edge-light: rgba(255, 255, 255, 0.07);
+  --shadow-soft-1: rgba(0, 0, 0, 0.35);
+  --shadow-soft-2: rgba(0, 0, 0, 0.5);
 }
 
 @layer base {
@@ -178,7 +188,7 @@
     overscroll-behavior-x: none;
     -webkit-font-smoothing: antialiased;
     /* Smooth theme transition: background & color animate when CSS variables change.
-       This makes switching between dark/light/skeuomorphic/liquid-glass/theme-3d
+       This makes switching between Terang (light) & Gelap (dark)
        feel like a gentle cross-fade instead of a hard cut. */
     transition: background-color 0.6s ease, color 0.6s ease;
   }
@@ -508,191 +518,6 @@ html {
   color: #fff;
 }
 
-/* ===== LIGHT MODE WEB3 ANIMATED BACKGROUND ===== */
-@keyframes mesh-float-1 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(100px, -50px) scale(1.1); }
-  50% { transform: translate(-50px, 100px) scale(0.9); }
-  75% { transform: translate(50px, 50px) scale(1.05); }
-}
-
-@keyframes mesh-float-2 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(-80px, 60px) scale(1.15); }
-  50% { transform: translate(60px, -80px) scale(0.85); }
-  75% { transform: translate(-40px, -40px) scale(1.1); }
-}
-
-@keyframes mesh-float-3 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(70px, 70px) scale(0.9); }
-  50% { transform: translate(-90px, -30px) scale(1.1); }
-  75% { transform: translate(30px, -70px) scale(0.95); }
-}
-
-@keyframes orbit-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes pulse-ring {
-  0%, 100% { transform: scale(0.8); opacity: 0.4; }
-  50% { transform: scale(1.2); opacity: 0.8; }
-}
-
-@keyframes float-geometric {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  33% { transform: translateY(-20px) rotate(120deg); }
-  66% { transform: translateY(10px) rotate(240deg); }
-}
-
-@keyframes data-stream {
-  0% { transform: translateY(-100%); opacity: 0; }
-  10% { opacity: 0.6; }
-  90% { opacity: 0.6; }
-  100% { transform: translateY(100vh); opacity: 0; }
-}
-
-@keyframes grid-flow {
-  0% { background-position: 0 0; }
-  100% { background-position: 60px 60px; }
-}
-
-/* ===== DARK MODE BACKGROUND ANIMATIONS ===== */
-@keyframes dm-orb-1 { 0%,100%{transform:translate(0,0) scale(1)} 25%{transform:translate(60px,40px) scale(1.05)} 50%{transform:translate(30px,80px) scale(.95)} 75%{transform:translate(-20px,40px) scale(1.02)} }
-@keyframes dm-orb-2 { 0%,100%{transform:translate(0,0) scale(1)} 25%{transform:translate(-50px,-30px) scale(.95)} 50%{transform:translate(-80px,20px) scale(1.05)} 75%{transform:translate(-30px,-50px) scale(.98)} }
-@keyframes dm-orb-3 { 0%,100%{transform:translate(0,0) scale(1)} 25%{transform:translate(40px,-60px) scale(1.03)} 50%{transform:translate(-30px,-40px) scale(.97)} 75%{transform:translate(50px,-20px) scale(1.04)} }
-@keyframes dm-orb-4 { 0%,100%{transform:translate(0,0);opacity:1} 50%{transform:translate(-40px,30px);opacity:.7} }
-@keyframes dm-stream { 0%{transform:translateY(-30%)} 100%{transform:translateY(30%)} }
-@keyframes dm-geo-float { 0%,100%{transform:translateY(0) rotate(0deg);opacity:.6} 25%{transform:translateY(-20px) rotate(5deg);opacity:.8} 50%{transform:translateY(10px) rotate(-3deg);opacity:.5} 75%{transform:translateY(-15px) rotate(2deg);opacity:.7} }
-@keyframes dm-flow-sweep { 0%,100%{background-position:0% -100%} 50%{background-position:0% 100%} }
-@keyframes dm-orbit { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
-
-.light-web3-bg {
-  position: relative;
-  overflow: hidden;
-}
-
-.light-web3-bg::before {
-  content: '';
-  position: fixed;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: 
-    radial-gradient(ellipse 600px 600px at 20% 30%, rgba(0, 128, 255, 0.08), transparent 70%),
-    radial-gradient(ellipse 500px 500px at 80% 20%, rgba(204, 0, 136, 0.06), transparent 70%),
-    radial-gradient(ellipse 400px 400px at 50% 80%, rgba(109, 40, 217, 0.06), transparent 70%);
-  animation: mesh-float-1 20s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.light-mesh-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  pointer-events: none;
-}
-
-.light-mesh-orb-1 {
-  width: 500px;
-  height: 500px;
-  background: rgba(0, 128, 255, 0.12);
-  top: -10%;
-  right: -10%;
-  animation: mesh-float-1 25s ease-in-out infinite;
-}
-
-.light-mesh-orb-2 {
-  width: 400px;
-  height: 400px;
-  background: rgba(204, 0, 136, 0.08);
-  bottom: 10%;
-  left: -5%;
-  animation: mesh-float-2 30s ease-in-out infinite;
-}
-
-.light-mesh-orb-3 {
-  width: 350px;
-  height: 350px;
-  background: rgba(109, 40, 217, 0.08);
-  top: 50%;
-  right: 30%;
-  animation: mesh-float-3 22s ease-in-out infinite;
-}
-
-.light-grid-overlay {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(0, 128, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 128, 255, 0.04) 1px, transparent 1px);
-  background-size: 60px 60px;
-  animation: grid-flow 8s linear infinite;
-}
-
-.light-geo-shape {
-  position: absolute;
-  pointer-events: none;
-  opacity: 0.06;
-}
-
-.light-geo-hexagon {
-  width: 120px;
-  height: 120px;
-  border: 2px solid rgba(0, 128, 255, 1);
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  animation: float-geometric 12s ease-in-out infinite;
-}
-
-.light-geo-triangle {
-  width: 80px;
-  height: 80px;
-  border: 2px solid rgba(204, 0, 136, 1);
-  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-  animation: float-geometric 10s ease-in-out infinite reverse;
-}
-
-.light-geo-diamond {
-  width: 60px;
-  height: 60px;
-  border: 2px solid rgba(109, 40, 217, 1);
-  transform: rotate(45deg);
-  animation: float-geometric 14s ease-in-out infinite;
-}
-
-.light-orbit-ring {
-  position: absolute;
-  border: 1px solid rgba(0, 128, 255, 0.08);
-  border-radius: 50%;
-  pointer-events: none;
-  animation: orbit-spin 40s linear infinite;
-}
-
-.light-orbit-ring::after {
-  content: '';
-  position: absolute;
-  top: -3px;
-  left: 50%;
-  width: 6px;
-  height: 6px;
-  background: rgba(0, 128, 255, 0.4);
-  border-radius: 50%;
-  box-shadow: 0 0 10px rgba(0, 128, 255, 0.6);
-}
-
-.light-data-line {
-  position: absolute;
-  width: 1px;
-  background: linear-gradient(to bottom, transparent, rgba(0, 128, 255, 0.15), transparent);
-  pointer-events: none;
-  animation: data-stream 8s linear infinite;
-}
-
-/* Light mode selection override */
 :root ::selection {
   background: rgba(0, 128, 255, 0.25);
   color: #0A0A1A;
@@ -980,7 +805,7 @@ html {
 
 /* FIX: Light theme — hero name shimmer has #fff mid-stop which is invisible on white bg.
    Override to use a darker blue gradient so the name stays readable in light mode. */
-:root:not(.dark):not(.theme-3d):not(.liquid-glass):not(.skeuomorphic) .hero-name-shimmer {
+:root:not(.dark) .hero-name-shimmer {
   background: linear-gradient(
     90deg,
     var(--neon-cyan) 0%,
@@ -1519,1691 +1344,6 @@ html {
   }
 }
 
-/* ===== LIQUID GLASS THEME KEYFRAMES ===== */
-
-@keyframes liquid-morph-0 {
-  0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
-  25% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; transform: translate(-45%, -55%) scale(1.1) rotate(5deg); }
-  50% { border-radius: 50% 60% 30% 60% / 30% 50% 70% 60%; transform: translate(-55%, -45%) scale(0.95) rotate(-3deg); }
-  75% { border-radius: 60% 30% 60% 40% / 70% 40% 50% 60%; transform: translate(-48%, -52%) scale(1.05) rotate(4deg); }
-}
-
-@keyframes liquid-morph-1 {
-  0%, 100% { border-radius: 40% 60% 70% 30% / 40% 70% 30% 60%; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
-  33% { border-radius: 70% 30% 50% 50% / 30% 60% 70% 40%; transform: translate(-55%, -48%) scale(1.08) rotate(-4deg); }
-  66% { border-radius: 30% 70% 40% 60% / 60% 30% 60% 40%; transform: translate(-42%, -58%) scale(0.92) rotate(6deg); }
-}
-
-@keyframes liquid-morph-2 {
-  0%, 100% { border-radius: 50% 50% 40% 60% / 60% 40% 60% 40%; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
-  20% { border-radius: 70% 30% 60% 40% / 40% 60% 30% 70%; transform: translate(-60%, -50%) scale(1.12) rotate(3deg); }
-  40% { border-radius: 30% 70% 30% 70% / 70% 30% 70% 30%; transform: translate(-40%, -45%) scale(0.9) rotate(-5deg); }
-  60% { border-radius: 60% 40% 70% 30% / 30% 70% 40% 60%; transform: translate(-55%, -55%) scale(1.05) rotate(2deg); }
-  80% { border-radius: 40% 60% 30% 70% / 60% 40% 60% 30%; transform: translate(-48%, -50%) scale(0.95) rotate(-3deg); }
-}
-
-@keyframes sparkle-twinkle {
-  0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
-  50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
-}
-
-/* Liquid Glass Theme overrides */
-.liquid-glass {
-  --background: #f8f0ff;
-  --foreground: #2d1b4e;
-  --card: rgba(255, 255, 255, 0.35);
-  --card-foreground: #2d1b4e;
-  --popover: rgba(255, 255, 255, 0.5);
-  --popover-foreground: #2d1b4e;
-  --primary: #8b5cf6;
-  --primary-foreground: #ffffff;
-  --secondary: rgba(255, 255, 255, 0.25);
-  --secondary-foreground: #4a2d7a;
-  --muted: rgba(200, 180, 230, 0.2);
-  --muted-foreground: #7c6b99;
-  --accent: rgba(200, 160, 255, 0.2);
-  --accent-foreground: #4a2d7a;
-  --destructive: #ff4466;
-  --border: rgba(180, 150, 220, 0.15);
-  --input: rgba(180, 150, 220, 0.15);
-  --ring: #8b5cf6;
-
-  --neon-cyan: #7c3aed;
-  --neon-magenta: #db2777;
-  --neon-purple: #8b5cf6;
-  --dark-base: #f3e8ff;
-  --dark-surface: rgba(255, 255, 255, 0.45);
-  --glass-bg: rgba(255, 255, 255, 0.25);
-  --glass-border: rgba(255, 255, 255, 0.4);
-  --glow-cyan: 0 8px 32px rgba(139, 92, 246, 0.15);
-  --glow-magenta: 0 8px 32px rgba(219, 39, 119, 0.12);
-  --text-primary: #2d1b4e;
-  --text-secondary: #7c6b99;
-  --scanline-opacity: 0;
-}
-
-/* Liquid glass card styling */
-.liquid-glass .glass {
-  background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(20px) saturate(1.8);
-  -webkit-backdrop-filter: blur(20px) saturate(1.8);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6);
-}
-
-.liquid-glass .glass-strong {
-  background: rgba(255, 255, 255, 0.45);
-  backdrop-filter: blur(30px) saturate(1.8);
-  -webkit-backdrop-filter: blur(30px) saturate(1.8);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 12px 40px rgba(139, 92, 246, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.7);
-}
-
-.liquid-glass .glass-card-advanced {
-  background: linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.15) 100%);
-  backdrop-filter: blur(20px) saturate(1.8);
-  -webkit-backdrop-filter: blur(20px) saturate(1.8);
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  box-shadow:
-    0 8px 32px rgba(139, 92, 246, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.1);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.liquid-glass .glass-card-advanced:hover {
-  box-shadow:
-    0 16px 48px rgba(139, 92, 246, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.15);
-  transform: translateY(-2px);
-  border-color: rgba(200, 160, 255, 0.4);
-}
-
-/* Liquid glass text glow */
-.liquid-glass .font-display {
-  text-shadow: 0 2px 20px rgba(139, 92, 246, 0.15);
-}
-
-/* Liquid glass buttons */
-.liquid-glass .ripple-effect {
-  background: rgba(139, 92, 246, 0.1) !important;
-  border-color: rgba(139, 92, 246, 0.3) !important;
-  color: #7c3aed !important;
-  backdrop-filter: blur(10px);
-}
-
-.liquid-glass .ripple-effect:hover {
-  background: rgba(139, 92, 246, 0.2) !important;
-  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.2) !important;
-  color: #6d28d9 !important;
-}
-
-/* Liquid glass navbar */
-.liquid-glass header nav,
-.liquid-glass .glass-nav {
-  background: rgba(255, 255, 255, 0.3) !important;
-  backdrop-filter: blur(20px) saturate(1.8) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
-  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.06) !important;
-}
-
-/* Liquid glass footer */
-.liquid-glass footer {
-  background: rgba(255, 255, 255, 0.25) !important;
-  backdrop-filter: blur(20px) saturate(1.5) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.35) !important;
-}
-
-/* Liquid glass scanline off */
-.liquid-glass .scanline-overlay {
-  display: none !important;
-}
-
-/* Liquid glass scrollbar */
-.liquid-glass ::-webkit-scrollbar { width: 6px; }
-.liquid-glass ::-webkit-scrollbar-track { background: rgba(200, 180, 230, 0.1); }
-.liquid-glass ::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.25); border-radius: 3px; }
-.liquid-glass ::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.4); }
-
-/* Reduced motion for liquid glass */
-@media (prefers-reduced-motion: reduce) {
-  .liquid-blob,
-  .sparkle-particle {
-    animation: none !important;
-  }
-  .liquid-glass .glass-card-advanced:hover {
-    transform: none;
-  }
-}
-
-/* ===== REDUCED MOTION: NEW ANIMATIONS ===== */
-@media (prefers-reduced-motion: reduce) {
-  .aurora-hover::before,
-  .card-shine::after,
-  .neon-pulse-ring,
-  .breathing-glow,
-  .float-tag,
-  .dots-loading span {
-    animation: none !important;
-  }
-  .section-divider::before {
-    animation: none !important;
-    left: 50% !important;
-    opacity: 1 !important;
-  }
-  .skill-bar-track > *::after {
-    animation: none !important;
-    opacity: 0 !important;
-  }
-}
-
-/* =============================================================
-   ===== 3D WORLD THEME =====
-   ============================================================= */
-
-/* 3D Theme Keyframes */
-@keyframes float-3d {
-  0%, 100% { transform: translateY(0px) rotateX(0deg) rotateY(0deg); }
-  25% { transform: translateY(-15px) rotateX(5deg) rotateY(10deg); }
-  50% { transform: translateY(-8px) rotateX(-3deg) rotateY(-5deg); }
-  75% { transform: translateY(-20px) rotateX(3deg) rotateY(8deg); }
-}
-
-@keyframes spin-3d-slow {
-  0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
-  100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
-}
-
-@keyframes spin-3d-reverse {
-  0% { transform: rotateX(360deg) rotateY(0deg) rotateZ(0deg); }
-  100% { transform: rotateX(0deg) rotateY(360deg) rotateZ(360deg); }
-}
-
-@keyframes pulse-3d {
-  0%, 100% { transform: translateZ(0px) scale(1); box-shadow: 0 0 15px var(--neon-cyan), 0 10px 30px rgba(0,0,0,0.3); }
-  50% { transform: translateZ(10px) scale(1.05); box-shadow: 0 0 25px var(--neon-cyan), 0 15px 40px rgba(0,0,0,0.4); }
-}
-
-@keyframes grid-3d-flow {
-  0% { background-position: 0 0; }
-  100% { background-position: 40px 40px; }
-}
-
-@keyframes cube-rotate {
-  0% { transform: rotateX(-20deg) rotateY(0deg); }
-  100% { transform: rotateX(-20deg) rotateY(360deg); }
-}
-
-@keyframes depth-pulse {
-  0%, 100% { transform: perspective(600px) rotateX(2deg) rotateY(-2deg) translateZ(0); }
-  50% { transform: perspective(600px) rotateX(-1deg) rotateY(1deg) translateZ(5px); }
-}
-
-@keyframes orbit-3d {
-  0% { transform: rotateY(0deg) translateX(80px) rotateY(0deg); }
-  100% { transform: rotateY(360deg) translateX(80px) rotateY(-360deg); }
-}
-
-@keyframes orbit-3d-reverse {
-  0% { transform: rotateY(0deg) translateX(120px) rotateY(0deg) rotateX(10deg); }
-  100% { transform: rotateY(-360deg) translateX(120px) rotateY(360deg) rotateX(10deg); }
-}
-
-@keyframes wireframe-pulse {
-  0%, 100% { opacity: 0.15; transform: rotateX(15deg) rotateY(15deg) scale(1); }
-  50% { opacity: 0.25; transform: rotateX(15deg) rotateY(195deg) scale(1.1); }
-}
-
-@keyframes text-3d-breathe {
-  0%, 100% { text-shadow: 0 1px 0 #ccc, 0 2px 0 #c9c9c9, 0 3px 0 #bbb, 0 4px 0 #b9b9b9, 0 5px 0 #aaa, 0 6px 1px rgba(0,0,0,.1), 0 0 5px rgba(0,0,0,.1), 0 1px 3px rgba(0,0,0,.3), 0 3px 5px rgba(0,0,0,.2), 0 5px 10px rgba(0,0,0,.25), 0 10px 10px rgba(0,0,0,.2), 0 20px 20px rgba(0,0,0,.15); }
-  50% { text-shadow: 0 1px 0 #ccc, 0 2px 0 #c9c9c9, 0 3px 0 #bbb, 0 4px 0 #b9b9b9, 0 5px 0 #aaa, 0 6px 1px rgba(0,0,0,.1), 0 0 10px rgba(0,245,255,.3), 0 1px 5px rgba(0,0,0,.3), 0 3px 8px rgba(0,245,255,.15), 0 5px 15px rgba(0,0,0,.25), 0 10px 15px rgba(0,245,255,.1), 0 20px 25px rgba(0,0,0,.15); }
-}
-
-/* ============================================================ */
-/* ===== SKEUOMORFISME CAHAYA — Light Skeuomorphism (2026) ===== */
-/* Soft warm surfaces, subtle gradients, light embossing,       */
-/* gentle drop shadows. Stripped-down Apple UI + sleek 3D.      */
-/* ============================================================ */
-
-/* --- Skeuomorphic floating light orbs (cahaya) keyframes --- */
-@keyframes skeuomorphic-float-0 {
-  0%, 100% { transform: translate(-50%, -50%) translate(0, 0) scale(1); }
-  33% { transform: translate(-50%, -50%) translate(40px, -30px) scale(1.08); }
-  66% { transform: translate(-50%, -50%) translate(-25px, 35px) scale(0.95); }
-}
-@keyframes skeuomorphic-float-1 {
-  0%, 100% { transform: translate(-50%, -50%) translate(0, 0) scale(1); }
-  50% { transform: translate(-50%, -50%) translate(-45px, 25px) scale(1.12); }
-}
-@keyframes skeuomorphic-float-2 {
-  0%, 100% { transform: translate(-50%, -50%) translate(0, 0) scale(1); }
-  40% { transform: translate(-50%, -50%) translate(30px, 40px) scale(0.9); }
-  70% { transform: translate(-50%, -50%) translate(-30px, -20px) scale(1.05); }
-}
-
-/* --- Skeuomorphic background base --- */
-.skeuomorphic-bg {
-  background: #EFE8DA;
-}
-
-/* Subtle grain drift (very slow, barely perceptible) */
-.skeuomorphic-grain {
-  animation: skeuomorphic-grain-drift 60s linear infinite;
-}
-@keyframes skeuomorphic-grain-drift {
-  0% { background-position: 0 0; }
-  100% { background-position: 160px 160px; }
-}
-
-/* --- Skeuomorphic Theme: CSS Variable Overrides --- */
-.skeuomorphic {
-  /* Warm ivory / cream base palette */
-  --background: #EFE8DA;
-  --foreground: #3A322A;
-  --card: #F8F5EF;
-  --card-foreground: #3A322A;
-  --popover: #FBF9F4;
-  --popover-foreground: #3A322A;
-  --primary: #B8862E;
-  --primary-foreground: #FBF9F4;
-  --secondary: #E8E0CF;
-  --secondary-foreground: #3A322A;
-  --muted: #E5DDCC;
-  --muted-foreground: #6B5E4E;
-  --accent: #E8D9B8;
-  --accent-foreground: #5A4A2E;
-  --destructive: #B5453B;
-  --border: rgba(120, 100, 70, 0.14);
-  --input: rgba(120, 100, 70, 0.16);
-  --ring: #B8862E;
-
-  /* Warm amber/gold + muted teal accent (cahaya = illumination) */
-  --neon-cyan: #C8932E;
-  --neon-magenta: #B8763E;
-  --neon-purple: #6B9B9E;
-  --dark-base: #EFE8DA;
-  --dark-surface: #F8F5EF;
-  --glass-bg: rgba(248, 245, 239, 0.78);
-  --glass-border: rgba(120, 100, 70, 0.14);
-  --glow-cyan: 0 8px 24px rgba(184, 134, 46, 0.18);
-  --glow-magenta: 0 8px 24px rgba(184, 118, 62, 0.16);
-  --text-primary: #3A322A;
-  --text-secondary: #6B5E4E;
-  --scanline-opacity: 0;
-
-  /* Skeuomorphic shadow tokens (soft, tactile, embossed) */
-  --skeu-raised: 0 1px 0 rgba(255, 252, 245, 0.95) inset, 0 -1px 0 rgba(120, 100, 70, 0.06) inset, 0 6px 16px rgba(120, 100, 70, 0.12), 0 2px 4px rgba(120, 100, 70, 0.08);
-  --skeu-raised-lg: 0 1px 0 rgba(255, 252, 245, 0.95) inset, 0 -1px 0 rgba(120, 100, 70, 0.08) inset, 0 12px 32px rgba(120, 100, 70, 0.16), 0 4px 8px rgba(120, 100, 70, 0.10);
-  --skeu-pressed: 0 1px 2px rgba(120, 100, 70, 0.18) inset, 0 -1px 0 rgba(255, 252, 245, 0.5) inset;
-  --skeu-surface-grad: linear-gradient(180deg, #FCFAF5 0%, #F2EBDD 100%);
-}
-
-/* --- Skeuomorphic body warm wash --- */
-.skeuomorphic body {
-  background: linear-gradient(160deg, #F6F1E7 0%, #EFE8DA 50%, #E8DFCD 100%);
-  color: var(--text-primary);
-}
-
-/* --- Skeuomorphic glass surfaces (raised, embossed, tactile) --- */
-.skeuomorphic .glass {
-  background: linear-gradient(180deg, rgba(252, 250, 245, 0.92) 0%, rgba(242, 235, 224, 0.88) 100%);
-  backdrop-filter: blur(8px) saturate(1.1);
-  -webkit-backdrop-filter: blur(8px) saturate(1.1);
-  border: 1px solid rgba(255, 252, 245, 0.6);
-  box-shadow: var(--skeu-raised);
-}
-
-.skeuomorphic .glass-strong {
-  background: linear-gradient(180deg, rgba(255, 253, 248, 0.95) 0%, rgba(245, 238, 227, 0.92) 100%);
-  backdrop-filter: blur(12px) saturate(1.15);
-  -webkit-backdrop-filter: blur(12px) saturate(1.15);
-  border: 1px solid rgba(255, 252, 245, 0.7);
-  box-shadow: var(--skeu-raised-lg);
-}
-
-.skeuomorphic .glass-card-advanced {
-  background: linear-gradient(160deg, rgba(252, 250, 245, 0.95) 0%, rgba(243, 236, 224, 0.90) 100%);
-  backdrop-filter: blur(8px) saturate(1.1);
-  -webkit-backdrop-filter: blur(8px) saturate(1.1);
-  border: 1px solid rgba(255, 252, 245, 0.65);
-  box-shadow:
-    0 1px 0 rgba(255, 252, 245, 0.95) inset,
-    0 -1px 0 rgba(120, 100, 70, 0.07) inset,
-    0 8px 22px rgba(120, 100, 70, 0.13),
-    0 2px 5px rgba(120, 100, 70, 0.09);
-  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.skeuomorphic .glass-card-advanced:hover {
-  box-shadow:
-    0 1px 0 rgba(255, 252, 245, 1) inset,
-    0 -1px 0 rgba(120, 100, 70, 0.09) inset,
-    0 14px 36px rgba(120, 100, 70, 0.18),
-    0 4px 10px rgba(120, 100, 70, 0.12),
-    0 0 0 1px rgba(184, 134, 46, 0.12);
-  transform: translateY(-3px);
-  border-color: rgba(184, 134, 46, 0.22);
-}
-
-/* --- Skeuomorphic glass-hover-glow (warm amber glow on hover) --- */
-.skeuomorphic .glass-hover-glow:hover {
-  box-shadow:
-    0 1px 0 rgba(255, 252, 245, 1) inset,
-    0 12px 30px rgba(184, 134, 46, 0.22),
-    0 0 0 1px rgba(184, 134, 46, 0.18) !important;
-  border-color: rgba(184, 134, 46, 0.28) !important;
-}
-
-/* --- Skeuomorphic display font (soft, refined, no harsh neon) --- */
-.skeuomorphic .font-display {
-  text-shadow: 0 1px 0 rgba(255, 252, 245, 0.8), 0 2px 8px rgba(120, 100, 70, 0.10);
-  letter-spacing: 0.02em;
-}
-
-.skeuomorphic .font-mono-custom {
-  color: var(--text-secondary);
-}
-
-/* --- Skeuomorphic shimmering name (subtle warm sheen) --- */
-.skeuomorphic .hero-name-shimmer {
-  background: linear-gradient(120deg, #3A322A 0%, #8C6A2E 40%, #C8932E 50%, #8C6A2E 60%, #3A322A 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: skeuomorphic-sheen 6s linear infinite;
-  filter: drop-shadow(0 1px 0 rgba(255, 252, 245, 0.6));
-}
-@keyframes skeuomorphic-sheen {
-  0% { background-position: 200% center; }
-  100% { background-position: -200% center; }
-}
-
-/* --- Skeuomorphic text gradient animate (warm amber flow) --- */
-.skeuomorphic .text-gradient-animate {
-  background: linear-gradient(120deg, #8C6A2E, #C8932E, #6B9B9E, #8C6A2E);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: skeuomorphic-sheen 8s linear infinite;
-}
-
-/* --- Skeuomorphic buttons (raised, tactile, press-down feel) --- */
-.skeuomorphic .ripple-effect {
-  background: linear-gradient(180deg, #FBF6EA 0%, #E8D9B8 100%) !important;
-  border: 1px solid rgba(184, 134, 46, 0.28) !important;
-  color: #5A4A2E !important;
-  box-shadow:
-    0 1px 0 rgba(255, 252, 245, 0.9) inset,
-    0 -1px 0 rgba(120, 100, 70, 0.10) inset,
-    0 4px 10px rgba(184, 134, 46, 0.14),
-    0 1px 2px rgba(120, 100, 70, 0.10) !important;
-  text-shadow: 0 1px 0 rgba(255, 252, 245, 0.5);
-  transition: all 0.2s ease !important;
-}
-
-.skeuomorphic .ripple-effect:hover {
-  background: linear-gradient(180deg, #FBF6EA 0%, #E8D9B8 100%) !important;
-  box-shadow:
-    0 1px 0 rgba(255, 252, 245, 1) inset,
-    0 -1px 0 rgba(120, 100, 70, 0.12) inset,
-    0 8px 20px rgba(184, 134, 46, 0.24),
-    0 0 0 1px rgba(184, 134, 46, 0.22) !important;
-  color: #4A3A1E !important;
-  transform: translateY(-1px);
-}
-
-.skeuomorphic .ripple-effect:active {
-  box-shadow: var(--skeu-pressed) !important;
-  transform: translateY(1px);
-}
-
-/* --- Skeuomorphic navbar (raised bar, light from above) --- */
-.skeuomorphic header,
-.skeuomorphic header nav,
-.skeuomorphic .glass-nav {
-  background: linear-gradient(180deg, rgba(252, 250, 245, 0.92) 0%, rgba(244, 237, 225, 0.88) 100%) !important;
-  backdrop-filter: blur(12px) saturate(1.15) !important;
-  -webkit-backdrop-filter: blur(12px) saturate(1.15) !important;
-  border-bottom: 1px solid rgba(120, 100, 70, 0.12) !important;
-  box-shadow:
-    0 1px 0 rgba(255, 252, 245, 0.7) inset,
-    0 4px 14px rgba(120, 100, 70, 0.10) !important;
-}
-
-/* --- Skeuomorphic footer (slightly recessed, grounded) --- */
-.skeuomorphic footer {
-  background: linear-gradient(180deg, rgba(244, 237, 225, 0.92) 0%, rgba(236, 228, 214, 0.95) 100%) !important;
-  backdrop-filter: blur(10px) saturate(1.1) !important;
-  -webkit-backdrop-filter: blur(10px) saturate(1.1) !important;
-  border-top: 1px solid rgba(120, 100, 70, 0.14) !important;
-  box-shadow:
-    0 -1px 0 rgba(120, 100, 70, 0.10) inset,
-    0 -4px 14px rgba(120, 100, 70, 0.06) !important;
-}
-
-/* --- Skeuomorphic section dividers (embossed line) --- */
-.skeuomorphic .section-divider {
-  background: transparent !important;
-  height: 2px;
-  background: linear-gradient(90deg, transparent 0%, rgba(184, 134, 46, 0.25) 50%, transparent 100%) !important;
-  box-shadow: 0 1px 0 rgba(255, 252, 245, 0.6);
-}
-
-.skeuomorphic .section-title-line {
-  background: linear-gradient(90deg, rgba(184, 134, 46, 0.4) 0%, transparent 100%) !important;
-}
-
-/* --- Skeuomorphic scanline off --- */
-.skeuomorphic .scanline-overlay {
-  display: none !important;
-}
-
-/* --- Skeuomorphic scrollbar (warm, tactile) --- */
-.skeuomorphic ::-webkit-scrollbar { width: 10px; }
-.skeuomorphic ::-webkit-scrollbar-track {
-  background: rgba(232, 224, 207, 0.6);
-  box-shadow: inset 0 1px 2px rgba(120, 100, 70, 0.10);
-}
-.skeuomorphic ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #D4B57E 0%, #B8862E 100%);
-  border-radius: 5px;
-  border: 1px solid rgba(255, 252, 245, 0.4);
-  box-shadow: 0 1px 0 rgba(255, 252, 245, 0.5) inset, 0 2px 4px rgba(120, 100, 70, 0.15);
-}
-.skeuomorphic ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #D4B57E 0%, #A8761E 100%);
-}
-
-/* --- Skeuomorphic skill bars (raised track, inset fill) --- */
-.skeuomorphic .skill-bar-track {
-  background: rgba(232, 224, 207, 0.7) !important;
-  box-shadow: var(--skeu-pressed) !important;
-  border: 1px solid rgba(120, 100, 70, 0.10);
-}
-
-/* FIX: Override inline gradient on skill bar fill (hardcoded cyan neon)
-   The About component sets: linear-gradient(90deg, var(--neon-cyan), rgba(0,245,255,0.4))
-   This replaces it with a warm amber gradient matching the skeuomorphic theme. */
-.skeuomorphic .skill-bar-track > * {
-  background: linear-gradient(90deg, #C8932E 0%, #D4A24C 60%, #B8862E 100%) !important;
-  box-shadow: 0 1px 0 rgba(255, 252, 245, 0.4) inset, 0 0 8px rgba(184, 134, 46, 0.25);
-}
-
-/* --- Skeuomorphic soft-skill tags (pills, raised) --- */
-.skeuomorphic .soft-skill-tag {
-  background: linear-gradient(180deg, #FCFAF5 0%, #ECE3D1 100%) !important;
-  border: 1px solid rgba(184, 134, 46, 0.18) !important;
-  color: #5A4A2E !important;
-  box-shadow:
-    0 1px 0 rgba(255, 252, 245, 0.9) inset,
-    0 -1px 0 rgba(120, 100, 70, 0.06) inset,
-    0 2px 5px rgba(120, 100, 70, 0.10) !important;
-  transition: all 0.25s ease !important;
-}
-.skeuomorphic .soft-skill-tag:hover {
-  box-shadow:
-    0 1px 0 rgba(255, 252, 245, 1) inset,
-    0 -1px 0 rgba(120, 100, 70, 0.08) inset,
-    0 6px 14px rgba(184, 134, 46, 0.20),
-    0 0 0 1px rgba(184, 134, 46, 0.20) !important;
-  transform: translateY(-2px);
-  color: #4A3A1E !important;
-}
-
-/* --- Skeuomorphic aurora hover (warm glow, not neon) --- */
-.skeuomorphic .aurora-hover::before {
-  background: radial-gradient(circle at 50% 0%, rgba(212, 162, 76, 0.18) 0%, transparent 70%) !important;
-}
-.skeuomorphic .aurora-hover:hover::before {
-  background: radial-gradient(circle at 50% 0%, rgba(212, 162, 76, 0.32) 0%, transparent 70%) !important;
-}
-
-/* --- Skeuomorphic neon-pulse-ring (warm amber pulse) --- */
-.skeuomorphic .neon-pulse-ring {
-  box-shadow: 0 0 0 0 rgba(184, 134, 46, 0.35) !important;
-  animation: skeuomorphic-pulse 2.4s ease-out infinite !important;
-}
-@keyframes skeuomorphic-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(184, 134, 46, 0.35); }
-  70% { box-shadow: 0 0 0 14px rgba(184, 134, 46, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(184, 134, 46, 0); }
-}
-
-/* --- Skeuomorphic card shine (soft warm sweep) --- */
-.skeuomorphic .card-shine::after {
-  background: linear-gradient(115deg, transparent 30%, rgba(255, 252, 245, 0.5) 50%, transparent 70%) !important;
-}
-
-/* --- Skeuomorphic breathing glow (gentle warm breath) --- */
-.skeuomorphic .breathing-glow {
-  animation: skeuomorphic-breathe 4s ease-in-out infinite !important;
-}
-@keyframes skeuomorphic-breathe {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(184, 134, 46, 0); }
-  50% { box-shadow: 0 0 24px 2px rgba(184, 134, 46, 0.22); }
-}
-
-/* --- Skeuomorphic command palette (raised modal) --- */
-.skeuomorphic .command-palette-dialog {
-  background: linear-gradient(180deg, #FBF9F4 0%, #F2EBDD 100%) !important;
-  border: 1px solid rgba(184, 134, 46, 0.18) !important;
-  box-shadow:
-    0 1px 0 rgba(255, 252, 245, 0.95) inset,
-    0 24px 60px rgba(120, 100, 70, 0.28),
-    0 8px 20px rgba(120, 100, 70, 0.16) !important;
-}
-.skeuomorphic .command-palette-item:hover,
-.skeuomorphic .command-palette-item-active {
-  background: linear-gradient(180deg, #F0E6CF 0%, #E8D9B8 100%) !important;
-  color: #4A3A1E !important;
-}
-
-/* --- Skeuomorphic HUD bracket (warm, subtle) --- */
-.skeuomorphic .hud-bracket::before,
-.skeuomorphic .hud-bracket::after {
-  border-color: rgba(184, 134, 46, 0.35) !important;
-}
-
-/* --- Skeuomorphic avatar gradient border (warm gold ring) --- */
-.skeuomorphic .avatar-gradient-border {
-  background: linear-gradient(135deg, #D4A24C 0%, #B8862E 50%, #6B9B9E 100%) !important;
-  box-shadow:
-    0 1px 0 rgba(255, 252, 245, 0.6) inset,
-    0 0 0 2px rgba(255, 252, 245, 0.4),
-    0 8px 24px rgba(184, 134, 46, 0.24) !important;
-}
-.skeuomorphic .avatar-gradient-border > .avatar-inner {
-  box-shadow: 0 1px 0 rgba(255, 252, 245, 0.5) inset !important;
-}
-
-/* --- Skeuomorphic tilt cards (deeper raised on tilt) --- */
-.skeuomorphic [data-tilt-card] {
-  box-shadow: var(--skeu-raised-lg) !important;
-}
-
-/* --- Skeuomorphic dots loading (warm amber dots) --- */
-.skeuomorphic .dots-loading span {
-  background: #B8862E !important;
-  box-shadow: 0 1px 0 rgba(255, 252, 245, 0.5);
-}
-
-/* --- Skeuomorphic glitch text (subtle warm offset, no harsh chroma) --- */
-.skeuomorphic .glitch-text::before,
-.skeuomorphic .glitch-text::after {
-  background: transparent !important;
-  text-shadow: 1px 0 rgba(184, 134, 46, 0.3), -1px 0 rgba(107, 155, 158, 0.3) !important;
-}
-
-/* --- Skeuomorphic inputs (inset/recessed fields) --- */
-.skeuomorphic input,
-.skeuomorphic textarea {
-  background: linear-gradient(180deg, #F2EBDD 0%, #F8F5EF 100%) !important;
-  border: 1px solid rgba(120, 100, 70, 0.18) !important;
-  box-shadow: var(--skeu-pressed) !important;
-  color: var(--text-primary) !important;
-}
-.skeuomorphic input::placeholder,
-.skeuomorphic textarea::placeholder {
-  color: #9A9086 !important;
-}
-.skeuomorphic input:focus,
-.skeuomorphic textarea:focus {
-  border-color: rgba(184, 134, 46, 0.45) !important;
-  box-shadow:
-    var(--skeu-pressed),
-    0 0 0 3px rgba(184, 134, 46, 0.12) !important;
-}
-
-/* --- Skeuomorphic body before (no dark grid overlay) --- */
-.skeuomorphic body::before {
-  display: none !important;
-}
-
-/* --- Skeuomorphic focus ring (warm amber) --- */
-.skeuomorphic *:focus-visible {
-  outline: 2px solid rgba(184, 134, 46, 0.55) !important;
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-/* --- Skeuomorphic selection --- */
-.skeuomorphic ::selection {
-  background: rgba(184, 134, 46, 0.22) !important;
-  color: #3A322A !important;
-}
-
-/* --- Skeuomorphic neon underline (warm) --- */
-.skeuomorphic .neon-underline::after {
-  background: linear-gradient(90deg, #C8932E, #6B9B9E) !important;
-  box-shadow: 0 0 8px rgba(184, 134, 46, 0.3);
-}
-
-/* --- Skeuomorphic text stroke (warm emboss) --- */
-.skeuomorphic .text-stroke {
-  -webkit-text-stroke: 1px rgba(120, 100, 70, 0.3);
-}
-
-/* --- Skeuomorphic pill badges (raised) --- */
-.skeuomorphic .inline-flex.rounded-full {
-  background: linear-gradient(180deg, #FCFAF5 0%, #ECE3D1 100%) !important;
-  border: 1px solid rgba(184, 134, 46, 0.20) !important;
-  box-shadow:
-    0 1px 0 rgba(255, 252, 245, 0.9) inset,
-    0 1px 3px rgba(120, 100, 70, 0.10) !important;
-  color: #5A4A2E !important;
-}
-.skeuomorphic .inline-flex.rounded-full:hover {
-  box-shadow:
-    0 1px 0 rgba(255, 252, 245, 1) inset,
-    0 4px 10px rgba(184, 134, 46, 0.18) !important;
-  transform: translateY(-1px);
-}
-
-/* --- Skeuomorphic section-specific cards (experience, faq, contact, etc.) --- */
-.skeuomorphic #experience .glass,
-.skeuomorphic #faq .rounded-xl.glass,
-.skeuomorphic #contact a.glass,
-.skeuomorphic #achievements .glass,
-.skeuomorphic #stats .glass {
-  background: linear-gradient(160deg, rgba(252, 250, 245, 0.94) 0%, rgba(243, 236, 224, 0.88) 100%) !important;
-  border: 1px solid rgba(255, 252, 245, 0.6) !important;
-  box-shadow: var(--skeu-raised) !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.skeuomorphic #experience .glass:hover,
-.skeuomorphic #faq .rounded-xl.glass:hover,
-.skeuomorphic #contact a.glass:hover,
-.skeuomorphic #achievements .glass:hover,
-.skeuomorphic #stats .glass:hover {
-  box-shadow:
-    0 1px 0 rgba(255, 252, 245, 1) inset,
-    0 12px 28px rgba(120, 100, 70, 0.16),
-    0 0 0 1px rgba(184, 134, 46, 0.16) !important;
-  border-color: rgba(184, 134, 46, 0.24) !important;
-  transform: translateY(-2px);
-}
-
-/* --- Skeuomorphic experience timeline dot (warm gold, raised) --- */
-.skeuomorphic #experience [class*="rounded-full"][style*="neon-cyan"] {
-  background: linear-gradient(180deg, #D4A24C 0%, #B8862E 100%) !important;
-  box-shadow:
-    0 1px 0 rgba(255, 252, 245, 0.7) inset,
-    0 0 0 3px rgba(248, 245, 239, 0.9),
-    0 4px 10px rgba(184, 134, 46, 0.35) !important;
-}
-
-/* --- Skeuomorphic SVGs (warm tone) --- */
-.skeuomorphic svg {
-  filter: drop-shadow(0 1px 0 rgba(255, 252, 245, 0.5));
-}
-.skeuomorphic button:hover svg,
-.skeuomorphic a:hover svg {
-  filter: drop-shadow(0 1px 4px rgba(184, 134, 46, 0.25));
-}
-
-/* --- Skeuomorphic cyber link (warm underline grow) --- */
-.skeuomorphic .cyber-link:hover {
-  color: #8C6A2E !important;
-  text-shadow: 0 1px 0 rgba(255, 252, 245, 0.5);
-}
-
-/* --- Skeuomorphic quote decoration (warm) --- */
-.skeuomorphic .quote-decoration {
-  color: rgba(184, 134, 46, 0.45) !important;
-}
-
-/* --- Skeuomorphic reduced motion --- */
-@media (prefers-reduced-motion: reduce) {
-  .skeuomorphic-orb,
-  .skeuomorphic-grain,
-  .skeuomorphic .breathing-glow,
-  .skeuomorphic .neon-pulse-ring,
-  .skeuomorphic .hero-name-shimmer,
-  .skeuomorphic .text-gradient-animate {
-    animation: none !important;
-  }
-  .skeuomorphic .glass-card-advanced:hover,
-  .skeuomorphic .soft-skill-tag:hover,
-  .skeuomorphic .ripple-effect:hover {
-    transform: none;
-  }
-}
-
-/* ============================================================ */
-/* ===== SKEUOMORFISME CAHAYA — STYLING DETAILS (Round 2) ===== */
-/* ============================================================ */
-
-/* --- Skeuomorphic FAQ accordion (override cyan glow on open) --- */
-.skeuomorphic #faq .rounded-xl.glass {
-  background: linear-gradient(160deg, rgba(252, 250, 245, 0.95) 0%, rgba(243, 236, 224, 0.90) 100%) !important;
-  border: 1px solid rgba(255, 252, 245, 0.6) !important;
-  box-shadow: var(--skeu-raised) !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.skeuomorphic #faq .rounded-xl.glass[class*="border-[var(--neon-cyan)"] {
-  border-color: rgba(184, 134, 46, 0.35) !important;
-  box-shadow:
-    0 1px 0 rgba(255, 252, 245, 1) inset,
-    0 12px 28px rgba(184, 134, 46, 0.18),
-    0 0 0 1px rgba(184, 134, 46, 0.16) !important;
-}
-.skeuomorphic #faq button[aria-expanded="true"] span {
-  color: #8C6A2E !important;
-  text-shadow: 0 1px 0 rgba(255, 252, 245, 0.6);
-}
-.skeuomorphic #faq button[aria-expanded="true"] svg {
-  color: #B8862E !important;
-}
-
-/* --- Skeuomorphic TechStack orbit (warm gold rings instead of cyan) --- */
-.skeuomorphic .tech-3d-orbit-outer,
-.skeuomorphic .tech-3d-orbit-inner {
-  border-color: rgba(184, 134, 46, 0.22) !important;
-}
-.skeuomorphic .tech-3d-center-core {
-  background: radial-gradient(circle, rgba(212, 162, 76, 0.45) 0%, rgba(184, 134, 46, 0.15) 60%, transparent 100%) !important;
-  box-shadow:
-    0 0 24px rgba(184, 134, 46, 0.3),
-    0 1px 0 rgba(255, 252, 245, 0.6) inset !important;
-}
-.skeuomorphic .tech-3d-item {
-  background: linear-gradient(180deg, rgba(252, 250, 245, 0.95) 0%, rgba(232, 217, 184, 0.85) 100%) !important;
-  border: 1px solid rgba(184, 134, 46, 0.25) !important;
-  box-shadow:
-    0 1px 0 rgba(255, 252, 245, 0.9) inset,
-    0 -1px 0 rgba(120, 100, 70, 0.08) inset,
-    0 4px 10px rgba(120, 100, 70, 0.14) !important;
-  color: #5A4A2E !important;
-}
-.skeuomorphic .tech-3d-item:hover {
-  box-shadow:
-    0 1px 0 rgba(255, 252, 245, 1) inset,
-    0 8px 18px rgba(184, 134, 46, 0.22),
-    0 0 0 1px rgba(184, 134, 46, 0.30) !important;
-  transform: translateY(-2px);
-}
-
-/* --- Skeuomorphic Projects section --- */
-.skeuomorphic #projects .glass-card-advanced {
-  background: linear-gradient(160deg, rgba(252, 250, 245, 0.96) 0%, rgba(240, 232, 218, 0.92) 100%) !important;
-}
-.skeuomorphic #projects .glass-card-advanced:hover {
-  border-color: rgba(184, 134, 46, 0.28) !important;
-}
-/* Projects corner brackets — warm gold */
-.skeuomorphic #projects [class*="border-[var(--neon-cyan)"] {
-  border-color: rgba(184, 134, 46, 0.5) !important;
-}
-.skeuomorphic #projects [class*="border-[var(--neon-magenta)"] {
-  border-color: rgba(184, 118, 62, 0.5) !important;
-}
-
-/* --- Skeuomorphic Achievements cards --- */
-.skeuomorphic #achievements .glass-card-advanced .text-2xl.font-display {
-  color: #B8862E !important;
-  text-shadow: 0 1px 0 rgba(255, 252, 245, 0.7), 0 2px 6px rgba(184, 134, 46, 0.2);
-}
-.skeuomorphic #achievements .glass-card-advanced:hover .text-2xl.font-display {
-  color: #8C6A2E !important;
-}
-
-/* --- Skeuomorphic Stats section --- */
-.skeuomorphic #stats .text-3xl.font-display,
-.skeuomorphic #stats .text-4xl.font-display {
-  color: #B8862E !important;
-  text-shadow: 0 1px 0 rgba(255, 252, 245, 0.7), 0 2px 8px rgba(184, 134, 46, 0.18);
-}
-
-/* --- Skeuomorphic LoadingScreen (warm amber during initial load) --- */
-.skeuomorphic .glass[style*="rgba(10, 10, 15"] {
-  background: linear-gradient(160deg, rgba(246, 241, 231, 0.97) 0%, rgba(232, 223, 205, 0.97) 100%) !important;
-}
-.skeuomorphic .font-display[style*="text-shadow"][style*="0, 245, 255"] {
-  color: #B8862E !important;
-  text-shadow: 0 0 20px rgba(184, 134, 46, 0.5), 0 0 40px rgba(184, 134, 46, 0.3), 0 0 60px rgba(184, 134, 46, 0.15) !important;
-}
-
-/* --- Skeuomorphic hero name shimmer (stronger warm gradient, more visible) --- */
-.skeuomorphic .hero-name-shimmer {
-  background: linear-gradient(
-    120deg,
-    #3A322A 0%,
-    #8C6A2E 25%,
-    #D4A24C 45%,
-    #C8932E 55%,
-    #8C6A2E 75%,
-    #3A322A 100%
-  ) !important;
-  background-size: 200% auto !important;
-  -webkit-background-clip: text !important;
-  background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  filter: drop-shadow(0 1px 0 rgba(255, 252, 245, 0.7)) drop-shadow(0 2px 6px rgba(120, 100, 70, 0.15));
-  animation: skeuomorphic-sheen 7s linear infinite !important;
-}
-
-/* --- Skeuomorphic neon pulse ring on avatar/status (warm amber) --- */
-.skeuomorphic .absolute.inset-0.rounded-full[class*="animate-"] {
-  background: radial-gradient(circle, rgba(184, 134, 46, 0.25) 0%, transparent 70%) !important;
-}
-
-/* --- Skeuomorphic tech counter rings (warm gold) --- */
-.skeuomorphic .tech-3d-counter-outer,
-.skeuomorphic .tech-3d-counter-inner {
-  background: linear-gradient(180deg, rgba(252, 250, 245, 0.6) 0%, rgba(232, 217, 184, 0.4) 100%) !important;
-  border-color: rgba(184, 134, 46, 0.2) !important;
-  box-shadow: 0 1px 0 rgba(255, 252, 245, 0.7) inset !important;
-}
-
-/* --- Skeuomorphic focus ring on command palette search --- */
-.skeuomorphic .command-palette-dialog input:focus {
-  outline: none;
-  box-shadow: 0 1px 0 rgba(255, 252, 245, 0.6) inset !important;
-}
-
-/* --- Skeuomorphic toast notifications --- */
-.skeuomorphic .glass[class*="fixed"][class*="top-"][class*="right-"],
-.skeuomorphic [class*="toast"] {
-  background: linear-gradient(180deg, rgba(252, 250, 245, 0.96) 0%, rgba(243, 236, 224, 0.93) 100%) !important;
-  border: 1px solid rgba(184, 134, 46, 0.22) !important;
-  box-shadow: var(--skeu-raised-lg) !important;
-  color: var(--text-primary) !important;
-}
-
-/* --- Skeuomorphic section title (warm gold accent text) --- */
-.skeuomorphic .section-divider::before,
-.skeuomorphic h2.font-display {
-  color: var(--text-primary);
-}
-.skeuomorphic h2.font-display {
-  text-shadow: 0 1px 0 rgba(255, 252, 245, 0.85), 0 2px 10px rgba(120, 100, 70, 0.12) !important;
-}
-
-/* --- Skeuomorphic dialog/modal (CvReader, AdminPanel, etc.) --- */
-.skeuomorphic .glass-strong[role="dialog"],
-.skeuomorphic [role="dialog"] > .glass-strong,
-.skeuomorphic dialog .glass-strong {
-  background: linear-gradient(160deg, rgba(255, 253, 248, 0.97) 0%, rgba(243, 236, 224, 0.95) 100%) !important;
-  border: 1px solid rgba(184, 134, 46, 0.2) !important;
-  box-shadow:
-    0 1px 0 rgba(255, 252, 245, 0.95) inset,
-    0 24px 60px rgba(120, 100, 70, 0.28),
-    0 8px 20px rgba(120, 100, 70, 0.16) !important;
-}
-
-/* --- Skeuomorphic progress bar (ScrollProgress at top) --- */
-.skeuomorphic .fixed.top-0.left-0[class*="h-[2px]"],
-.skeuomorphic .fixed.top-0[class*="z-50"][class*="origin-left"] {
-  background: linear-gradient(90deg, #C8932E 0%, #D4A24C 50%, #B8763E 100%) !important;
-  box-shadow: 0 0 8px rgba(184, 134, 46, 0.4) !important;
-}
-
-/* ===== END SKEUOMORFISME CAHAYA ===== */
-
-/* 3D Theme: CSS Variable Overrides */
-.theme-3d {
-  --background: #050510;
-  --foreground: #e8e8ff;
-  --card: rgba(10, 10, 30, 0.85);
-  --card-foreground: #e8e8ff;
-  --popover: rgba(10, 10, 30, 0.9);
-  --popover-foreground: #e8e8ff;
-  --primary: #00F5FF;
-  --primary-foreground: #050510;
-  --secondary: #0a0a2e;
-  --secondary-foreground: #e8e8ff;
-  --muted: #0a0a2e;
-  --muted-foreground: #7777aa;
-  --accent: #0f0f3a;
-  --accent-foreground: #e8e8ff;
-  --destructive: #FF4466;
-  --border: rgba(0, 245, 255, 0.1);
-  --input: rgba(0, 245, 255, 0.12);
-  --ring: #00F5FF;
-
-  --neon-cyan: #00F5FF;
-  --neon-magenta: #FF2DAA;
-  --neon-purple: #A78BFA;
-  --dark-base: #050510;
-  --dark-surface: #0a0a20;
-  --glass-bg: rgba(10, 15, 40, 0.65);
-  --glass-border: rgba(0, 245, 255, 0.12);
-  --glow-cyan: 0 0 20px rgba(0, 245, 255, 0.4), 0 8px 32px rgba(0, 0, 0, 0.5);
-  --glow-magenta: 0 0 20px rgba(255, 45, 170, 0.4), 0 8px 32px rgba(0, 0, 0, 0.5);
-  --text-primary: #e8e8ff;
-  --text-secondary: #8888bb;
-  --scanline-opacity: 0;
-  --3d-perspective: 1200px;
-  --3d-depth: 40px;
-}
-
-/* ===== 3D THEME: BASE LAYOUT ===== */
-/* NOTE: Do NOT set perspective or preserve-3d on body/main/header.
-   perspective on body breaks fixed-position stacking contexts.
-   preserve-3d on elements with z-index creates undefined behavior.
-   Instead, apply perspective per-section so 3D card effects work
-   without breaking the global z-index / click event model. */
-.theme-3d body {
-  overflow-x: hidden;
-}
-
-.theme-3d main {
-  /* No preserve-3d here — main has z-[1] which conflicts */
-  /* No perspective here — apply per-section instead */
-}
-
-.theme-3d section {
-  perspective: var(--3d-perspective);
-  transform-style: preserve-3d;
-  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* ===== 3D THEME: GLASS CARDS ===== */
-.theme-3d .glass {
-  background: linear-gradient(145deg, rgba(10, 15, 45, 0.7) 0%, rgba(5, 8, 25, 0.85) 100%);
-  backdrop-filter: blur(16px) brightness(1.1);
-  -webkit-backdrop-filter: blur(16px) brightness(1.1);
-  border: 1px solid rgba(0, 245, 255, 0.1);
-  box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.3),
-    0 8px 16px rgba(0, 0, 0, 0.2),
-    0 16px 32px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(0, 245, 255, 0.08);
-  /* No translateZ(0px) — creates stacking context on every glass element,
-     breaking click events on buttons, nav links, footer icons, etc. */
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.theme-3d .glass-strong {
-  background: linear-gradient(145deg, rgba(10, 15, 45, 0.85) 0%, rgba(5, 8, 25, 0.95) 100%);
-  backdrop-filter: blur(24px) brightness(1.1);
-  -webkit-backdrop-filter: blur(24px) brightness(1.1);
-  border: 1px solid rgba(0, 245, 255, 0.15);
-  box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.4),
-    0 8px 16px rgba(0, 0, 0, 0.3),
-    0 20px 40px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(0, 245, 255, 0.1);
-  /* No preserve-3d — used on navbar header which has z-50 */
-}
-
-/* ===== 3D THEME: CARD ADVANCED HOVER ===== */
-.theme-3d .glass-card-advanced {
-  background: linear-gradient(145deg, rgba(10, 15, 45, 0.7) 0%, rgba(5, 8, 25, 0.85) 100%);
-  backdrop-filter: blur(16px) brightness(1.1);
-  -webkit-backdrop-filter: blur(16px) brightness(1.1);
-  border: 1px solid rgba(0, 245, 255, 0.1);
-  box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.3),
-    0 8px 16px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(0, 245, 255, 0.08),
-    inset 0 -1px 0 rgba(255, 45, 170, 0.05);
-  transform-style: preserve-3d;
-  transform: perspective(800px) translateZ(0);
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.theme-3d .glass-card-advanced::after {
-  background: linear-gradient(135deg,
-    rgba(0, 245, 255, 0.08) 0%,
-    transparent 40%,
-    transparent 60%,
-    rgba(255, 45, 170, 0.06) 100%
-  );
-  transform: translateZ(1px);
-}
-
-.theme-3d .glass-card-advanced:hover {
-  transform: perspective(800px) translateZ(20px) rotateX(2deg) rotateY(-2deg);
-  box-shadow:
-    0 4px 8px rgba(0, 0, 0, 0.4),
-    0 12px 24px rgba(0, 0, 0, 0.3),
-    0 24px 48px rgba(0, 0, 0, 0.2),
-    0 0 30px rgba(0, 245, 255, 0.1),
-    inset 0 1px 0 rgba(0, 245, 255, 0.15),
-    inset 0 -1px 0 rgba(255, 45, 170, 0.08);
-  border-color: rgba(0, 245, 255, 0.25);
-}
-
-/* ===== 3D THEME: GLASS HOVER GLOW ===== */
-.theme-3d .glass-hover-glow:hover {
-  transform: perspective(600px) translateZ(15px) translateY(-4px) rotateX(3deg) rotateY(-2deg);
-  box-shadow:
-    0 0 0 1px rgba(0, 245, 255, 0.15),
-    0 8px 32px rgba(0, 0, 0, 0.3),
-    0 16px 48px rgba(0, 0, 0, 0.2),
-    0 0 30px rgba(0, 245, 255, 0.15);
-}
-
-/* ===== 3D THEME: FONTS ===== */
-.theme-3d .font-display {
-  font-family: 'Orbitron', sans-serif;
-  text-shadow:
-    0 0 10px rgba(0, 245, 255, 0.5),
-    0 0 20px rgba(0, 245, 255, 0.3),
-    0 0 40px rgba(0, 245, 255, 0.1);
-  letter-spacing: 0.05em;
-}
-
-.theme-3d .font-mono-custom {
-  text-shadow: 0 0 6px rgba(0, 245, 255, 0.2);
-}
-
-/* ===== 3D THEME: HERO NAME SHIMMER ===== */
-.theme-3d .hero-name-shimmer {
-  background: linear-gradient(
-    90deg,
-    var(--neon-cyan) 0%,
-    #fff 15%,
-    var(--neon-cyan) 30%,
-    var(--neon-magenta) 60%,
-    var(--neon-purple) 80%,
-    var(--neon-cyan) 100%
-  );
-  background-size: 300% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: text-shimmer 4s linear infinite;
-  filter: drop-shadow(0 0 20px rgba(0, 245, 255, 0.4)) drop-shadow(0 0 40px rgba(0, 245, 255, 0.2));
-  transform: translateZ(30px);
-  transform-style: preserve-3d;
-}
-
-/* ===== 3D THEME: SECTION TITLE LINE ===== */
-.theme-3d .section-title-line {
-  height: 4px;
-  box-shadow:
-    0 0 8px var(--neon-cyan),
-    0 0 16px rgba(0, 245, 255, 0.3),
-    0 2px 4px rgba(0, 0, 0, 0.5);
-  transform: perspective(200px) rotateX(30deg) translateZ(5px);
-  transform-origin: left center;
-}
-
-/* ===== 3D THEME: SECTION DIVIDER ===== */
-.theme-3d .section-divider {
-  height: 2px;
-  transform: perspective(300px) rotateX(10deg);
-  box-shadow:
-    0 0 10px var(--neon-cyan),
-    0 0 20px rgba(0, 245, 255, 0.2);
-}
-
-.theme-3d .section-divider::before {
-  width: 8px;
-  height: 8px;
-  box-shadow:
-    0 0 10px var(--neon-cyan),
-    0 0 20px var(--neon-cyan),
-    0 0 30px rgba(0, 245, 255, 0.3);
-  transform: translateZ(5px);
-  background: radial-gradient(circle, var(--neon-cyan), rgba(0, 245, 255, 0.5));
-}
-
-.theme-3d .section-divider::after {
-  width: 8px;
-  height: 8px;
-  box-shadow:
-    0 0 10px var(--neon-magenta),
-    0 0 20px var(--neon-magenta);
-  background: radial-gradient(circle, var(--neon-magenta), rgba(255, 45, 170, 0.5));
-}
-
-/* ===== 3D THEME: NAVBAR ===== */
-.theme-3d header {
-  /* No preserve-3d — header has z-50 which conflicts */
-}
-
-.theme-3d header nav,
-.theme-3d .glass-nav {
-  background: linear-gradient(180deg, rgba(5, 5, 16, 0.95) 0%, rgba(5, 5, 16, 0.85) 100%) !important;
-  backdrop-filter: blur(20px) brightness(1.1) !important;
-  -webkit-backdrop-filter: blur(20px) brightness(1.1) !important;
-  border-bottom: 1px solid rgba(0, 245, 255, 0.15) !important;
-  box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.5),
-    0 0 20px rgba(0, 245, 255, 0.05),
-    inset 0 -1px 0 rgba(0, 245, 255, 0.08) !important;
-  /* No translateZ here — breaks click events on nav children */
-}
-
-/* ===== 3D THEME: FOOTER ===== */
-.theme-3d footer {
-  background: linear-gradient(180deg, rgba(5, 5, 16, 0.8) 0%, rgba(5, 5, 20, 0.95) 100%) !important;
-  border-top: 1px solid rgba(0, 245, 255, 0.15) !important;
-  box-shadow:
-    0 -4px 20px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(0, 245, 255, 0.08);
-  /* No transform with translateZ — breaks click events on footer buttons */
-}
-
-/* ===== 3D THEME: BUTTONS ===== */
-.theme-3d .ripple-effect {
-  position: relative;
-  transform-style: preserve-3d;
-  transform: translateZ(0);
-  box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.4),
-    0 6px 12px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.theme-3d .ripple-effect:hover {
-  transform: perspective(400px) translateZ(8px) translateY(-2px);
-  box-shadow:
-    0 4px 8px rgba(0, 0, 0, 0.5),
-    0 12px 24px rgba(0, 0, 0, 0.3),
-    0 0 20px rgba(0, 245, 255, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
-}
-
-.theme-3d .ripple-effect:active {
-  transform: perspective(400px) translateZ(0) translateY(1px);
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.5),
-    0 2px 4px rgba(0, 0, 0, 0.3),
-    inset 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-/* ===== 3D THEME: ICONS ===== */
-.theme-3d svg {
-  filter: drop-shadow(0 0 4px rgba(0, 245, 255, 0.3));
-  transition: filter 0.3s ease, transform 0.3s ease;
-}
-
-.theme-3d button:hover svg,
-.theme-3d a:hover svg {
-  filter: drop-shadow(0 0 8px rgba(0, 245, 255, 0.5)) drop-shadow(0 0 16px rgba(0, 245, 255, 0.2));
-  transform: translateZ(5px) scale(1.1);
-}
-
-/* ===== 3D THEME: TIMELINE (Experience) ===== */
-.theme-3d #experience [class*="absolute"][class*="left-4"] {
-  box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px rgba(0, 245, 255, 0.2);
-}
-
-/* 3D timeline nodes */
-.theme-3d #experience [class*="rounded-full"][style*="neon-cyan"] {
-  box-shadow:
-    0 0 10px var(--neon-cyan),
-    0 0 20px var(--neon-cyan),
-    0 0 30px rgba(0, 245, 255, 0.3);
-  transform: translateZ(10px);
-}
-
-/* ===== 3D THEME: SKILL BARS ===== */
-.theme-3d .skill-bar-track {
-  background: rgba(0, 245, 255, 0.05) !important;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
-  border-radius: 4px;
-  transform: perspective(200px) rotateX(10deg);
-  transform-origin: left;
-}
-
-/* ===== 3D THEME: SOFT SKILL TAGS ===== */
-.theme-3d .soft-skill-tag {
-  transform-style: preserve-3d;
-  transform: translateZ(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.theme-3d .soft-skill-tag:hover {
-  transform: perspective(400px) translateZ(10px) translateY(-4px) rotateX(3deg);
-  box-shadow:
-    0 8px 16px rgba(255, 45, 170, 0.15),
-    0 0 15px rgba(255, 45, 170, 0.1);
-  border-color: var(--neon-magenta) !important;
-}
-
-/* ===== 3D THEME: AURORA HOVER ===== */
-.theme-3d .aurora-hover::before {
-  background: linear-gradient(
-    135deg,
-    rgba(0, 245, 255, 0.15),
-    rgba(255, 45, 170, 0.15),
-    rgba(167, 139, 250, 0.15),
-    rgba(0, 245, 255, 0.15)
-  );
-  background-size: 400% 400%;
-  opacity: 0;
-  transform: translateZ(-1px);
-}
-
-.theme-3d .aurora-hover:hover::before {
-  opacity: 0.2;
-}
-
-/* ===== 3D THEME: TEXT GRADIENT ANIMATE ===== */
-.theme-3d .text-gradient-animate {
-  filter: drop-shadow(0 0 8px rgba(0, 245, 255, 0.4));
-}
-
-/* ===== 3D THEME: NEON PULSE RING ===== */
-.theme-3d .neon-pulse-ring {
-  animation: pulse-3d 2s ease-in-out infinite;
-}
-
-/* ===== 3D THEME: CARD SHINE ===== */
-.theme-3d .card-shine::after {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(0, 245, 255, 0.1) 40%,
-    rgba(255, 255, 255, 0.15) 50%,
-    rgba(0, 245, 255, 0.1) 60%,
-    transparent 100%
-  );
-  transform: translateX(-100%) translateY(-100%) rotate(45deg) translateZ(2px);
-}
-
-/* ===== 3D THEME: BREATHING GLOW ===== */
-.theme-3d .breathing-glow {
-  animation: pulse-3d 3s ease-in-out infinite;
-}
-
-/* ===== 3D THEME: SCROLLBAR ===== */
-.theme-3d ::-webkit-scrollbar { width: 8px; }
-.theme-3d ::-webkit-scrollbar-track {
-  background: rgba(5, 5, 16, 0.9);
-  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5);
-}
-.theme-3d ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--neon-cyan), var(--neon-magenta));
-  border-radius: 4px;
-  box-shadow: 0 0 6px var(--neon-cyan), 0 0 12px rgba(0, 245, 255, 0.2);
-}
-.theme-3d ::-webkit-scrollbar-thumb:hover {
-  box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px rgba(0, 245, 255, 0.4);
-}
-
-/* ===== 3D THEME: SCANLINE OFF ===== */
-.theme-3d .scanline-overlay {
-  display: none !important;
-}
-
-/* ===== 3D THEME: COMMAND PALETTE ===== */
-.theme-3d .command-palette-dialog {
-  box-shadow:
-    0 0 0 1px rgba(0, 245, 255, 0.2),
-    0 0 40px rgba(0, 245, 255, 0.1),
-    0 25px 60px rgba(0, 0, 0, 0.6),
-    0 50px 100px rgba(0, 0, 0, 0.3);
-  transform: translateX(-50%) perspective(800px) translateZ(30px);
-  border: 1px solid rgba(0, 245, 255, 0.15);
-}
-
-/* ===== 3D THEME: HUD BRACKETS ===== */
-.theme-3d .hud-bracket::before,
-.theme-3d .hud-bracket::after {
-  box-shadow: 0 0 6px var(--neon-cyan);
-  transform: translateZ(5px);
-}
-
-/* ===== 3D THEME: AVATAR GRADIENT BORDER ===== */
-.theme-3d .avatar-gradient-border {
-  box-shadow:
-    0 0 20px rgba(0, 245, 255, 0.3),
-    0 0 40px rgba(255, 45, 170, 0.15),
-    0 10px 30px rgba(0, 0, 0, 0.5);
-  transform: perspective(600px) translateZ(10px);
-}
-
-/* ===== 3D THEME: TILT CARDS ENHANCED ===== */
-.theme-3d [data-tilt-card] {
-  transform-style: preserve-3d;
-}
-
-/* ===== 3D THEME: DOT LOADING ===== */
-.theme-3d .dots-loading span {
-  box-shadow: 0 0 8px var(--neon-cyan), 0 0 16px rgba(0, 245, 255, 0.3);
-}
-
-/* ===== 3D THEME: GLITCH TEXT ===== */
-.theme-3d .glitch-text::before {
-  text-shadow: 2px 0 var(--neon-cyan), -2px 0 var(--neon-magenta);
-}
-
-.theme-3d .glitch-text::after {
-  text-shadow: -2px 0 var(--neon-magenta), 2px 0 var(--neon-cyan);
-}
-
-/* ===== 3D THEME: INPUT FIELDS ===== */
-.theme-3d input,
-.theme-3d textarea {
-  background: rgba(5, 8, 25, 0.6) !important;
-  border-color: rgba(0, 245, 255, 0.15) !important;
-  box-shadow:
-    inset 0 2px 4px rgba(0, 0, 0, 0.3),
-    0 0 0 0 transparent;
-  transition: all 0.3s ease;
-}
-
-.theme-3d input:focus,
-.theme-3d textarea:focus {
-  border-color: var(--neon-cyan) !important;
-  box-shadow:
-    inset 0 2px 4px rgba(0, 0, 0, 0.3),
-    0 0 15px rgba(0, 245, 255, 0.2),
-    0 0 30px rgba(0, 245, 255, 0.1) !important;
-  transform: perspective(400px) translateZ(3px);
-}
-
-/* ===== 3D THEME: BACKGROUND BODY ===== */
-.theme-3d body::before {
-  background: linear-gradient(135deg,
-    rgba(0, 245, 255, 0.04) 0%,
-    rgba(255, 45, 170, 0.03) 25%,
-    rgba(167, 139, 250, 0.04) 50%,
-    rgba(0, 245, 255, 0.03) 75%,
-    rgba(255, 45, 170, 0.04) 100%
-  ) !important;
-  background-size: 400% 400% !important;
-}
-
-/* ===== 3D THEME: FLOATING 3D GEOMETRY SHAPES ===== */
-.theme-3d-bg {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  perspective: 800px;
-  overflow: hidden;
-}
-
-.theme-3d-cube {
-  position: absolute;
-  width: 40px;
-  height: 40px;
-  transform-style: preserve-3d;
-  animation: cube-rotate 20s linear infinite;
-  opacity: 0.15;
-}
-
-.theme-3d-cube .face {
-  position: absolute;
-  width: 40px;
-  height: 40px;
-  border: 1px solid var(--neon-cyan);
-  background: rgba(0, 245, 255, 0.03);
-  box-shadow: inset 0 0 10px rgba(0, 245, 255, 0.05);
-}
-
-.theme-3d-cube .face-front  { transform: translateZ(20px); }
-.theme-3d-cube .face-back   { transform: rotateY(180deg) translateZ(20px); }
-.theme-3d-cube .face-left   { transform: rotateY(-90deg) translateZ(20px); }
-.theme-3d-cube .face-right  { transform: rotateY(90deg) translateZ(20px); }
-.theme-3d-cube .face-top    { transform: rotateX(90deg) translateZ(20px); }
-.theme-3d-cube .face-bottom { transform: rotateX(-90deg) translateZ(20px); }
-
-.theme-3d-cube.magenta .face {
-  border-color: var(--neon-magenta);
-  background: rgba(255, 45, 170, 0.03);
-  box-shadow: inset 0 0 10px rgba(255, 45, 170, 0.05);
-}
-
-.theme-3d-cube.purple .face {
-  border-color: var(--neon-purple);
-  background: rgba(167, 139, 250, 0.03);
-  box-shadow: inset 0 0 10px rgba(167, 139, 250, 0.05);
-}
-
-/* 3D Wireframe Sphere */
-.theme-3d-sphere {
-  position: absolute;
-  border-radius: 50%;
-  border: 1px solid var(--neon-cyan);
-  opacity: 0.08;
-  animation: wireframe-pulse 8s ease-in-out infinite;
-  box-shadow: 0 0 20px rgba(0, 245, 255, 0.05);
-}
-
-/* 3D Orbiting particles */
-.theme-3d-orbit-container {
-  position: absolute;
-  transform-style: preserve-3d;
-  animation: spin-3d-slow 30s linear infinite;
-}
-
-.theme-3d-orbit-dot {
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--neon-cyan);
-  box-shadow: 0 0 8px var(--neon-cyan), 0 0 16px rgba(0, 245, 255, 0.3);
-  animation: orbit-3d 8s linear infinite;
-}
-
-/* 3D Grid floor effect */
-.theme-3d-grid {
-  position: absolute;
-  bottom: 0;
-  left: -20%;
-  width: 140%;
-  height: 40%;
-  background-image:
-    linear-gradient(rgba(0, 245, 255, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 245, 255, 0.06) 1px, transparent 1px);
-  background-size: 40px 40px;
-  animation: grid-3d-flow 4s linear infinite;
-  transform: perspective(500px) rotateX(60deg);
-  transform-origin: center top;
-  mask-image: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
-  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
-}
-
-/* ===== 3D THEME: CYBER LINK ===== */
-.theme-3d .cyber-link:hover {
-  text-shadow:
-    0 0 8px var(--neon-cyan),
-    0 0 16px rgba(0, 245, 255, 0.3);
-  transform: translateZ(5px);
-}
-
-/* ===== 3D THEME: FOCUS STYLES ===== */
-.theme-3d *:focus-visible {
-  outline: 2px solid var(--neon-cyan);
-  outline-offset: 3px;
-  box-shadow:
-    0 0 10px rgba(0, 245, 255, 0.4),
-    0 0 20px rgba(0, 245, 255, 0.15);
-}
-
-/* ===== 3D THEME: SELECTION ===== */
-.theme-3d ::selection {
-  background: rgba(0, 245, 255, 0.3);
-  color: #fff;
-  text-shadow: 0 0 4px rgba(0, 245, 255, 0.5);
-}
-
-/* ===== 3D THEME: NEON UNDERLINE ===== */
-.theme-3d .neon-underline::after {
-  box-shadow: 0 0 6px var(--neon-cyan);
-  height: 2px;
-}
-
-/* ===== 3D THEME: TEXT STROKE ===== */
-.theme-3d .text-stroke {
-  -webkit-text-stroke: 2px var(--neon-cyan);
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 8px rgba(0, 245, 255, 0.4));
-}
-
-/* ===== 3D THEME: BADGES & TAGS ===== */
-.theme-3d .inline-flex.rounded-full {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  transform-style: preserve-3d;
-  transform: translateZ(0);
-  transition: all 0.3s ease;
-}
-
-.theme-3d .inline-flex.rounded-full:hover {
-  transform: translateZ(5px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 10px rgba(0, 245, 255, 0.15);
-}
-
-/* ===== 3D THEME: EXPERIENCE TIMELINE CARDS ===== */
-.theme-3d #experience .glass {
-  transform: perspective(800px) translateZ(0);
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.theme-3d #experience .glass:hover {
-  transform: perspective(800px) translateZ(15px) rotateY(2deg);
-  box-shadow:
-    0 4px 8px rgba(0, 0, 0, 0.4),
-    0 12px 24px rgba(0, 0, 0, 0.3),
-    0 0 20px rgba(0, 245, 255, 0.08);
-}
-
-/* ===== 3D THEME: FAQ ACCORDION ===== */
-.theme-3d #faq .rounded-xl.glass {
-  transform: perspective(600px) translateZ(0);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-style: preserve-3d;
-}
-
-.theme-3d #faq .rounded-xl.glass:hover {
-  transform: perspective(600px) translateZ(5px);
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.3),
-    0 0 15px rgba(0, 245, 255, 0.08);
-}
-
-/* ===== 3D THEME: CONTACT CARDS ===== */
-.theme-3d #contact a.glass {
-  transform: perspective(600px) translateZ(0);
-  transform-style: preserve-3d;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.theme-3d #contact a.glass:hover {
-  transform: perspective(600px) translateZ(10px) translateY(-3px);
-  box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.3),
-    0 0 20px rgba(0, 245, 255, 0.1);
-}
-
-/* ===== 3D THEME: ACHIEVEMENT CARDS ===== */
-.theme-3d #achievements .glass {
-  transform: perspective(800px) translateZ(0);
-  transform-style: preserve-3d;
-}
-
-.theme-3d #achievements .glass:hover {
-  transform: perspective(800px) translateZ(12px) rotateX(2deg) rotateY(-1deg);
-}
-
-/* ===== 3D THEME: STATS CARDS ===== */
-.theme-3d #stats .glass,
-.theme-3d .glass-hover-glow {
-  transform: perspective(600px) translateZ(0);
-  transform-style: preserve-3d;
-}
-
-/* ===== 3D THEME: ABOUT AVATAR ===== */
-.theme-3d .avatar-gradient-border > .avatar-inner {
-  box-shadow: inset 0 0 30px rgba(0, 245, 255, 0.1);
-}
-
-/* ===== 3D THEME: SCROLL PROGRESS BAR ===== */
-.theme-3d [style*="translateX"] {
-  box-shadow: 0 0 8px var(--neon-cyan), 0 0 16px rgba(0, 245, 255, 0.3);
-}
-
-/* ===== 3D THEME: DYNAMIC LIGHTING (mouse-following) ===== */
-.theme-3d {
-  --light-x: 0;
-  --light-y: 0;
-  --light-px: 50%;
-  --light-py: 50%;
-}
-
-/* Dynamic neon glow border on glass card hover */
-.theme-3d .glass:hover,
-.theme-3d .glass-card-advanced:hover {
-  border-color: rgba(0, 245, 255, calc(0.15 + var(--light-x) * 0.1));
-  box-shadow:
-    /* Dynamic ambient occlusion shadow - shifts opposite to light */
-    calc(var(--light-x) * -8px) calc(var(--light-y) * -6px) 20px rgba(0, 0, 0, 0.45),
-    calc(var(--light-x) * -4px) calc(var(--light-y) * -3px) 10px rgba(0, 0, 0, 0.3),
-    /* Base depth shadows */
-    0 2px 4px rgba(0, 0, 0, 0.3),
-    0 8px 16px rgba(0, 0, 0, 0.2),
-    0 16px 32px rgba(0, 0, 0, 0.15),
-    /* Dynamic neon glow - follows light direction */
-    calc(var(--light-x) * 12px) calc(var(--light-y) * 8px) 30px rgba(0, 245, 255, calc(0.12 + var(--light-x) * 0.08)),
-    calc(var(--light-x) * 6px) calc(var(--light-y) * 4px) 15px rgba(0, 245, 255, calc(0.06 + var(--light-x) * 0.04)),
-    /* Secondary magenta glow on opposite edge */
-    calc(var(--light-x) * -10px) calc(var(--light-y) * -6px) 25px rgba(255, 45, 170, calc(0.06 - var(--light-x) * 0.04)),
-    /* Inset highlight on light-facing edge */
-    inset calc(var(--light-x) * 1px + 1px) calc(var(--light-y) * -1px - 1px) 0 rgba(0, 245, 255, calc(0.12 + var(--light-x) * 0.08)),
-    inset calc(var(--light-x) * -1px - 1px) calc(var(--light-y) * 1px + 1px) 0 rgba(255, 45, 170, calc(0.05 - var(--light-x) * 0.03));
-}
-
-/* Dynamic lighting for glass-hover-glow cards */
-.theme-3d .glass-hover-glow:hover {
-  box-shadow:
-    calc(var(--light-x) * -10px) calc(var(--light-y) * -8px) 30px rgba(0, 0, 0, 0.35),
-    0 8px 32px rgba(0, 0, 0, 0.3),
-    0 16px 48px rgba(0, 0, 0, 0.2),
-    calc(var(--light-x) * 15px) calc(var(--light-y) * 10px) 35px rgba(0, 245, 255, calc(0.1 + var(--light-x) * 0.1)),
-    calc(var(--light-x) * 8px) calc(var(--light-y) * 6px) 18px rgba(0, 245, 255, calc(0.05 + var(--light-x) * 0.05)),
-    inset calc(var(--light-x) * 1px + 1px) calc(var(--light-y) * -1px - 1px) 0 rgba(0, 245, 255, calc(0.1 + var(--light-x) * 0.08));
-}
-
-/* Dynamic lighting for experience cards */
-.theme-3d #experience .glass:hover {
-  box-shadow:
-    calc(var(--light-x) * -6px) calc(var(--light-y) * -5px) 18px rgba(0, 0, 0, 0.4),
-    0 4px 8px rgba(0, 0, 0, 0.3),
-    0 12px 24px rgba(0, 0, 0, 0.25),
-    calc(var(--light-x) * 10px) calc(var(--light-y) * 7px) 25px rgba(0, 245, 255, calc(0.08 + var(--light-x) * 0.08)),
-    inset calc(var(--light-x) * 1px + 1px) calc(var(--light-y) * -1px - 1px) 0 rgba(0, 245, 255, calc(0.1 + var(--light-x) * 0.06));
-}
-
-/* Dynamic lighting for FAQ cards */
-.theme-3d #faq .rounded-xl.glass:hover {
-  box-shadow:
-    calc(var(--light-x) * -5px) calc(var(--light-y) * -4px) 14px rgba(0, 0, 0, 0.35),
-    0 4px 12px rgba(0, 0, 0, 0.25),
-    calc(var(--light-x) * 8px) calc(var(--light-y) * 5px) 20px rgba(0, 245, 255, calc(0.07 + var(--light-x) * 0.07)),
-    inset calc(var(--light-x) * 1px + 1px) calc(var(--light-y) * -1px - 1px) 0 rgba(0, 245, 255, calc(0.08 + var(--light-x) * 0.06));
-}
-
-/* Dynamic lighting for contact cards */
-.theme-3d #contact a.glass:hover {
-  box-shadow:
-    calc(var(--light-x) * -6px) calc(var(--light-y) * -5px) 18px rgba(0, 0, 0, 0.35),
-    0 8px 24px rgba(0, 0, 0, 0.3),
-    calc(var(--light-x) * 12px) calc(var(--light-y) * 8px) 28px rgba(0, 245, 255, calc(0.08 + var(--light-x) * 0.09)),
-    inset calc(var(--light-x) * 1px + 1px) calc(var(--light-y) * -1px - 1px) 0 rgba(0, 245, 255, calc(0.1 + var(--light-x) * 0.07));
-}
-
-/* Dynamic lighting for achievement cards */
-.theme-3d #achievements .glass:hover {
-  box-shadow:
-    calc(var(--light-x) * -7px) calc(var(--light-y) * -5px) 20px rgba(0, 0, 0, 0.4),
-    0 6px 16px rgba(0, 0, 0, 0.3),
-    calc(var(--light-x) * 10px) calc(var(--light-y) * 7px) 22px rgba(0, 245, 255, calc(0.09 + var(--light-x) * 0.08)),
-    calc(var(--light-x) * -8px) calc(var(--light-y) * -5px) 18px rgba(167, 139, 250, calc(0.05 - var(--light-x) * 0.03)),
-    inset calc(var(--light-x) * 1px + 1px) calc(var(--light-y) * -1px - 1px) 0 rgba(0, 245, 255, calc(0.09 + var(--light-x) * 0.07));
-}
-
-/* Dynamic lighting for stats cards */
-.theme-3d #stats .glass:hover {
-  box-shadow:
-    calc(var(--light-x) * -6px) calc(var(--light-y) * -5px) 16px rgba(0, 0, 0, 0.4),
-    0 4px 12px rgba(0, 0, 0, 0.3),
-    calc(var(--light-x) * 10px) calc(var(--light-y) * 7px) 24px rgba(0, 245, 255, calc(0.1 + var(--light-x) * 0.08)),
-    inset calc(var(--light-x) * 1px + 1px) calc(var(--light-y) * -1px - 1px) 0 rgba(0, 245, 255, calc(0.1 + var(--light-x) * 0.07));
-}
-
 /* 3D Tech Stack orbital ring animations */
 @keyframes orbit-outer-3d {
   0% { transform: rotateY(0deg) rotateX(8deg); }
@@ -3301,28 +1441,6 @@ html {
   }
   .tech-3d-orbit-scaler-ring {
     transform: scale(0.82) !important;
-  }
-}
-
-/* ===== 3D THEME: REDUCED MOTION ===== */
-@media (prefers-reduced-motion: reduce) {
-  .theme-3d-cube,
-  .theme-3d-sphere,
-  .theme-3d-orbit-container,
-  .theme-3d-orbit-dot,
-  .theme-3d-grid {
-    animation: none !important;
-  }
-  .theme-3d .glass-card-advanced:hover,
-  .theme-3d .glass-hover-glow:hover,
-  .theme-3d .ripple-effect:hover,
-  .theme-3d .soft-skill-tag:hover,
-  .theme-3d .tech-3d-orbit-outer,
-  .theme-3d .tech-3d-orbit-inner,
-  .theme-3d .tech-3d-item,
-  .theme-3d .tech-3d-center-core {
-    transform: none !important;
-    animation: none !important;
   }
 }
 
@@ -3536,5 +1654,159 @@ html {
   }
   .dark .glass-card-advanced:hover {
     transform: none;
+  }
+}
+
+/* ============================================================
+   UNIFIED 3D DESIGN SYSTEM — TWO THEMES (Terang & Gelap)
+   One modern 3D design language across the entire site:
+   layered elevation, edge lighting, perspective motion.
+   ============================================================ */
+
+/* ---- Shared keyframes (used by the 3D tech orbit centerpiece) ---- */
+@keyframes pulse-3d {
+  0%, 100% { transform: translateZ(0px) scale(1); box-shadow: 0 0 15px var(--neon-cyan), 0 10px 30px rgba(0,0,0,0.3); }
+  50% { transform: translateZ(10px) scale(1.05); box-shadow: 0 0 25px var(--neon-cyan), 0 15px 40px rgba(0,0,0,0.4); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tech-3d-orbit-outer,
+  .tech-3d-orbit-inner,
+  .tech-3d-item,
+  .tech-3d-center-core,
+  .tech-3d-counter-outer,
+  .tech-3d-counter-inner {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+/* ---- Base 3D elevation for every glass surface ----
+   Declared inside @layer components so Tailwind shadow utilities
+   (e.g. shadow-[var(--glow-cyan)]) still win where they are used. */
+@layer components {
+  .glass {
+    box-shadow:
+      inset 0 1px 0 0 var(--glass-edge-light),
+      0 1px 2px var(--shadow-soft-1),
+      0 10px 28px -14px var(--shadow-soft-2);
+  }
+  .glass-strong {
+    box-shadow:
+      inset 0 1px 0 0 var(--glass-edge-light),
+      0 2px 8px -2px var(--shadow-soft-1),
+      0 22px 48px -18px var(--shadow-soft-2);
+  }
+}
+
+/* ---- Light calibrations of the 3D depth system ----
+   Hard black shadows read as dirt on bright surfaces; light mode uses
+   softer, blue-tinted, higher-diffuse shadows instead. */
+:root:not(.dark) .glass-depth {
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 0 rgba(30, 42, 90, 0.06),
+    0 2px 6px -2px rgba(30, 42, 90, 0.10),
+    0 12px 32px -10px rgba(30, 42, 90, 0.16),
+    0 28px 64px -20px rgba(30, 42, 90, 0.18);
+}
+
+:root:not(.dark) .glass-depth-sm {
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.95),
+    0 2px 8px -2px rgba(30, 42, 90, 0.10),
+    0 10px 28px -12px rgba(30, 42, 90, 0.15);
+}
+
+:root:not(.dark) .lift-3d:hover {
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 1),
+    0 6px 16px -6px rgba(30, 42, 90, 0.14),
+    0 24px 56px -14px rgba(30, 42, 90, 0.2),
+    0 40px 90px -24px rgba(30, 42, 90, 0.22);
+}
+
+:root:not(.dark) .chip-3d {
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.95),
+    0 8px 20px -8px rgba(30, 42, 90, 0.28);
+}
+
+:root:not(.dark) .tilt-glare {
+  background: radial-gradient(
+    420px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 255, 255, 0.55),
+    transparent 45%
+  );
+}
+
+/* Light title gradient — saturated enough for bright backgrounds */
+:root:not(.dark) .title-gradient-3d {
+  background: linear-gradient(
+    120deg,
+    #0057FF 0%,
+    #1E90FF 30%,
+    #6D28D9 64%,
+    #CC0088 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ---- Light-theme 3D hover for advanced cards (dark equivalent lives above) ---- */
+:root:not(.dark) .glass-card-advanced:hover {
+  transform: translateY(-6px) perspective(900px) rotateX(2deg) scale(1.01);
+}
+
+/* ---- Depth-of-field vignette (light calibration; dark lives above) ---- */
+.depth-vignette {
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 42%, transparent 40%, rgba(240, 244, 255, 0.55) 100%);
+}
+
+/* ---- Light ambient sky behind the WebGL scene ---- */
+:root:not(.dark) body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(135deg,
+    rgba(0, 128, 255, 0.05) 0%,
+    rgba(204, 0, 136, 0.03) 25%,
+    rgba(109, 40, 217, 0.04) 50%,
+    rgba(0, 128, 255, 0.03) 75%,
+    rgba(204, 0, 136, 0.04) 100%
+  );
+  background-size: 400% 400%;
+  animation: bg-shift 30s ease infinite;
+  pointer-events: none;
+}
+
+/* ---- 3D perspective helpers ---- */
+.stage-3d { perspective: 1200px; }
+.preserve-3d { transform-style: preserve-3d; }
+
+/* ---- 3D entrance motion (CSS-side; framer-motion sections use JS variants) ---- */
+@keyframes reveal-3d-up {
+  from { opacity: 0; transform: perspective(1100px) translateY(30px) rotateX(10deg) scale(0.985); }
+  to { opacity: 1; transform: perspective(1100px) translateY(0) rotateX(0deg) scale(1); }
+}
+
+.reveal-3d { animation: reveal-3d-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.reveal-3d-d1 { animation-delay: 0.07s; }
+.reveal-3d-d2 { animation-delay: 0.14s; }
+.reveal-3d-d3 { animation-delay: 0.21s; }
+.reveal-3d-d4 { animation-delay: 0.28s; }
+.reveal-3d-d5 { animation-delay: 0.35s; }
+.reveal-3d-d6 { animation-delay: 0.42s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-3d,
+  .reveal-3d-d1, .reveal-3d-d2, .reveal-3d-d3,
+  .reveal-3d-d4, .reveal-3d-d5, .reveal-3d-d6 {
+    animation: none !important;
   }
 }

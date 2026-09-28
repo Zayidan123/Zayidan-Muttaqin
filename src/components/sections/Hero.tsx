@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import Image from 'next/image'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { Download, MapPin, Eye, Briefcase, Sparkles, TrendingUp } from 'lucide-react'
-import { ParticleBackground } from '@/components/ui/ParticleBackground'
 import { NeonButton } from '@/components/ui/NeonButton'
 import { useLanguageStore } from '@/store/language-store'
 import { useCvStore } from '@/store/cv-store'
@@ -143,73 +142,8 @@ export function Hero() {
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
       ref={parallaxRef}
     >
-      {/* Particle background — on dark theme the WebGL 3D scene takes over */}
-      {mounted && !isDark && <ParticleBackground />}
-
-      {/* ===== HERO-SPECIFIC LIGHT MODE ANIMATED ELEMENTS ===== */}
-      {mounted && !isDark && (
-        <>
-          <div
-            className="absolute hidden sm:block"
-            style={{
-              top: '12%', left: '5%', width: '140px', height: '140px',
-              border: '2px solid rgba(0, 128, 255, 0.08)',
-              clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
-              animation: 'float-geometric 14s ease-in-out infinite',
-            }}
-          />
-          <div
-            className="absolute hidden sm:block"
-            style={{
-              top: '55%', right: '8%', width: '100px', height: '100px',
-              border: '2px solid rgba(204, 0, 136, 0.07)',
-              clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
-              animation: 'float-geometric 11s ease-in-out infinite reverse',
-            }}
-          />
-          <div
-            className="absolute hidden md:block"
-            style={{
-              bottom: '15%', left: '18%', width: '70px', height: '70px',
-              border: '2px solid rgba(109, 40, 217, 0.06)',
-              transform: 'rotate(45deg)',
-              animation: 'float-geometric 16s ease-in-out infinite',
-              animationDelay: '-4s',
-            }}
-          />
-          <div
-            className="absolute hidden lg:block"
-            style={{
-              top: '25%', right: '20%', width: '100px', height: '100px',
-              border: '1.5px solid rgba(0, 200, 150, 0.06)',
-              clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
-              animation: 'float-geometric 18s ease-in-out infinite',
-              animationDelay: '-7s',
-            }}
-          />
-
-          {/* Hero orbit rings */}
-          <div className="absolute hidden lg:block" style={{ top: '50%', left: '50%', width: '500px', height: '500px', marginTop: '-250px', marginLeft: '-250px', border: '1px solid rgba(0, 128, 255, 0.06)', borderRadius: '50%', animation: 'orbit-spin 45s linear infinite' }} />
-          <div className="absolute hidden lg:block" style={{ top: '50%', left: '50%', width: '700px', height: '700px', marginTop: '-350px', marginLeft: '-350px', border: '1px solid rgba(204, 0, 136, 0.04)', borderRadius: '50%', animation: 'orbit-spin 60s linear infinite reverse' }} />
-          <div className="absolute hidden xl:block" style={{ top: '50%', left: '50%', width: '900px', height: '900px', marginTop: '-450px', marginLeft: '-450px', border: '1px solid rgba(109, 40, 217, 0.03)', borderRadius: '50%', animation: 'orbit-spin 80s linear infinite' }} />
-
-          {/* Orbit dots */}
-          <div className="absolute hidden lg:block" style={{ top: '50%', left: '50%', width: '500px', height: '500px', marginTop: '-250px', marginLeft: '-250px', animation: 'orbit-spin 45s linear infinite' }}>
-            <div style={{ position: 'absolute', top: '-4px', left: '50%', width: '8px', height: '8px', background: 'rgba(0, 128, 255, 0.5)', borderRadius: '50%', boxShadow: '0 0 12px rgba(0, 128, 255, 0.7)', transform: 'translateX(-50%)' }} />
-          </div>
-          <div className="absolute hidden lg:block" style={{ top: '50%', left: '50%', width: '700px', height: '700px', marginTop: '-350px', marginLeft: '-350px', animation: 'orbit-spin 60s linear infinite reverse' }}>
-            <div style={{ position: 'absolute', top: '-3px', left: '50%', width: '6px', height: '6px', background: 'rgba(204, 0, 136, 0.4)', borderRadius: '50%', boxShadow: '0 0 10px rgba(204, 0, 136, 0.6)', transform: 'translateX(-50%)' }} />
-          </div>
-          <div className="absolute hidden xl:block" style={{ top: '50%', left: '50%', width: '900px', height: '900px', marginTop: '-450px', marginLeft: '-450px', animation: 'orbit-spin 80s linear infinite' }}>
-            <div style={{ position: 'absolute', bottom: '-3px', left: '50%', width: '6px', height: '6px', background: 'rgba(109, 40, 217, 0.4)', borderRadius: '50%', boxShadow: '0 0 10px rgba(109, 40, 217, 0.6)', transform: 'translateX(-50%)' }} />
-          </div>
-
-          {/* Data stream lines */}
-          <div className="absolute hidden md:block" style={{ left: '15%', height: '200px', width: '1px', background: 'linear-gradient(to bottom, transparent, rgba(0, 128, 255, 0.12), transparent)', animation: 'data-stream 7s linear infinite' }} />
-          <div className="absolute hidden md:block" style={{ left: '45%', height: '150px', width: '1px', background: 'linear-gradient(to bottom, transparent, rgba(204, 0, 136, 0.1), transparent)', animation: 'data-stream 9s linear infinite', animationDelay: '-2.5s' }} />
-          <div className="absolute hidden md:block" style={{ right: '15%', height: '180px', width: '1px', background: 'linear-gradient(to bottom, transparent, rgba(109, 40, 217, 0.1), transparent)', animation: 'data-stream 6s linear infinite', animationDelay: '-4s' }} />
-        </>
-      )}
+      {/* The unified WebGL 3D scene (fixed, behind everything) provides the
+          3D ambience for BOTH themes — no per-theme decorations needed here. */}
 
       {/* Grid Overlay (dark mode) */}
       {mounted && isDark && (
@@ -238,11 +172,11 @@ export function Hero() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           {/* Left Column: Text content */}
           <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
-            {/* Greeting */}
+            {/* Greeting — 3D entrance */}
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              initial={{ opacity: 0, y: 20, rotateX: 35, transformPerspective: 800 }}
+              animate={{ opacity: 1, y: 0, rotateX: 0, transformPerspective: 800 }}
+              transition={{ duration: 0.7, delay: 0.2 }}
               className="text-sm sm:text-base font-mono-custom text-[var(--text-secondary)] tracking-[0.25em] uppercase mb-4"
             >
               {t('hero.greeting')}
@@ -250,9 +184,9 @@ export function Hero() {
 
             {/* Name with glitch intro, then modern gradient */}
             <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
+              initial={{ opacity: 0, y: 26, rotateX: 28, transformPerspective: 900 }}
+              animate={{ opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
               className={`font-display text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-6 ${!glitchDone ? 'glitch-text' : ''}`}
               data-text={t('hero.name')}
             >
@@ -261,9 +195,9 @@ export function Hero() {
 
             {/* Badges */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
+              initial={{ opacity: 0, y: 20, rotateX: 25, transformPerspective: 800 }}
+              animate={{ opacity: 1, y: 0, rotateX: 0, transformPerspective: 800 }}
+              transition={{ duration: 0.7, delay: 0.6 }}
               className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mb-6"
             >
               <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-xs font-mono-custom tracking-wider border border-[var(--neon-magenta)]/30 shadow-[var(--glow-magenta)]">
@@ -280,9 +214,9 @@ export function Hero() {
 
             {/* Location Badge */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.9 }}
+              initial={{ opacity: 0, y: 20, rotateX: 25, transformPerspective: 800 }}
+              animate={{ opacity: 1, y: 0, rotateX: 0, transformPerspective: 800 }}
+              transition={{ duration: 0.7, delay: 0.9 }}
               className="mb-8"
             >
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-mono-custom text-[var(--text-secondary)] glass glass-depth-sm border border-[var(--glass-border)] tracking-wider">
@@ -293,9 +227,9 @@ export function Hero() {
 
             {/* CTA Buttons */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.0 }}
+              initial={{ opacity: 0, y: 24, rotateX: 25, transformPerspective: 800 }}
+              animate={{ opacity: 1, y: 0, rotateX: 0, transformPerspective: 800 }}
+              transition={{ duration: 0.7, delay: 1.0 }}
               className="flex w-full flex-col flex-wrap items-stretch justify-center gap-3 sm:flex-row sm:items-center sm:justify-start sm:gap-4 lg:justify-start"
             >
               <NeonButton variant="primary" onClick={() => scrollTo('contact')} className="w-full sm:w-auto btn-depth">
@@ -314,9 +248,9 @@ export function Hero() {
 
           {/* Right Column: Modern 3D Photo Card */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
+            initial={{ opacity: 0, scale: 0.86, rotateY: -18, transformPerspective: 1100 }}
+            animate={{ opacity: 1, scale: 1, rotateY: 0, transformPerspective: 1100 }}
+            transition={{ duration: 0.9, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="order-first lg:order-none lg:col-span-5 mb-8 lg:mb-0 flex justify-center items-center w-full"
           >
             <div className="hero-3d-stage relative w-60 h-60 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-[320px] lg:h-[320px] xl:w-[360px] xl:h-[360px] shrink-0">

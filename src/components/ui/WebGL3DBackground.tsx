@@ -5,36 +5,44 @@ import { useTheme } from '@/lib/theme'
 import type * as ThreeNS from 'three'
 
 /**
- * Modern 3D WebGL Background — floating faceted glass geometry + additive
- * particle field with mouse & scroll parallax, built with three.js.
+ * Modern 3D WebGL Background — floating faceted glass geometry + particle
+ * field with mouse & scroll parallax, built with three.js.
+ *
+ * This is the signature 3D layer of the whole site and runs in BOTH themes:
+ *  - Gelap (dark):  additive glow particles, neon point lights, deep fog
+ *  - Terang (light): airy pastel glass, normal-blend particles, bright fog
  *
  * Performance-first design:
  *  - `three` is dynamically imported (kept out of the initial JS bundle → better SEO/LCP)
  *  - quality adapts to the device (object count, particle count, DPR, antialias)
  *  - animation pauses when the tab is hidden
  *  - honors `prefers-reduced-motion` (renders a single static frame)
+ *  - theme switches update colors/lighting IN PLACE (no canvas rebuild → no flicker)
  *  - full GPU resource disposal on unmount
  *
  * The palette is read from CSS custom properties (--neon-cyan, --neon-magenta,
- * --neon-purple) so it stays in sync with the active theme / user presets.
+ * --neon-purple) so it stays in sync with the active theme.
  */
 export function WebGL3DBackground() {
   const { theme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const hostRef = useRef<HTMLDivElement>(null)
+  const themeRef = useRef(theme)
+  const applyThemeRef = useRef<((isLight: boolean) => void) | null>(null)
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true)
   }, [])
 
-  // The WebGL scene is the signature layer of the modern-3D experience.
-  // It is active on the default (dark) theme only — every other theme keeps
-  // its own carefully crafted background untouched.
-  const active = mounted && theme === 'dark'
+  useEffect(() => {
+    themeRef.current = theme
+    // Update the live scene in place when the theme flips (no rebuild flicker)
+    applyThemeRef.current?.(theme === 'light')
+  }, [theme])
 
   useEffect(() => {
-    if (!active) return
+    if (!mounted) return
 
     const host = hostRef.current
     if (!host) return
@@ -52,15 +60,11 @@ export function WebGL3DBackground() {
       const THREE = await import('three')
       if (disposed || !hostRef.current) return
 
-      /* ---------- palette (theme aware) ---------- */
-      const styles = getComputedStyle(document.documentElement)
+      /* ---------- palette (theme aware, read from CSS vars) ---------- */
       const readVar = (name: string, fallback: string) => {
-        const v = styles.getPropertyValue(name)?.trim()
+        const v = getComputedStyle(document.documentElement).getPropertyValue(name)?.trim()
         return v && v.startsWith('#') ? v : fallback
       }
-      const CYAN = readVar('--neon-cyan', '#00F5FF')
-      const MAGENTA = readVar('--neon-magenta', '#FF00AA')
-      const PURPLE = readVar('--neon-purple', '#8B5CF6')
 
       /* ---------- renderer ---------- */
       const renderer = new THREE.WebGLRenderer({
@@ -76,23 +80,25 @@ export function WebGL3DBackground() {
 
       /* ---------- scene & camera ---------- */
       const scene = new THREE.Scene()
-      scene.fog = new THREE.FogExp2(0x0a0a0f, 0.016)
+      const fog = new THREE.FogExp2(0x0a0a0f, 0.016)
+      scene.fog = fog
 
       const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 120)
       camera.position.set(0, 0, 26)
 
       /* ---------- lights (soft, glassy, colorful) ---------- */
-      scene.add(new THREE.AmbientLight(0xffffff, 0.35))
+      const ambient = new THREE.AmbientLight(0xffffff, 0.35)
+      scene.add(ambient)
 
-      const keyLight = new THREE.PointLight(new THREE.Color(CYAN), 260, 90)
+      const keyLight = new THREE.PointLight(0x00f5ff, 260, 90)
       keyLight.position.set(-14, 8, 16)
       scene.add(keyLight)
 
-      const fillLight = new THREE.PointLight(new THREE.Color(MAGENTA), 200, 90)
+      const fillLight = new THREE.PointLight(0xff00aa, 200, 90)
       fillLight.position.set(16, -6, 12)
       scene.add(fillLight)
 
-      const rimLight = new THREE.PointLight(new THREE.Color(PURPLE), 180, 90)
+      const rimLight = new THREE.PointLight(0x8b5cf6, 180, 90)
       rimLight.position.set(4, 12, -8)
       scene.add(rimLight)
 
@@ -102,6 +108,9 @@ export function WebGL3DBackground() {
 
       type FloatingMesh = {
         mesh: ThreeNS.Mesh
+        paletteIndex: number
+        baseOpacity: number
+        isShell: boolean
         spin: { x: number; y: number; z: number }
         floatAmp: number
         floatSpeed: number
@@ -110,8 +119,6 @@ export function WebGL3DBackground() {
       }
       const fleet: FloatingMesh[] = []
       const disposables: Array<{ dispose: () => void }> = []
-
-      const palette = [CYAN, MAGENTA, PURPLE]
 
       const shapeKinds = isMobile
         ? ['ico', 'oct', 'torus'] as const
@@ -123,7 +130,6 @@ export function WebGL3DBackground() {
 
       for (let i = 0; i < COUNT; i++) {
         const kind = shapeKinds[i % shapeKinds.length]
-        const color = new THREE.Color(palette[i % palette.length])
         const scale = rand(0.85, isMobile ? 1.6 : 2.3)
 
         let geometry: ThreeNS.BufferGeometry
@@ -146,13 +152,11 @@ export function WebGL3DBackground() {
         disposables.push(geometry)
 
         const material = new THREE.MeshStandardMaterial({
-          color: color,
-          emissive: color.clone().multiplyScalar(0.12),
+          color: 0xffffff,
           metalness: 0.35,
           roughness: 0.22,
           flatShading: kind !== 'sphere',
           transparent: true,
-          opacity: kind === 'sphere' ? 0.14 : rand(0.42, 0.62),
           side: THREE.DoubleSide,
         })
         disposables.push(material)
@@ -173,6 +177,9 @@ export function WebGL3DBackground() {
 
         fleet.push({
           mesh,
+          paletteIndex: i % 3,
+          baseOpacity: kind === 'sphere' ? 0.14 : rand(0.42, 0.62),
+          isShell: false,
           spin: { x: rand(0.05, 0.22), y: rand(0.05, 0.28), z: rand(0.02, 0.12) },
           floatAmp: rand(0.35, 0.95),
           floatSpeed: rand(0.25, 0.6),
@@ -186,7 +193,7 @@ export function WebGL3DBackground() {
       if (!isMobile) {
         const shellGeometry = new THREE.IcosahedronGeometry(9, 1)
         const shellMaterial = new THREE.MeshBasicMaterial({
-          color: new THREE.Color(CYAN),
+          color: 0x00f5ff,
           wireframe: true,
           transparent: true,
           opacity: 0.045,
@@ -195,9 +202,11 @@ export function WebGL3DBackground() {
         const shell = new THREE.Mesh(shellGeometry, shellMaterial)
         shell.position.set(0, 0, -14)
         group.add(shell)
-        ;(shell as ThreeNS.Mesh & { __isShell?: boolean }).__isShell = true
         fleet.push({
           mesh: shell,
+          paletteIndex: 0,
+          baseOpacity: 0.045,
+          isShell: true,
           spin: { x: 0.02, y: 0.045, z: 0 },
           floatAmp: 0.4,
           floatSpeed: 0.18,
@@ -206,22 +215,18 @@ export function WebGL3DBackground() {
         })
       }
 
-      /* ---------- additive particle field ---------- */
+      /* ---------- particle field ---------- */
       const PARTICLES = isMobile ? 320 : 750
       const positions = new Float32Array(PARTICLES * 3)
       const colors = new Float32Array(PARTICLES * 3)
-      const cCyan = new THREE.Color(CYAN)
-      const cMagenta = new THREE.Color(MAGENTA)
-      const cPurple = new THREE.Color(PURPLE)
 
       for (let i = 0; i < PARTICLES; i++) {
         positions[i * 3] = rand(-34, 34)
         positions[i * 3 + 1] = rand(-20, 20)
         positions[i * 3 + 2] = rand(-28, 8)
-        const c = [cCyan, cMagenta, cPurple][i % 3]
-        colors[i * 3] = c.r
-        colors[i * 3 + 1] = c.g
-        colors[i * 3 + 2] = c.b
+        colors[i * 3] = 1
+        colors[i * 3 + 1] = 1
+        colors[i * 3 + 2] = 1
       }
 
       const particleGeometry = new THREE.BufferGeometry()
@@ -242,6 +247,70 @@ export function WebGL3DBackground() {
 
       const particles = new THREE.Points(particleGeometry, particleMaterial)
       scene.add(particles)
+
+      /* ---------- in-place theme switching (no canvas rebuild) ---------- */
+      const applyTheme = (isLight: boolean) => {
+        const CYAN = readVar('--neon-cyan', isLight ? '#0080FF' : '#00F5FF')
+        const MAGENTA = readVar('--neon-magenta', isLight ? '#CC0088' : '#FF00AA')
+        const PURPLE = readVar('--neon-purple', isLight ? '#6D28D9' : '#8B5CF6')
+        const palette = [CYAN, MAGENTA, PURPLE]
+
+        // Atmosphere: deep space fog ↔ bright airy fog
+        fog.color.set(isLight ? 0xeef2ff : 0x0a0a0f)
+
+        // Lighting: airy & bright ↔ dramatic neon
+        ambient.intensity = isLight ? 0.9 : 0.35
+        keyLight.color.set(CYAN)
+        keyLight.intensity = isLight ? 110 : 260
+        fillLight.color.set(MAGENTA)
+        fillLight.intensity = isLight ? 85 : 200
+        rimLight.color.set(PURPLE)
+        rimLight.intensity = isLight ? 75 : 180
+
+        // Geometry fleet: pastel glass ↔ neon glass
+        for (const item of fleet) {
+          const material = item.mesh.material as ThreeNS.MeshStandardMaterial | ThreeNS.MeshBasicMaterial
+          if (item.isShell) {
+            const m = material as ThreeNS.MeshBasicMaterial
+            m.color.set(CYAN)
+            m.opacity = isLight ? 0.07 : 0.045
+          } else {
+            const m = material as ThreeNS.MeshStandardMaterial
+            const color = new THREE.Color(palette[item.paletteIndex])
+            m.color.set(color)
+            m.emissive.set(color.clone().multiplyScalar(isLight ? 0.05 : 0.12))
+            m.opacity = isLight ? item.baseOpacity * 0.8 : item.baseOpacity
+            m.metalness = isLight ? 0.22 : 0.35
+            m.roughness = isLight ? 0.34 : 0.22
+            m.needsUpdate = true
+          }
+        }
+
+        // Particles: additive glow only works on dark — switch to normal
+        // blending on light so the field stays visible
+        particleMaterial.blending = isLight ? THREE.NormalBlending : THREE.AdditiveBlending
+        particleMaterial.opacity = isLight ? 0.5 : 0.75
+        particleMaterial.needsUpdate = true
+
+        const cCyan = new THREE.Color(CYAN)
+        const cMagenta = new THREE.Color(MAGENTA)
+        const cPurple = new THREE.Color(PURPLE)
+        const particlePalette = [cCyan, cMagenta, cPurple]
+        if (isLight) {
+          // Slightly deepen colors so they read on a bright background
+          for (const c of particlePalette) c.multiplyScalar(0.82)
+        }
+        for (let i = 0; i < PARTICLES; i++) {
+          const c = particlePalette[i % 3]
+          colors[i * 3] = c.r
+          colors[i * 3 + 1] = c.g
+          colors[i * 3 + 2] = c.b
+        }
+        particleGeometry.getAttribute('color').needsUpdate = true
+      }
+
+      applyThemeRef.current = applyTheme
+      applyTheme(themeRef.current === 'light')
 
       /* ---------- interaction state ---------- */
       const mouse = { x: 0, y: 0 }
@@ -331,6 +400,7 @@ export function WebGL3DBackground() {
 
       /* ---------- cleanup ---------- */
       cleanup = () => {
+        applyThemeRef.current = null
         running = false
         cancelAnimationFrame(raf)
         clearTimeout(resizeTimer)
@@ -353,7 +423,7 @@ export function WebGL3DBackground() {
       disposed = true
       cleanup?.()
     }
-  }, [active])
+  }, [mounted])
 
   if (!mounted) return null
 
@@ -362,11 +432,7 @@ export function WebGL3DBackground() {
       ref={hostRef}
       aria-hidden="true"
       className="fixed inset-0 pointer-events-none z-0 overflow-hidden"
-      style={{
-        opacity: active ? 1 : 0,
-        transition: 'opacity 0.6s ease',
-        visibility: active ? 'visible' : 'hidden',
-      }}
+      style={{ opacity: 1 }}
     />
   )
 }

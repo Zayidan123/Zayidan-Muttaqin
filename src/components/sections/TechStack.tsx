@@ -50,8 +50,8 @@ function TechStack3D({ t, inView, ref }: { t: (k: string) => string; inView: boo
     <section id="techstack" className="relative py-20 sm:py-28 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto" ref={ref}>
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
+          initial={{ opacity: 0, y: 20, rotateX: 18, transformPerspective: 900 }}
+          animate={inView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
           transition={{ duration: 0.6 }}
           className="mb-12 sm:mb-16 text-center"
         >
@@ -66,8 +66,8 @@ function TechStack3D({ t, inView, ref }: { t: (k: string) => string; inView: boo
 
         {/* 3D Orbital Container */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={inView ? { opacity: 1, scale: 1 } : {}}
+          initial={{ opacity: 0, scale: 0.8, rotateX: 16, transformPerspective: 900 }}
+          animate={inView ? { opacity: 1, scale: 1, rotateX: 0, transformPerspective: 900 } : {}}
           transition={{ duration: 1, delay: 0.2 }}
           className="relative flex items-center justify-center tech-3d-orbit-scaler"
           style={{ minHeight: '540px', perspective: '900px', transition: 'transform 0.3s ease' }}

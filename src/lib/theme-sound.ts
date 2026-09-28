@@ -54,11 +54,8 @@ export function playThemeSwitchSound(theme: string) {
 
   // Pitch map per theme (Hz) — gives each theme a distinct signature
   const pitchMap: Record<string, number> = {
-    dark: 220,          // A3 — low, calm
-    light: 440,         // A4 — bright
-    skeuomorphic: 330,  // E4 — warm
-    'liquid-glass': 392, // G4 — soft
-    'theme-3d': 277,    // C#4 — deep
+    dark: 220,   // A3 — low, calm
+    light: 440,  // A4 — bright
   }
   const baseFreq = pitchMap[theme] || 330
 

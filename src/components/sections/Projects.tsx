@@ -16,8 +16,8 @@ export function Projects() {
     <section id="projects" className="relative py-20 sm:py-28 px-4 sm:px-6 lg:px-8">
       <motion.div className="max-w-4xl mx-auto" ref={ref}>
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
+          initial={{ opacity: 0, y: 20, rotateX: 18, transformPerspective: 900 }}
+          animate={inView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
           transition={{ duration: 0.6 }}
           className="mb-12 sm:mb-16"
         >
@@ -34,8 +34,8 @@ export function Projects() {
             return (
               <motion.div
                 key={project.id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={inView ? { opacity: 1, y: 0 } : {}}
+                initial={{ opacity: 0, y: 30, rotateX: 22, transformPerspective: 900 }}
+                animate={inView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
                 transition={{ duration: 0.6, delay: 0.2 + idx * 0.15 }}
               >
               <TiltCard
