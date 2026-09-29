@@ -115,11 +115,12 @@ const breadcrumbJsonLd = JSON.stringify({
 });
 
 // ProfilePage schema — tells Google this URL is a profile/about-me page
-// (implements E-E-A-T signals for personal brands)
+// (implements E-E-A-T signals for personal brands).
+// dateModified is stamped at build time so every deploy refreshes it.
 const profilePageJsonLd = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "ProfilePage",
-  "dateModified": "2026-09-29",
+  "dateModified": new Date().toISOString().split('T')[0],
   "mainEntity": {
     "@type": "Person",
     "name": "Zayidan Muttaqin",
@@ -280,11 +281,11 @@ export const metadata: Metadata = {
     siteName: "Zayidan Muttaqin Portfolio",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Zayidan Muttaqin — Sales & Leadership Professional di Banyuwangi, Indonesia",
-        type: "image/png",
+        type: "image/jpeg",
       },
     ],
   },
@@ -296,7 +297,7 @@ export const metadata: Metadata = {
     description: "Sales Promotion Boy · Store Associate · Store Manager — Banyuwangi, Indonesia. Disiplin, teliti, bertanggung jawab, dan adaptif.",
     images: [
       {
-        url: "/twitter-image.png",
+        url: "/twitter-image.jpg",
         width: 1200,
         height: 600,
         alt: "Zayidan Muttaqin — Sales & Leadership Portfolio",
@@ -363,6 +364,12 @@ export default function RootLayout({
         <script id="structured-data-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }} />
         <script id="structured-data-profile-page" type="application/ld+json" dangerouslySetInnerHTML={{ __html: profilePageJsonLd }} />
         <script id="structured-data-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqPageJsonLd }} />
+        {/* rel="me" identity links — cross-site identity verification
+            (IndieWeb/rel-me auth) that reinforces the sameAs graph */}
+        <link rel="me" href="https://www.linkedin.com/in/zayidan-muttaqin/" />
+        <link rel="me" href="https://github.com/Zayidan123" />
+        <link rel="me" href="https://t.me/ZayM1122" />
+        <link rel="me" href="https://www.instagram.com/zayidan1122" />
       </head>
       <body className="antialiased min-h-screen w-full overflow-x-hidden bg-[var(--background)] text-[var(--foreground)] transition-colors duration-300">
         <ThemeProvider>

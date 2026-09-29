@@ -57,7 +57,14 @@ interface LanguageState { lang: 'id' | 'en'; setLang: (lang: 'id' | 'en') => voi
 
 export const useLanguageStore = create<LanguageState>((set, get) => ({
   lang: 'id',
-  setLang: (lang) => { if (typeof window !== 'undefined') localStorage.setItem('lang', lang); set({ lang }) },
+  setLang: (lang) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('lang', lang)
+      // Keep <html lang> in sync for accessibility + SEO correctness
+      document.documentElement.lang = lang === 'en' ? 'en' : 'id'
+    }
+    set({ lang })
+  },
   toggleLang: () => { const n = get().lang === 'id' ? 'en' : 'id'; get().setLang(n) },
   t: (key: string) => { const { lang } = get(); const data = translations[lang]; if (!data) return key; return getNestedValue(data, key) },
 }))
