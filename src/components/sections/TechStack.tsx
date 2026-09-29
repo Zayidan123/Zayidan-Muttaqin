@@ -55,7 +55,7 @@ function TechStack3D({ t, inView, ref }: { t: (k: string) => string; inView: boo
           transition={{ duration: 0.6 }}
           className="mb-12 sm:mb-16 text-center"
         >
-          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2">
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2 holo-text">
             <ScrambleText text={t('techstack.title')} />
           </h2>
           <div className="section-title-line mx-auto" />
@@ -207,7 +207,7 @@ function TechStack3D({ t, inView, ref }: { t: (k: string) => string; inView: boo
               zIndex: 10,
             }}
           >
-            <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full flex items-center justify-center">
+            <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full flex items-center justify-center holo-ring holo-ring-always">
               {/* Pulsing rings */}
               <div className="absolute inset-0 rounded-full border border-[var(--neon-cyan)]/20" style={{ animation: 'pulse-3d 3s ease-in-out infinite' }} />
               <div className="absolute inset-2 rounded-full border border-[var(--neon-magenta)]/15" style={{ animation: 'pulse-3d 3s ease-in-out infinite 0.5s' }} />

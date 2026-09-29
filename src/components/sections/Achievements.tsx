@@ -28,7 +28,7 @@ export function Achievements() {
           transition={{ duration: 0.6 }}
           className="mb-12 sm:mb-16 text-center"
         >
-          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2">
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2 holo-text">
             <ScrambleText text={t('achievements.title')} />
           </h2>
           <div className="section-title-line mx-auto" />
@@ -64,7 +64,7 @@ export function Achievements() {
               >
                 <TiltCard maxTilt={5}>
                   <div
-                    className="relative p-5 rounded-xl glass glass-depth border glass-card-advanced card-shine transition-all duration-300 group overflow-hidden"
+                    className="relative p-5 rounded-xl glass glass-depth border holo-sheen glass-card-advanced card-shine transition-all duration-300 group overflow-hidden"
                     style={{ borderColor: color + '22' }}
                     onMouseEnter={(e) => {
                       const el = e.currentTarget as HTMLElement

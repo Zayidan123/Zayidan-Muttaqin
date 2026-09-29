@@ -1810,3 +1810,333 @@ html {
     animation: none !important;
   }
 }
+
+/* ============================================================
+   WEB3 3D DESIGN SYSTEM — LAYER 3: HOLOGRAPHIC WEB3 UPGRADE
+   Iridescent holo accents, floating 3D geometry, Web3 grid
+   floor, holo ring borders — applied across BOTH themes
+   (Terang & Gelap). Appended last so it never fights the
+   base layers above.
+   ============================================================ */
+
+/* ---- Holographic Web3 palette (theme-aware) ---- */
+:root {
+  --holo-1: #0080FF;   /* electric blue */
+  --holo-2: #CC0088;   /* magenta       */
+  --holo-3: #6D28D9;   /* violet        */
+  --holo-4: #00966B;   /* web3 green    */
+  --holo-5: #E08A00;   /* gold          */
+  --grid-line: rgba(0, 110, 255, 0.10);
+  --shape-border-alpha: 55%;
+  --shape-fill-alpha: 12%;
+  --shape-glow-alpha: 35%;
+  --holo-ring-opacity: 0.7;
+}
+
+.dark {
+  --holo-1: #00F5FF;
+  --holo-2: #FF00AA;
+  --holo-3: #8B5CF6;
+  --holo-4: #00FFA3;
+  --holo-5: #FFD166;
+  --grid-line: rgba(0, 245, 255, 0.08);
+  --shape-border-alpha: 65%;
+  --shape-fill-alpha: 10%;
+  --shape-glow-alpha: 30%;
+  --holo-ring-opacity: 0.55;
+}
+
+/* ---- 1. Holographic rotating ring border (conic gradient) ----
+   Animated iridescent ring that hugs the element edge. Paused
+   by default (perf), spins up on hover; pair with
+   .holo-ring-always for signature elements. */
+.holo-ring { position: relative; }
+
+.holo-ring::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--border-angle, 0deg),
+    var(--holo-1), var(--holo-3), var(--holo-2), var(--holo-4), var(--holo-5), var(--holo-1)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: var(--holo-ring-opacity);
+  animation: rotate-border 7s linear infinite;
+  animation-play-state: paused;
+  pointer-events: none;
+  z-index: 3;
+  transition: opacity 0.4s ease;
+}
+
+.holo-ring:hover::before {
+  opacity: 1;
+  animation-play-state: running;
+}
+
+.holo-ring-always::before { animation-play-state: running; }
+
+/* ---- 2. Iridescent top edge (cheap, static holo accent) ---- */
+.holo-edge { position: relative; }
+
+.holo-edge::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1.5px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--holo-1), var(--holo-2), var(--holo-3), var(--holo-4), transparent);
+  opacity: 0.75;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ---- 3. Holographic sheen sweep for glass cards ----
+   A soft iridescent light band that periodically sweeps
+   across the card — the signature Web3 glassmorphism touch. */
+@keyframes holo-sheen-move {
+  0%   { background-position: 220% 0; }
+  100% { background-position: -120% 0; }
+}
+
+.holo-sheen { position: relative; }
+
+.holo-sheen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    115deg,
+    transparent 32%,
+    color-mix(in srgb, var(--holo-1) 14%, transparent) 42%,
+    color-mix(in srgb, var(--holo-2) 10%, transparent) 50%,
+    color-mix(in srgb, var(--holo-3) 14%, transparent) 58%,
+    transparent 68%
+  );
+  background-size: 260% 100%;
+  background-repeat: no-repeat;
+  animation: holo-sheen-move 6.5s ease-in-out infinite;
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 2;
+  mix-blend-mode: screen;
+}
+
+:root:not(.dark) .holo-sheen::before {
+  mix-blend-mode: normal;
+  opacity: 0.45;
+}
+
+/* ---- 4. Holographic iridescent text ---- */
+.holo-text {
+  background: linear-gradient(
+    110deg,
+    var(--holo-1) 0%, var(--holo-5) 22%, var(--holo-2) 45%,
+    var(--holo-3) 68%, var(--holo-4) 88%, var(--holo-1) 100%
+  );
+  background-size: 280% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: gradient-shift 7s ease infinite;
+  filter: drop-shadow(0 0 18px color-mix(in srgb, var(--holo-1) 22%, transparent));
+}
+
+:root:not(.dark) .holo-text { filter: none; }
+
+/* ---- 5. Web3 perspective grid floor (hero depth cue) ---- */
+@keyframes grid-flow {
+  from { background-position-y: 0px; }
+  to   { background-position-y: 48px; }
+}
+
+.web3-grid-floor {
+  position: absolute;
+  left: -25%;
+  right: -25%;
+  bottom: -6%;
+  height: 52%;
+  min-height: 260px;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 48px 48px;
+  transform: perspective(620px) rotateX(63deg) scale(1.15);
+  transform-origin: center top;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.9) 26%, rgba(0, 0, 0, 0.55) 62%, transparent 96%);
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.9) 26%, rgba(0, 0, 0, 0.55) 62%, transparent 96%);
+  animation: grid-flow 3.2s linear infinite;
+  opacity: 0.9;
+}
+
+/* ---- 6. Floating Web3 3D shapes (CSS-only holographic geometry) ---- */
+@keyframes shape-spin-y {
+  0%   { transform: rotateY(0deg) rotateX(12deg); }
+  100% { transform: rotateY(360deg) rotateX(12deg); }
+}
+
+@keyframes shape-spin-y-rev {
+  0%   { transform: rotateY(360deg) rotateZ(8deg); }
+  100% { transform: rotateY(0deg) rotateZ(8deg); }
+}
+
+@keyframes shape-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-18px); }
+}
+
+.web3-shape-wrap {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  animation: shape-bob 9s ease-in-out infinite;
+}
+
+.web3-shape {
+  display: block;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Holo diamond — rotating 3D glass square */
+.web3-diamond {
+  width: 26px;
+  height: 26px;
+  border-radius: 5px;
+  border: 1.5px solid color-mix(in srgb, var(--holo-1) var(--shape-border-alpha), transparent);
+  background: color-mix(in srgb, var(--holo-1) var(--shape-fill-alpha), transparent);
+  box-shadow:
+    0 0 16px color-mix(in srgb, var(--holo-1) var(--shape-glow-alpha), transparent),
+    inset 0 0 10px color-mix(in srgb, var(--holo-1) calc(var(--shape-glow-alpha) / 2), transparent);
+  animation: shape-spin-y 16s linear infinite;
+}
+
+/* Holo ring — counter-rotating 3D torus outline */
+.web3-ring-shape {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, var(--holo-2) var(--shape-border-alpha), transparent);
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--holo-2) var(--shape-glow-alpha), transparent),
+    inset 0 0 12px color-mix(in srgb, var(--holo-2) calc(var(--shape-glow-alpha) / 2), transparent);
+  animation: shape-spin-y-rev 22s linear infinite;
+}
+
+/* Holo plus — web3 green cross */
+.web3-plus {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  animation: shape-spin-y 26s linear infinite;
+}
+
+.web3-plus::before,
+.web3-plus::after {
+  content: '';
+  position: absolute;
+  background: color-mix(in srgb, var(--holo-4) var(--shape-border-alpha), transparent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--holo-4) var(--shape-glow-alpha), transparent);
+  border-radius: 2px;
+}
+
+.web3-plus::before { left: 50%; top: 0; bottom: 0; width: 3px; transform: translateX(-50%); }
+.web3-plus::after  { top: 50%; left: 0; right: 0; height: 3px; transform: translateY(-50%); }
+
+/* Shape placement presets */
+.web3-shape-1 { top: 14%; left: 5%; }
+.web3-shape-2 { top: 19%; right: 11%; animation-delay: -3s; }
+.web3-shape-3 { bottom: 26%; left: 10%; animation-delay: -6s; }
+.web3-shape-4 { bottom: 34%; right: 13%; animation-delay: -1.5s; }
+
+@media (max-width: 640px) {
+  .web3-shape-3, .web3-shape-4 { display: none; }
+  .web3-shape-1 { left: 4%; top: 10%; }
+  .web3-shape-2 { right: 4%; top: 14%; }
+}
+
+/* ---- 7. Web3 button upgrade — holo ring that ignites on hover ---- */
+.btn-web3 { position: relative; }
+
+.btn-web3::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--border-angle, 0deg),
+    var(--holo-1), var(--holo-3), var(--holo-2), var(--holo-4), var(--holo-1)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: 0.55;
+  animation: rotate-border 5s linear infinite;
+  animation-play-state: paused;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.btn-web3:hover::before,
+.btn-web3:focus-visible::before {
+  opacity: 1;
+  animation-play-state: running;
+}
+
+/* ---- 8. Animated holo flow lines (navbar & footer edges) ---- */
+@keyframes holo-line-flow {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+.nav-holo-line {
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--holo-1) 20%,
+    var(--holo-2) 40%,
+    var(--holo-3) 60%,
+    var(--holo-4) 80%,
+    transparent 100%);
+  background-size: 200% 100%;
+  animation: holo-line-flow 6s linear infinite;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--holo-1) 30%, transparent);
+}
+
+.footer-holo-line {
+  background: linear-gradient(90deg,
+    transparent,
+    var(--holo-1), var(--holo-2), var(--holo-3), var(--holo-4), var(--holo-5),
+    transparent);
+  background-size: 200% 100%;
+  animation: holo-line-flow 8s linear infinite;
+}
+
+/* ---- 9. Reduced motion: still beautiful, never busy ---- */
+@media (prefers-reduced-motion: reduce) {
+  .holo-ring::before,
+  .holo-ring-always::before,
+  .btn-web3::before { animation: none !important; }
+  .holo-sheen::before { animation: none !important; opacity: 0; }
+  .web3-grid-floor { animation: none !important; }
+  .web3-shape-wrap,
+  .web3-shape,
+  .web3-diamond,
+  .web3-ring-shape,
+  .web3-plus { animation: none !important; }
+  .nav-holo-line,
+  .footer-holo-line { animation: none !important; }
+  .holo-text { animation: none !important; }
+}

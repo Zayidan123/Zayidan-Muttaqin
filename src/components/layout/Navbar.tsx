@@ -37,7 +37,7 @@ export function Navbar() {
   return (
     <>
       <header className={cn('fixed top-0 left-0 right-0 z-50 transition-all duration-300', scrolled ? 'glass-strong shadow-lg' : 'bg-transparent')}>
-        {scrolled && <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--neon-cyan)]/40 to-transparent" />}
+        {scrolled && <div className="absolute bottom-0 left-0 right-0 h-[1.5px] nav-holo-line" />}
         <nav className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-2 px-3 sm:px-6 lg:px-8">
           <a href="#hero" onClick={(e) => { e.preventDefault(); handleClick('#hero') }} className="shrink-0 font-display text-base font-bold tracking-wider text-[var(--neon-cyan)] text-glow-cyan transition-opacity hover:opacity-80 sm:text-lg">ZAYIDAN</a>
           <div className="hidden items-center gap-8 md:flex">

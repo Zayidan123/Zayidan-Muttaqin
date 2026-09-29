@@ -28,7 +28,7 @@ export function NeonButton({
 
   const variantClasses = {
     primary: cn(
-      'border border-[var(--neon-cyan)] text-[var(--neon-cyan)]',
+      'btn-web3 border border-[var(--neon-cyan)] text-[var(--neon-cyan)]',
       'hover:shadow-[var(--glow-cyan)] hover:bg-[var(--neon-cyan)] hover:text-[var(--dark-base)]',
       'bg-transparent'
     ),

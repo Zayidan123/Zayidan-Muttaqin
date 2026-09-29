@@ -30,7 +30,7 @@ export function FAQ() {
           transition={{ duration: 0.6 }}
           className="mb-12 sm:mb-16 text-center"
         >
-          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2">
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2 holo-text">
             <ScrambleText text={t('faq.title')} />
           </h2>
           <div className="section-title-line mx-auto" />
@@ -50,7 +50,7 @@ export function FAQ() {
                 transition={{ duration: 0.4, delay: 0.1 + idx * 0.08 }}
               >
                 <div
-                  className={`rounded-xl glass border transition-all duration-300 ${
+                  className={`rounded-xl glass border holo-edge transition-all duration-300 ${
                     isOpen
                       ? 'border-[var(--neon-cyan)]/30 shadow-[0_0_20px_rgba(0,245,255,0.08)]'
                       : 'border-[var(--glass-border)] hover:border-[var(--glass-border)]/80'
@@ -73,10 +73,11 @@ export function FAQ() {
                   <AnimatePresence initial={false}>
                     {isOpen && (
                       <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                        initial={{ height: 0, opacity: 0, rotateX: -14 }}
+                        animate={{ height: 'auto', opacity: 1, rotateX: 0 }}
+                        exit={{ height: 0, opacity: 0, rotateX: -14 }}
+                        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                        style={{ transformOrigin: 'top center', transformPerspective: 700 }}
                         className="overflow-hidden"
                       >
                         <div className="px-5 pb-4 pl-12">

@@ -7,25 +7,16 @@ import { Download, MapPin, Eye, Briefcase, Sparkles, TrendingUp } from 'lucide-r
 import { NeonButton } from '@/components/ui/NeonButton'
 import { useLanguageStore } from '@/store/language-store'
 import { useCvStore } from '@/store/cv-store'
-import { useTheme } from '@/lib/theme'
 import { useTilt } from '@/hooks/useTilt'
 
 export function Hero() {
   const { t, lang } = useLanguageStore()
   const { setOpen: setCvOpen } = useCvStore()
-  const { theme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMounted(true)
-  }, [])
 
   const [glitchDone, setGlitchDone] = useState(false)
   const [displayedTagline, setDisplayedTagline] = useState('')
   const [typingDone, setTypingDone] = useState(false)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
-  const isDark = theme === 'dark'
   const parallaxRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: parallaxRef, offset: ["start end", "end start"] })
   const y = useTransform(scrollYProgress, [0, 1], [-15, 15])
@@ -145,16 +136,16 @@ export function Hero() {
       {/* The unified WebGL 3D scene (fixed, behind everything) provides the
           3D ambience for BOTH themes — no per-theme decorations needed here. */}
 
-      {/* Grid Overlay (dark mode) */}
-      {mounted && isDark && (
-        <div
-          className="absolute inset-0 pointer-events-none opacity-[0.05]"
-          style={{
-            backgroundImage: `linear-gradient(var(--neon-cyan) 1px, transparent 1px), linear-gradient(90deg, var(--neon-cyan) 1px, transparent 1px)`,
-            backgroundSize: '60px 60px',
-          }}
-        />
-      )}
+      {/* Web3 perspective grid floor — holographic depth cue (both themes) */}
+      <div className="web3-grid-floor" aria-hidden="true" />
+
+      {/* Floating Web3 3D shapes — rotating holographic geometry */}
+      <div aria-hidden="true">
+        <span className="web3-shape-wrap web3-shape-1"><span className="web3-shape web3-diamond" /></span>
+        <span className="web3-shape-wrap web3-shape-2"><span className="web3-shape web3-ring-shape" /></span>
+        <span className="web3-shape-wrap web3-shape-3"><span className="web3-shape web3-plus" /></span>
+        <span className="web3-shape-wrap web3-shape-4"><span className="web3-shape web3-diamond" /></span>
+      </div>
 
       {/* Content */}
       {/* SEO: visually-hidden description for search engines (keyword-rich) */}
@@ -190,7 +181,7 @@ export function Hero() {
               className={`font-display text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-6 ${!glitchDone ? 'glitch-text' : ''}`}
               data-text={t('hero.name')}
             >
-              <span className={`hero-name-shimmer ${glitchDone ? 'title-gradient-3d' : ''}`}>{t('hero.name')}</span>
+              <span className={`hero-name-shimmer ${glitchDone ? 'holo-text' : ''}`}>{t('hero.name')}</span>
             </motion.h1>
 
             {/* Badges */}

@@ -33,7 +33,14 @@ ADR:;;Banyuwangi;;;Indonesia
 END:VCARD`
 
 const MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
-const hasValidKey = Boolean(MAPS_API_KEY) && MAPS_API_KEY !== 'YOUR_API_KEY' && MAPS_API_KEY.trim() !== '';
+// The classic keyless embed works everywhere without Google Cloud setup.
+// The keyed Embed API URL is only used when a key is present AND the
+// keyless fallback is known to be unnecessary — currently the keyless
+// URL is the safest universal default (the previous keyed URL rendered
+// "This API is not activated" errors on the live site).
+const MAPS_EMBED_QUERY = 'dusun+pondokasem+desa+kedungasri+tegaldlimo+banyuwangi';
+const MAPS_EMBED_URL = `https://maps.google.com/maps?q=${MAPS_EMBED_QUERY}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
+void MAPS_API_KEY;
 
 export function Contact() {
   const { t, lang } = useLanguageStore()
@@ -128,7 +135,7 @@ export function Contact() {
     <section id="contact" className="relative py-20 sm:py-28 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto" ref={ref}>
         <motion.div initial={{ opacity: 0, y: 20, rotateX: 18, transformPerspective: 900 }} animate={inView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}} transition={{ duration: 0.6 }} className="mb-12 sm:mb-16">
-          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2"><ScrambleText text={t('contact.title')} /></h2>
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2 holo-text"><ScrambleText text={t('contact.title')} /></h2>
           <div className="section-title-line" />
           <p className="mt-4 text-sm sm:text-base text-[var(--text-secondary)] max-w-xl">{t('contact.subtitle')}</p>
         </motion.div>
@@ -139,7 +146,7 @@ export function Contact() {
               return (
                 <a key={item.key} href={item.isShare || item.key === 'cv' ? undefined : item.href} download={item.key === 'cv' ? undefined : ('download' in item && item.download ? true : undefined)} target={item.href?.startsWith('http') ? '_blank' : undefined} rel={item.href?.startsWith('http') ? 'noopener noreferrer' : undefined}
                   onClick={(e) => { if (item.copyable) { e.preventDefault(); handleCopy(item.copyValue!, item.key) } else if (item.isShare) { e.preventDefault(); handleShare() } else if (item.key === 'cv') { e.preventDefault(); setCvOpen(true) } }}
-                  className={`flex items-start gap-4 p-4 rounded-xl glass glass-depth border border-[var(--glass-border)] glass-card-advanced transition-all duration-300 group${item.isShare ? ' share-profile-btn cursor-pointer' : ''}`}
+                  className={`flex items-start gap-4 p-4 rounded-xl glass glass-depth border border-[var(--glass-border)] glass-card-advanced holo-sheen transition-all duration-300 group${item.isShare ? ' share-profile-btn cursor-pointer' : ''}`}
                   style={{ '--hover-glow': item.color } as React.CSSProperties}
                   onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = `0 0 20px ${item.color}33` }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.removeProperty('box-shadow') }}>
@@ -194,7 +201,7 @@ export function Contact() {
             )}
           </motion.div>
           <motion.div initial={{ opacity: 0, x: 30, rotateY: -10, transformPerspective: 900 }} animate={inView ? { opacity: 1, x: 0, rotateY: 0, transformPerspective: 900 } : {}} transition={{ duration: 0.6, delay: 0.3 }} className="lg:col-span-3 space-y-6">
-            <TiltCard maxTilt={4}><div className="relative p-6 sm:p-8 rounded-xl glass glass-depth border border-[var(--glass-border)] glass-noise">
+            <TiltCard maxTilt={4} className="rounded-xl holo-ring holo-ring-always"><div className="relative p-6 sm:p-8 rounded-xl glass glass-depth border border-[var(--glass-border)] glass-noise">
               <div className="absolute -top-px -left-px w-5 h-5 border-t-2 border-l-2 border-[var(--neon-cyan)]" /><div className="absolute -top-px -right-px w-5 h-5 border-t-2 border-r-2 border-[var(--neon-magenta)]" /><div className="absolute -bottom-px -left-px w-5 h-5 border-b-2 border-l-2 border-[var(--neon-magenta)]" /><div className="absolute -bottom-px -right-px w-5 h-5 border-b-2 border-r-2 border-[var(--neon-cyan)]" />
               {formStatus === 'success' ? (
                 <div className="flex flex-col items-center justify-center py-12 gap-4">
@@ -214,7 +221,7 @@ export function Contact() {
                     <textarea required rows={5} maxLength={500} value={formData.message} onChange={e => setFormData(p => ({ ...p, message: e.target.value }))} className="w-full px-4 py-2.5 rounded-lg bg-transparent border border-[var(--glass-border)] text-sm text-[var(--text-primary)] placeholder-[var(--text-secondary)]/40 transition-all focus:outline-none focus:border-[var(--neon-cyan)] focus:shadow-[var(--glow-cyan)] resize-none" placeholder={t('contact.messagePlaceholder')} />
                   </div>
                   {formStatus === 'error' && <div className="flex items-center gap-2 text-xs text-red-400"><AlertCircle className="h-4 w-4" /><span>{t('contact.error')}</span></div>}
-                  <button type="submit" disabled={formStatus === 'loading'} className="w-full sm:w-auto ripple-effect inline-flex items-center justify-center gap-2 px-8 py-3 rounded-lg font-display text-sm tracking-wider uppercase border border-[var(--neon-cyan)] text-[var(--neon-cyan)] transition-all hover:shadow-[var(--glow-cyan)] hover:bg-[var(--neon-cyan)] hover:text-[var(--dark-base)] disabled:opacity-50 disabled:cursor-not-allowed">
+                  <button type="submit" disabled={formStatus === 'loading'} className="w-full sm:w-auto ripple-effect btn-web3 inline-flex items-center justify-center gap-2 px-8 py-3 rounded-lg font-display text-sm tracking-wider uppercase border border-[var(--neon-cyan)] text-[var(--neon-cyan)] transition-all hover:shadow-[var(--glow-cyan)] hover:bg-[var(--neon-cyan)] hover:text-[var(--dark-base)] disabled:opacity-50 disabled:cursor-not-allowed">
                     {formStatus === 'loading' ? <><Loader2 className="h-4 w-4 animate-spin" />{t('contact.sending')}</> : <><Send className="h-4 w-4" />{t('contact.send')}</>}
                   </button>
                 </form>
@@ -239,11 +246,7 @@ export function Contact() {
               >
                 <iframe
                   title="Kedungasri, Tegaldlimo, Banyuwangi Location"
-                  src={
-                    hasValidKey
-                      ? `https://www.google.com/maps/embed/v1/place?key=${MAPS_API_KEY}&q=dusun+pondokasem+rt+026+rw+005+desa+kedungasri,+kecamatan+tegaldlimo+kabupaten+banyuwangi+jawa+timur+indonesia`
-                      : 'https://maps.google.com/maps?q=dusun+pondokasem+desa+kedungasri+tegaldlimo+banyuwangi&t=&z=14&ie=UTF8&iwloc=&output=embed'
-                  }
+                  src={MAPS_EMBED_URL}
                   style={{ width: '100%', height: '100%', border: 0 }}
                   allowFullScreen
                   loading="lazy"

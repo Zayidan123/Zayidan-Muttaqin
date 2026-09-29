@@ -82,7 +82,7 @@ export function Stats() {
           transition={{ duration: 0.6 }}
           className="mb-10 sm:mb-14 text-center"
         >
-          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2">
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2 holo-text">
             <ScrambleText text={t('stats.title')} />
           </h2>
           <div className="section-title-line mx-auto" />
@@ -98,7 +98,7 @@ export function Stats() {
                 animate={inView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
                 transition={{ duration: 0.6, delay: idx * 0.15 }}
               >
-                <TiltCard className="transition-[box-shadow_0.3s]" maxTilt={6} glare>
+                <TiltCard className="transition-[box-shadow_0.3s] rounded-xl holo-edge" maxTilt={6} glare>
                 <div className={`tilt-glare-host relative p-5 sm:p-6 rounded-xl glass glass-depth border ${colors.border} glass-hover-glow glass-noise transition-[box-shadow_0.3s]`}>
                   <div className="flex flex-col items-center text-center gap-3">
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center border ${colors.border} bg-[var(--glass-bg)]`}>

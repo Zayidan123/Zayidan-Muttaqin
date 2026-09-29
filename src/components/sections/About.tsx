@@ -93,7 +93,7 @@ export function About() {
           transition={{ duration: 0.6 }}
           className="mb-12 sm:mb-16"
         >
-          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2">
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2 holo-text">
             <ScrambleText text={t('about.title')} />
           </h2>
           <div className="section-title-line" />
@@ -243,7 +243,7 @@ export function About() {
               initial={{ opacity: 0, y: 20, rotateX: 18, transformPerspective: 900 }}
               animate={skillsInView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="p-6 rounded-xl glass glass-depth lift-3d border border-[var(--glass-border)]"
+              className="p-6 rounded-xl glass glass-depth lift-3d holo-sheen border border-[var(--glass-border)]"
             >
               <h3 className="font-display text-sm sm:text-base font-bold text-[var(--neon-cyan)] mb-5 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[var(--neon-cyan)] shadow-[var(--glow-cyan)]" />
@@ -289,7 +289,7 @@ export function About() {
               initial={{ opacity: 0, y: 20, rotateX: 18, transformPerspective: 900 }}
               animate={skillsInView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="p-6 rounded-xl glass glass-depth lift-3d border border-[var(--glass-border)]"
+              className="p-6 rounded-xl glass glass-depth lift-3d holo-sheen border border-[var(--glass-border)]"
             >
               <h3 className="font-display text-sm sm:text-base font-bold text-[var(--neon-magenta)] mb-5 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[var(--neon-magenta)] shadow-[var(--glow-magenta)]" />
@@ -319,7 +319,7 @@ export function About() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="mt-10 flex justify-center"
           >
-            <div className="p-6 rounded-xl glass glass-depth lift-3d border border-[var(--glass-border)]">
+            <div className="p-6 rounded-xl glass glass-depth lift-3d holo-sheen border border-[var(--glass-border)]">
               <SkillRadar
                 skills={hardSkills.map(s => ({
                   name: t(s.key).split('(')[0].trim().substring(0, 12),

@@ -21,7 +21,7 @@ export function Projects() {
           transition={{ duration: 0.6 }}
           className="mb-12 sm:mb-16"
         >
-          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2">
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2 holo-text">
             <ScrambleText text={t('projects.title')} />
           </h2>
           <p className="text-sm text-[var(--text-secondary)] mb-3">{t('projects.subtitle')}</p>
@@ -41,7 +41,7 @@ export function Projects() {
               <TiltCard
                 maxTilt={7}
                 glare
-                className="tilt-glare-host relative p-5 sm:p-6 rounded-xl glass glass-depth border border-[var(--glass-border)] glass-card-advanced group flex flex-col h-full"
+                className="tilt-glare-host relative p-5 sm:p-6 rounded-xl glass glass-depth border border-[var(--glass-border)] glass-card-advanced holo-sheen group flex flex-col h-full"
               >
                 <div className="absolute -top-px -left-px w-4 h-4 border-t-2 border-l-2 border-[var(--neon-cyan)] opacity-60 group-hover:opacity-100 transition-opacity z-[6]" />
                 <div className="absolute -top-px -right-px w-4 h-4 border-t-2 border-r-2 border-[var(--neon-magenta)] opacity-60 group-hover:opacity-100 transition-opacity z-[6]" />

@@ -27,7 +27,7 @@ export function Footer() {
   return (
     <footer ref={ref} className="relative mt-auto border-t border-[var(--glass-border)]" style={{ background: 'linear-gradient(to bottom, var(--dark-base), var(--dark-surface))' }}>
       {/* Decorative top line */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--neon-cyan)]/40 to-transparent" />
+      <div className="absolute top-0 left-0 right-0 h-[1.5px] footer-holo-line" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         <motion.div
