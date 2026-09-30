@@ -70,9 +70,9 @@ export function Experience() {
                   {/* Spacer for mobile */}
                   <div className="w-10 shrink-0 sm:hidden" />
 
-                  {/* Card */}
-                  <div className={`flex-1 sm:w-[calc(50%-2rem)] ${isLeft ? 'sm:pr-8' : 'sm:pl-8'}`}>
-                    <div className="relative p-5 sm:p-6 rounded-xl glass glass-depth border border-[var(--glass-border)] glass-card-advanced holo-sheen group">
+                  {/* Card — koridor 3D: kartu kiri/kanan miring seperti dinding lorong, lurus saat hover */}
+                  <div className={`flex-1 sm:w-[calc(50%-2rem)] corridor-${isLeft ? 'l' : 'r'} ${isLeft ? 'sm:pr-8' : 'sm:pl-8'}`}>
+                    <div className="corridor-card relative p-5 sm:p-6 rounded-xl glass glass-depth border border-[var(--glass-border)] glass-card-advanced holo-sheen group">
                       {/* HUD Brackets */}
                       <div className="absolute -top-px -left-px w-4 h-4 border-t-2 border-l-2 border-[var(--neon-cyan)] opacity-60 group-hover:opacity-100 transition-opacity" />
                       <div className="absolute -top-px -right-px w-4 h-4 border-t-2 border-r-2 border-[var(--neon-magenta)] opacity-60 group-hover:opacity-100 transition-opacity" />

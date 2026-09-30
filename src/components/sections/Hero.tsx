@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import Image from 'next/image'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { Download, MapPin, Eye, Briefcase, Sparkles, TrendingUp } from 'lucide-react'
+import { Download, MapPin, Eye, Briefcase, Sparkles, TrendingUp, Coins, LineChart, Code2, MessageSquare, Zap, Palette } from 'lucide-react'
 import { NeonButton } from '@/components/ui/NeonButton'
 import { useLanguageStore } from '@/store/language-store'
 import { useCvStore } from '@/store/cv-store'
@@ -12,6 +12,19 @@ import { useTilt } from '@/hooks/useTilt'
 export function Hero() {
   const { t, lang } = useLanguageStore()
   const { setOpen: setCvOpen } = useCvStore()
+
+  // Full-3D orbit satellites — dua bidang orbit miring (gyroscope)
+  const satellitesA = [
+    { icon: Coins, color: 'var(--neon-cyan)', glow: 'var(--glow-cyan)' },
+    { icon: LineChart, color: 'var(--neon-magenta)', glow: 'var(--glow-magenta)' },
+    { icon: Code2, color: 'var(--neon-purple)', glow: '0 0 20px rgba(139,92,246,0.3)' },
+  ]
+  const satellitesB = [
+    { icon: MessageSquare, color: 'var(--neon-magenta)', glow: 'var(--glow-magenta)' },
+    { icon: Zap, color: 'var(--neon-cyan)', glow: 'var(--glow-cyan)' },
+    { icon: Palette, color: 'var(--neon-purple)', glow: '0 0 20px rgba(139,92,246,0.3)' },
+  ]
+  const satAngle = (i: number, total: number) => `${Math.round((i / total) * 360)}deg`
 
   const [glitchDone, setGlitchDone] = useState(false)
   const [displayedTagline, setDisplayedTagline] = useState('')
@@ -300,9 +313,54 @@ export function Hero() {
                 </div>
               </div>
 
-              {/* Orbiting accent rings (outside the tilt card, subtle) */}
-              <div className="absolute -inset-6 rounded-full border border-[var(--neon-cyan)]/8 pointer-events-none animate-[spin_40s_linear_infinite]" aria-hidden="true" />
-              <div className="absolute -inset-10 rounded-full border border-[var(--neon-magenta)]/5 pointer-events-none animate-[spin_55s_linear_infinite_reverse]" aria-hidden="true" />
+              {/* FULL 3D ORBIT SATELLITES — gyroscope ganda mengelilingi foto.
+                  Chip counter-rotate agar ikon selalu menghadap pembaca. */}
+              <div className="hero-orbit-stage" aria-hidden="true">
+                <div className="hero-orbit-wrap hero-orbit-wrap-a">
+                  <div className="hero-orbit-spin hero-orbit-spin-a">
+                    {satellitesA.map((sat, i) => {
+                      const Icon = sat.icon
+                      return (
+                        <span
+                          key={`sat-a-${i}`}
+                          className="hero-sat"
+                          style={{ '--a': satAngle(i, satellitesA.length), '--r': '195px' } as React.CSSProperties}
+                        >
+                          <span className="hero-sat-pre">
+                            <span className="hero-sat-cc-a">
+                              <span className="hero-sat-chip" style={{ borderColor: 'color-mix(in srgb, ' + sat.color + ' 35%, transparent)', boxShadow: sat.glow }}>
+                                <Icon className="h-4 w-4" style={{ color: sat.color }} />
+                              </span>
+                            </span>
+                          </span>
+                        </span>
+                      )
+                    })}
+                  </div>
+                </div>
+                <div className="hero-orbit-wrap hero-orbit-wrap-b">
+                  <div className="hero-orbit-spin hero-orbit-spin-b">
+                    {satellitesB.map((sat, i) => {
+                      const Icon = sat.icon
+                      return (
+                        <span
+                          key={`sat-b-${i}`}
+                          className="hero-sat"
+                          style={{ '--a': satAngle(i, satellitesB.length), '--r': '225px' } as React.CSSProperties}
+                        >
+                          <span className="hero-sat-pre">
+                            <span className="hero-sat-cc-b">
+                              <span className="hero-sat-chip" style={{ borderColor: 'color-mix(in srgb, ' + sat.color + ' 35%, transparent)', boxShadow: sat.glow }}>
+                                <Icon className="h-4 w-4" style={{ color: sat.color }} />
+                              </span>
+                            </span>
+                          </span>
+                        </span>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
             </div>
           </motion.div>
         </div>

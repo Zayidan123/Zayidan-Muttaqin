@@ -1,12 +1,184 @@
 'use client'
 
+import { useState, type MouseEvent } from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { Github, ExternalLink } from 'lucide-react'
+import { Github, ExternalLink, RotateCw, Undo2, Layers } from 'lucide-react'
 import { useLanguageStore } from '@/store/language-store'
-import { projects } from '@/data/projects'
+import { projects, type ProjectEntry } from '@/data/projects'
 import { ScrambleText } from '@/components/ui/ScrambleText'
-import { TiltCard } from '@/components/ui/TiltCard'
+
+/* ===== Full-3D Holographic Flip Card =====
+   Front: ringkasan + stack utama. Back: deskripsi penuh + tautan.
+   - Desktop : hover otomatis membalik kartu (rotateY 180°)
+   - Touch   : ketuk kartu untuk membalik
+   - Keyboard: fokus ke tautan di sisi belakang ikut membalik (focus-within)
+   - Teks penuh tetap ada di DOM → SEO tetap utuh */
+function ProjectFlipCard({
+  project,
+  idx,
+  inView,
+  t,
+  lang,
+}: {
+  project: ProjectEntry
+  idx: number
+  inView: boolean
+  t: (k: string) => string
+  lang: 'id' | 'en'
+}) {
+  const [flipped, setFlipped] = useState(false)
+
+  const description = project.description[lang]
+  const summary =
+    description.length > 165 ? `${description.slice(0, 165).trimEnd()}…` : description
+  const allTags = project.tags[lang]
+  const shownTags = allTags.slice(0, 6)
+  const moreCount = allTags.length - shownTags.length
+
+  const handleFlip = (e: MouseEvent<HTMLDivElement>) => {
+    // Jangan balik kartu jika pengguna sedang memilih teks
+    const selection = window.getSelection()
+    if (selection && selection.toString().length > 0) return
+    // Klik pada tautan di sisi belakang tidak boleh menutup kartu
+    if ((e.target as HTMLElement).closest('a')) return
+    setFlipped((f) => !f)
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30, rotateX: 22, transformPerspective: 900 }}
+      animate={inView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
+      transition={{ duration: 0.6, delay: 0.2 + idx * 0.15 }}
+      className="h-full"
+    >
+      <div
+        className={`flip-3d h-full cursor-pointer select-none ${flipped ? 'flipped' : ''}`}
+        onClick={handleFlip}
+        role="button"
+        aria-pressed={flipped}
+        aria-label={`${project.title} — ${flipped ? t('projects.flipBack') : t('projects.flip')}`}
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            if ((e.target as HTMLElement).closest('a,button')) return
+            e.preventDefault()
+            setFlipped((f) => !f)
+          }
+        }}
+      >
+        <div className="flip-3d-inner">
+          {/* ===== FRONT — ringkasan ===== */}
+          <div className="flip-3d-face flip-3d-front rounded-xl p-5 sm:p-6 glass-depth holo-sheen group flex flex-col h-full">
+            {/* HUD Brackets */}
+            <div className="absolute -top-px -left-px w-4 h-4 border-t-2 border-l-2 border-[var(--neon-cyan)] opacity-60 group-hover:opacity-100 transition-opacity z-[6]" />
+            <div className="absolute -top-px -right-px w-4 h-4 border-t-2 border-r-2 border-[var(--neon-magenta)] opacity-60 group-hover:opacity-100 transition-opacity z-[6]" />
+            <div className="absolute -bottom-px -left-px w-4 h-4 border-b-2 border-l-2 border-[var(--neon-magenta)] opacity-60 group-hover:opacity-100 transition-opacity z-[6]" />
+            <div className="absolute -bottom-px -right-px w-4 h-4 border-b-2 border-r-2 border-[var(--neon-cyan)] opacity-60 group-hover:opacity-100 transition-opacity z-[6]" />
+
+            <div className="flex items-center gap-2 mb-2">
+              <Layers className="h-4 w-4 text-[var(--neon-cyan)] shrink-0" />
+              <h3 className="font-display text-base sm:text-lg font-semibold text-[var(--text-primary)]">
+                {project.title}
+              </h3>
+            </div>
+
+            <p className="text-xs sm:text-sm text-[var(--text-secondary)] mb-4 flex-1">
+              {summary}
+            </p>
+
+            <div className="flex flex-wrap gap-1.5 mb-4">
+              {shownTags.map((tag) => (
+                <span
+                  key={tag}
+                  className="px-2 py-0.5 rounded text-[10px] font-mono-custom text-[var(--text-secondary)] bg-[var(--glass-bg)] border border-[var(--glass-border)]"
+                >
+                  {tag}
+                </span>
+              ))}
+              {moreCount > 0 && (
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono-custom text-[var(--neon-cyan)] border border-[var(--neon-cyan)]/30">
+                  +{moreCount}
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between mt-auto pt-2 border-t border-[var(--glass-border)]">
+              <span className="text-[10px] font-mono-custom text-[var(--text-secondary)]/70 tracking-wide">
+                {t('projects.tapHint')}
+              </span>
+              <span className="flip-hint inline-flex items-center gap-1.5 text-[10px] font-mono-custom text-[var(--neon-cyan)]">
+                <RotateCw className="h-3 w-3" />
+                {t('projects.flip')}
+              </span>
+            </div>
+          </div>
+
+          {/* ===== BACK — detail penuh ===== */}
+          <div className="flip-3d-face flip-3d-back flip-3d-backface rounded-xl p-5 sm:p-6 glass-depth flex flex-col">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[10px] font-mono-custom text-[var(--neon-magenta)] tracking-[0.2em] uppercase">
+                {t('projects.stackLabel')}
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-mono-custom text-[var(--text-secondary)]/70">
+                <Undo2 className="h-3 w-3" />
+                {t('projects.flipBack')}
+              </span>
+            </div>
+
+            <h3 className="font-display text-base sm:text-lg font-semibold text-[var(--text-primary)] mb-3">
+              {project.title}
+            </h3>
+
+            {/* Tautan aksi di atas — langsung terlihat saat kartu dibalik */}
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              <a
+                href={project.repoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg glass border border-[var(--glass-border)] text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--neon-cyan)] hover:border-[var(--neon-cyan)]/30 hover:shadow-[var(--glow-cyan)] transition-all duration-300"
+                aria-label={`${t('projects.viewRepo')} — ${project.title}`}
+              >
+                <Github className="h-3.5 w-3.5" />
+                {t('projects.viewRepo')}
+              </a>
+              {project.demoUrl && (
+                <a
+                  href={project.demoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg glass border border-[var(--glass-border)] text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--neon-magenta)] hover:border-[var(--neon-magenta)]/30 hover:shadow-[var(--glow-magenta)] transition-all duration-300"
+                  aria-label={`${t('projects.viewDemo')} — ${project.title}`}
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  {t('projects.viewDemo')}
+                </a>
+              )}
+            </div>
+
+            <p className="text-xs sm:text-sm text-[var(--text-secondary)] mb-4 flex-1">
+              {description}
+            </p>
+
+            <div className="flex flex-wrap gap-1.5 mt-auto pt-3 border-t border-[var(--glass-border)]">
+              {allTags.map((tag) => (
+                <span
+                  key={tag}
+                  className="px-2 py-0.5 rounded text-[10px] font-mono-custom text-[var(--text-secondary)] bg-[var(--glass-bg)] border border-[var(--glass-border)]"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Bayangan lantai 3D */}
+        <div className="flip-3d-shadow" aria-hidden="true" />
+      </div>
+    </motion.div>
+  )
+}
 
 export function Projects() {
   const { t, lang } = useLanguageStore()
@@ -29,72 +201,16 @@ export function Projects() {
         </motion.div>
 
         <div className="grid gap-6 sm:grid-cols-2">
-          {projects.map((project, idx) => {
-            const description = project.description[lang]
-            return (
-              <motion.div
-                key={project.id}
-                initial={{ opacity: 0, y: 30, rotateX: 22, transformPerspective: 900 }}
-                animate={inView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
-                transition={{ duration: 0.6, delay: 0.2 + idx * 0.15 }}
-              >
-              <TiltCard
-                maxTilt={7}
-                glare
-                className="tilt-glare-host relative p-5 sm:p-6 rounded-xl glass glass-depth border border-[var(--glass-border)] glass-card-advanced holo-sheen group flex flex-col h-full"
-              >
-                <div className="absolute -top-px -left-px w-4 h-4 border-t-2 border-l-2 border-[var(--neon-cyan)] opacity-60 group-hover:opacity-100 transition-opacity z-[6]" />
-                <div className="absolute -top-px -right-px w-4 h-4 border-t-2 border-r-2 border-[var(--neon-magenta)] opacity-60 group-hover:opacity-100 transition-opacity z-[6]" />
-                <div className="absolute -bottom-px -left-px w-4 h-4 border-b-2 border-l-2 border-[var(--neon-magenta)] opacity-60 group-hover:opacity-100 transition-opacity z-[6]" />
-                <div className="absolute -bottom-px -right-px w-4 h-4 border-b-2 border-r-2 border-[var(--neon-cyan)] opacity-60 group-hover:opacity-100 transition-opacity z-[6]" />
-
-                <h3 className="font-display text-base sm:text-lg font-semibold text-[var(--text-primary)] mb-2">
-                  {project.title}
-                </h3>
-
-                <p className="text-xs sm:text-sm text-[var(--text-secondary)] mb-4 flex-1">
-                  {description}
-                </p>
-
-                <div className="flex flex-wrap gap-1.5 mb-4">
-                  {project.tags[lang].map(tag => (
-                    <span
-                      key={tag}
-                      className="px-2 py-0.5 rounded text-[10px] font-mono-custom text-[var(--text-secondary)] bg-[var(--glass-bg)] border border-[var(--glass-border)]"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2 mt-auto">
-                  <a
-                    href={project.repoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg glass border border-[var(--glass-border)] text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--neon-cyan)] hover:border-[var(--neon-cyan)]/30 hover:shadow-[var(--glow-cyan)] transition-all duration-300"
-                    aria-label={`${t('projects.viewRepo')} — ${project.title}`}
-                  >
-                    <Github className="h-3.5 w-3.5" />
-                    {t('projects.viewRepo')}
-                  </a>
-                  {project.demoUrl && (
-                    <a
-                      href={project.demoUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg glass border border-[var(--glass-border)] text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--neon-magenta)] hover:border-[var(--neon-magenta)]/30 hover:shadow-[var(--glow-magenta)] transition-all duration-300"
-                      aria-label={`${t('projects.viewDemo')} — ${project.title}`}
-                    >
-                      <ExternalLink className="h-3.5 w-3.5" />
-                      {t('projects.viewDemo')}
-                    </a>
-                  )}
-                </div>
-              </TiltCard>
-              </motion.div>
-            )
-          })}
+          {projects.map((project, idx) => (
+            <ProjectFlipCard
+              key={project.id}
+              project={project}
+              idx={idx}
+              inView={inView}
+              t={t}
+              lang={lang}
+            />
+          ))}
         </div>
       </motion.div>
     </section>

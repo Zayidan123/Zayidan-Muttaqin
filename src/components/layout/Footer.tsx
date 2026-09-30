@@ -29,7 +29,12 @@ export function Footer() {
       {/* Decorative top line */}
       <div className="absolute top-0 left-0 right-0 h-[1.5px] footer-holo-line" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+      {/* 3D Horizon Grid — lantai grid holografik di cakrawala footer */}
+      <div className="footer-horizon absolute inset-0" aria-hidden="true">
+        <div className="web3-grid-floor" />
+      </div>
+
+      <div className="relative z-[1] max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         <motion.div
           initial={{ opacity: 0, y: 20, rotateX: 18, transformPerspective: 900 }}
           animate={inView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}

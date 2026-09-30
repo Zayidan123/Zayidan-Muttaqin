@@ -81,11 +81,23 @@ export function Achievements() {
                     <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(to right, transparent, ' + color + '66, transparent)' }} />
 
                     <div className="flex items-start gap-4">
-                      <div
-                        className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border"
-                        style={{ color: color, borderColor: color + '33', backgroundColor: color + '0D' }}
-                      >
-                        <Icon className="h-5 w-5" />
+                      {/* Koin holografik 3D — berayun idle, berputar penuh saat hover */}
+                      <div className="ach-3d shrink-0 float-3d">
+                        <div className="coin-cradle">
+                          <div className="holo-coin">
+                            <div
+                              className="holo-coin-face"
+                              style={{
+                                color: color,
+                                borderColor: color + '55',
+                                boxShadow:
+                                  'inset 0 0 0 3px ' + color + '14, 0 10px 26px -10px rgba(0,0,0,0.5), 0 0 18px ' + color + '26',
+                              }}
+                            >
+                              <Icon className="h-6 w-6" />
+                            </div>
+                          </div>
+                        </div>
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="text-sm font-display font-bold text-[var(--text-primary)] mb-1">

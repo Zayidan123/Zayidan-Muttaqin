@@ -34,6 +34,18 @@ export function LoadingScreen() {
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center gap-8">
+        {/* Holo Cube 3D — kubus holografik berputar (CSS 3D murni) */}
+        <div className="holo-cube-stage" aria-hidden="true">
+          <div className="holo-cube">
+            <div className="holo-cube-face holo-cube-f1" />
+            <div className="holo-cube-face holo-cube-f2" />
+            <div className="holo-cube-face holo-cube-f3" />
+            <div className="holo-cube-face holo-cube-f4" />
+            <div className="holo-cube-face holo-cube-f5" />
+            <div className="holo-cube-face holo-cube-f6" />
+          </div>
+        </div>
+
         {/* ZAYIDAN text — div instead of h1 to maintain single h1 per page for SEO */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}

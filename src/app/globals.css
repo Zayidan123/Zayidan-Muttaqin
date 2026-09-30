@@ -2140,3 +2140,356 @@ html {
   .footer-holo-line { animation: none !important; }
   .holo-text { animation: none !important; }
 }
+
+/* ============================================================
+   FULL 3D SYSTEM v2 — Metaverse Depth Layers
+   Dipasang untuk overhaul "full 3D" portfolio:
+   stage/layer primitives, 3D flip cards, hero orbit satellites,
+   holo coins, 3D corridor timeline, nav 3D pop, holo cube,
+   stat 3D emitter. Semua theme-aware (Terang/Gelap) dan
+   dimatikan otomatis untuk prefers-reduced-motion.
+   ============================================================ */
+
+/* ---------- 0. Shared depth primitives ---------- */
+.stage-3d { perspective: 1100px; }
+.layer-3d { transform-style: preserve-3d; }
+
+@keyframes float-3d-idle {
+  0%, 100% { transform: translateY(0px) rotateX(0deg) rotateY(0deg); }
+  25%      { transform: translateY(-7px) rotateX(1.2deg) rotateY(1.6deg); }
+  50%      { transform: translateY(-2px) rotateX(-0.8deg) rotateY(2.4deg); }
+  75%      { transform: translateY(-9px) rotateX(1.6deg) rotateY(-1.2deg); }
+}
+.float-3d { animation: float-3d-idle 8s ease-in-out infinite; }
+
+/* ---------- 1. 3D Flip Card (Projects) ----------
+   CATATAN: face sengaja TIDAK memakai backdrop-filter supaya
+   backface-visibility bekerja sempurna di semua browser. */
+.flip-3d { perspective: 1500px; position: relative; }
+.flip-3d-inner {
+  position: relative;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+@media (hover: hover) and (pointer: fine) {
+  .flip-3d:hover .flip-3d-inner { transform: rotateY(180deg); }
+}
+.flip-3d.flipped .flip-3d-inner,
+.flip-3d:focus-within .flip-3d-inner { transform: rotateY(180deg); }
+.flip-3d-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: var(--flip-face-bg);
+  border: 1px solid var(--glass-border);
+}
+:root { --flip-face-bg: rgba(255, 255, 255, 0.94); }
+.dark { --flip-face-bg: rgba(14, 14, 26, 0.94); }
+.flip-3d-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+/* Bayangan lantai yang terangkat saat kartu berputar */
+.flip-3d-shadow {
+  position: absolute;
+  left: 10px; right: 10px; bottom: -16px;
+  height: 28px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.4), transparent 70%);
+  filter: blur(10px);
+  opacity: 0.35;
+  transform: scale(0.95);
+  transition: opacity 0.6s ease, transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+:root:not(.dark) .flip-3d-shadow {
+  background: radial-gradient(ellipse at center, rgba(30, 42, 90, 0.22), transparent 70%);
+  opacity: 0.5;
+}
+.flip-3d:hover .flip-3d-shadow,
+.flip-3d.flipped .flip-3d-shadow { opacity: 0.6; transform: scale(1.04); }
+:root:not(.dark) .flip-3d:hover .flip-3d-shadow,
+:root:not(.dark) .flip-3d.flipped .flip-3d-shadow { opacity: 0.65; }
+
+@keyframes flip-hint-pulse {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
+}
+.flip-hint { animation: flip-hint-pulse 2.4s ease-in-out infinite; }
+
+/* ---------- 2. Hero orbit satellites (gyroscope ganda) ---------- */
+.hero-orbit-stage {
+  position: absolute;
+  inset: -64px;
+  pointer-events: none;
+  z-index: 2;
+}
+.hero-orbit-wrap {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-style: preserve-3d;
+}
+.hero-orbit-wrap-a { transform: rotateX(64deg) rotateZ(-8deg); }
+.hero-orbit-wrap-b { transform: rotateY(58deg) rotateX(18deg); }
+.hero-orbit-spin {
+  position: absolute;
+  top: 0; left: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.hero-orbit-spin-a { animation: hero-orbit-spin-a 26s linear infinite; }
+.hero-orbit-spin-b { animation: hero-orbit-spin-b 34s linear infinite; }
+@keyframes hero-orbit-spin-a {
+  from { transform: rotateZ(0deg); }
+  to   { transform: rotateZ(360deg); }
+}
+@keyframes hero-orbit-spin-b {
+  from { transform: rotateZ(360deg); }
+  to   { transform: rotateZ(0deg); }
+}
+.hero-sat {
+  position: absolute;
+  top: 0; left: 0;
+  transform: rotateZ(var(--a)) translateY(var(--r));
+  transform-style: preserve-3d;
+}
+.hero-sat-pre {
+  display: block;
+  transform: rotateZ(calc(var(--a) * -1));
+  transform-style: preserve-3d;
+}
+.hero-sat-cc-a { animation: hero-sat-cc-a 26s linear infinite; }
+.hero-sat-cc-b { animation: hero-sat-cc-b 34s linear infinite; }
+/* Counter-rotation = inverse(wrap) + inverse(spin) agar chip selalu menghadap pembaca */
+@keyframes hero-sat-cc-a {
+  from { transform: rotateZ(8deg) rotateX(-64deg); }
+  to   { transform: rotateZ(-352deg) rotateX(-64deg); }
+}
+@keyframes hero-sat-cc-b {
+  from { transform: rotateZ(-360deg) rotateX(-18deg) rotateY(-58deg); }
+  to   { transform: rotateZ(0deg) rotateX(-18deg) rotateY(-58deg); }
+}
+.hero-sat-chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  margin: -21px 0 0 -21px;
+  border-radius: 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.4);
+}
+:root:not(.dark) .hero-sat-chip {
+  box-shadow: 0 8px 20px -8px rgba(30, 42, 90, 0.25), var(--glow-cyan);
+}
+@media (max-width: 639px) {
+  .hero-orbit-stage { inset: -40px; transform: scale(0.78); }
+}
+
+/* ---------- 3. Holo coin 3D (Achievements) ---------- */
+.coin-cradle {
+  transform-style: preserve-3d;
+  animation: coin-swing 5.5s ease-in-out infinite alternate;
+}
+@keyframes coin-swing {
+  from { transform: rotateY(-16deg); }
+  to   { transform: rotateY(16deg); }
+}
+.holo-coin {
+  transform-style: preserve-3d;
+  transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ach-3d:hover .holo-coin,
+.ach-3d:focus-within .holo-coin { transform: rotateY(360deg); }
+.holo-coin-face {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 9999px;
+  background: var(--glass-bg);
+  border: 1.5px solid var(--coin-edge);
+  box-shadow:
+    inset 0 0 0 3px var(--coin-inner),
+    0 10px 26px -10px rgba(0, 0, 0, 0.5);
+}
+:root { --coin-edge: rgba(0, 128, 255, 0.4); --coin-inner: rgba(0, 128, 255, 0.08); }
+.dark { --coin-edge: rgba(0, 245, 255, 0.4); --coin-inner: rgba(0, 245, 255, 0.07); }
+
+/* ---------- 4. Corridor timeline 3D (Experience) ---------- */
+.corridor-card {
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s ease;
+}
+@media (min-width: 640px) {
+  .corridor-l .corridor-card { transform: perspective(1400px) rotateY(7deg); }
+  .corridor-r .corridor-card { transform: perspective(1400px) rotateY(-7deg); }
+  .corridor-l .corridor-card:hover,
+  .corridor-r .corridor-card:hover { transform: perspective(1400px) rotateY(0deg) translateZ(16px); }
+}
+
+/* ---------- 5. Navbar 3D pop ---------- */
+.nav-3d-links { perspective: 520px; }
+.nav-3d-link {
+  display: inline-block;
+  transform-style: preserve-3d;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.nav-3d-link:hover { transform: translateZ(10px) rotateX(-7deg); }
+.nav-logo-3d { perspective: 420px; display: inline-block; }
+.nav-logo-3d > span {
+  display: inline-block;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-style: preserve-3d;
+}
+.nav-logo-3d:hover > span { transform: rotateX(14deg) rotateY(-14deg) translateZ(8px); }
+
+/* ---------- 6. Holo cube 3D (LoadingScreen) ---------- */
+.holo-cube-stage {
+  perspective: 620px;
+  width: 64px;
+  height: 64px;
+}
+.holo-cube {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  animation: holo-cube-spin 4.5s linear infinite;
+}
+@keyframes holo-cube-spin {
+  from { transform: rotateX(-22deg) rotateY(0deg); }
+  to   { transform: rotateX(-22deg) rotateY(360deg); }
+}
+.holo-cube-face {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(0, 245, 255, 0.4);
+  background: linear-gradient(135deg, rgba(0, 245, 255, 0.05), rgba(255, 0, 170, 0.05));
+  box-shadow: inset 0 0 20px rgba(0, 245, 255, 0.12);
+}
+:root:not(.dark) .holo-cube-face {
+  border-color: rgba(0, 128, 255, 0.45);
+  background: linear-gradient(135deg, rgba(0, 128, 255, 0.06), rgba(204, 0, 136, 0.06));
+  box-shadow: inset 0 0 20px rgba(0, 128, 255, 0.14);
+}
+.holo-cube-f1 { transform: translateZ(32px); }
+.holo-cube-f2 { transform: rotateY(90deg) translateZ(32px); }
+.holo-cube-f3 { transform: rotateY(180deg) translateZ(32px); }
+.holo-cube-f4 { transform: rotateY(-90deg) translateZ(32px); }
+.holo-cube-f5 { transform: rotateX(90deg) translateZ(32px); }
+.holo-cube-f6 { transform: rotateX(-90deg) translateZ(32px); }
+
+/* ---------- 7. Stat 3D emitter (Stats) ---------- */
+.stat-emitter {
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  width: 54px;
+  height: 54px;
+  margin-left: -27px;
+  z-index: 5;
+  transform-style: preserve-3d;
+  animation: float-3d-idle 6.5s ease-in-out infinite;
+}
+.stat-emitter-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 1.5px dashed var(--neon-cyan);
+  opacity: 0.45;
+  transform: rotateX(68deg);
+  animation: emitter-ring-spin 9s linear infinite;
+}
+.stat-emitter-ring-2 {
+  inset: 5px;
+  border-color: var(--neon-magenta);
+  opacity: 0.3;
+  animation-duration: 14s;
+  animation-direction: reverse;
+}
+@keyframes emitter-ring-spin {
+  from { transform: rotateX(68deg) rotateZ(0deg); }
+  to   { transform: rotateX(68deg) rotateZ(360deg); }
+}
+.stat-emitter-core {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 12px 28px -10px rgba(0, 0, 0, 0.45), var(--glow-cyan);
+}
+:root:not(.dark) .stat-emitter-core {
+  box-shadow: 0 12px 24px -10px rgba(30, 42, 90, 0.22), var(--glow-cyan);
+}
+.stat-scanline {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+.stat-scanline::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  top: -30%;
+  height: 22%;
+  background: linear-gradient(to bottom, transparent, var(--neon-cyan), transparent);
+  opacity: 0.10;
+  animation: stat-scan-sweep 3.8s ease-in-out infinite;
+}
+:root:not(.dark) .stat-scanline::after { opacity: 0.14; }
+@keyframes stat-scan-sweep {
+  0%   { top: -30%; }
+  55%  { top: 105%; }
+  100% { top: 105%; }
+}
+
+/* ---------- 8. Footer horizon grid ---------- */
+.footer-horizon {
+  position: relative;
+  overflow: hidden;
+}
+.footer-horizon .web3-grid-floor {
+  bottom: auto;
+  top: -34%;
+  height: 90%;
+  min-height: 200px;
+  opacity: 0.55;
+}
+
+/* ---------- 9. Reduced motion: matikan semua animasi 3D baru ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .float-3d,
+  .coin-cradle,
+  .hero-orbit-spin-a,
+  .hero-orbit-spin-b,
+  .hero-sat-cc-a,
+  .hero-sat-cc-b,
+  .holo-cube,
+  .stat-emitter,
+  .stat-emitter-ring,
+  .stat-scanline::after,
+  .flip-hint { animation: none !important; }
+  .flip-3d-inner,
+  .holo-coin,
+  .corridor-card,
+  .nav-3d-link,
+  .nav-logo-3d > span { transition-duration: 0.01ms !important; }
+}

@@ -99,11 +99,17 @@ export function Stats() {
                 transition={{ duration: 0.6, delay: idx * 0.15 }}
               >
                 <TiltCard className="transition-[box-shadow_0.3s] rounded-xl holo-edge" maxTilt={6} glare>
-                <div className={`tilt-glare-host relative p-5 sm:p-6 rounded-xl glass glass-depth border ${colors.border} glass-hover-glow glass-noise transition-[box-shadow_0.3s]`}>
-                  <div className="flex flex-col items-center text-center gap-3">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center border ${colors.border} bg-[var(--glass-bg)]`}>
+                <div className={`tilt-glare-host relative p-5 sm:p-6 pt-10 rounded-xl glass glass-depth border ${colors.border} glass-hover-glow glass-noise transition-[box-shadow_0.3s]`}>
+                  {/* 3D Emitter — ikon melayang di ring orbit miring di atas kartu */}
+                  <div className="stat-emitter">
+                    <span className="stat-emitter-ring" aria-hidden="true" />
+                    <span className="stat-emitter-ring stat-emitter-ring-2" aria-hidden="true" />
+                    <span className="stat-emitter-core">
                       <Icon className={`h-5 w-5 ${colors.icon}`} />
-                    </div>
+                    </span>
+                  </div>
+                  <div className="stat-scanline" aria-hidden="true" />
+                  <div className="flex flex-col items-center text-center gap-3">
                     <div className="text-[var(--text-primary)]">
                       <AnimatedCounter
                         target={item.numericValue}

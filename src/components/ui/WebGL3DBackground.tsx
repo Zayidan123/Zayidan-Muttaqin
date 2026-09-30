@@ -5,23 +5,24 @@ import { useTheme } from '@/lib/theme'
 import type * as ThreeNS from 'three'
 
 /**
- * Modern 3D WebGL Background — floating faceted glass geometry + particle
- * field with mouse & scroll parallax, built with three.js.
+ * FULL 3D World Background v2 — "Web3 Metaverse Layer"
  *
- * This is the signature 3D layer of the whole site and runs in BOTH themes:
- *  - Gelap (dark):  additive glow particles, neon point lights, deep fog
- *  - Terang (light): airy pastel glass, normal-blend particles, bright fog
+ * Layer WebGL global untuk SELURUH situs (kedua tema), dibangun dengan three.js:
+ *  1. Fleet geometri kaca faceted yang melayang (warisan v1)
+ *  2. Blockchain constellation network — node + garis koneksi dinamis
+ *  3. Holo-core centerpiece — torus knot holografik di belakang hero,
+ *     bereaksi terhadap gerakan mouse
+ *  4. Orbiters — titik cahaya yang mengorbit pada jalur elips miring
+ *  5. Camera journey — kamera "berjalan" menembus dunia 3D saat halaman
+ *     di-scroll (dolly + rise + roll halus)
  *
- * Performance-first design:
- *  - `three` is dynamically imported (kept out of the initial JS bundle → better SEO/LCP)
- *  - quality adapts to the device (object count, particle count, DPR, antialias)
- *  - animation pauses when the tab is hidden
- *  - honors `prefers-reduced-motion` (renders a single static frame)
- *  - theme switches update colors/lighting IN PLACE (no canvas rebuild → no flicker)
- *  - full GPU resource disposal on unmount
- *
- * The palette is read from CSS custom properties (--neon-cyan, --neon-magenta,
- * --neon-purple) so it stays in sync with the active theme.
+ * Performance-first (tidak boleh mengganggu situs produksi di Vercel):
+ *  - `three` di-import dinamis (di luar bundle JS awal → SEO/LCP aman)
+ *  - kualitas menyesuaikan perangkat (jumlah objek/partikel/DPR/antialias)
+ *  - animasi berhenti saat tab tersembunyi
+ *  - menghormati `prefers-reduced-motion` (render satu frame statis)
+ *  - pergantian tema memperbarui warna/pencahayaan DI TEMPAT (tanpa flicker)
+ *  - disposal penuh semua resource GPU saat unmount
  */
 export function WebGL3DBackground() {
   const { theme } = useTheme()
@@ -80,7 +81,7 @@ export function WebGL3DBackground() {
 
       /* ---------- scene & camera ---------- */
       const scene = new THREE.Scene()
-      const fog = new THREE.FogExp2(0x0a0a0f, 0.016)
+      const fog = new THREE.FogExp2(0x0a0a0f, 0.013)
       scene.fog = fog
 
       const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 120)
@@ -102,7 +103,7 @@ export function WebGL3DBackground() {
       rimLight.position.set(4, 12, -8)
       scene.add(rimLight)
 
-      /* ---------- floating geometry fleet ---------- */
+      /* ---------- 1. floating geometry fleet ---------- */
       const group = new THREE.Group()
       scene.add(group)
 
@@ -189,7 +190,7 @@ export function WebGL3DBackground() {
         group.add(mesh)
       }
 
-      /* ---------- hero centerpiece: large wireframe icosahedron shell ---------- */
+      /* ---------- hero containment shell (wireframe icosahedron) ---------- */
       if (!isMobile) {
         const shellGeometry = new THREE.IcosahedronGeometry(9, 1)
         const shellMaterial = new THREE.MeshBasicMaterial({
@@ -214,6 +215,110 @@ export function WebGL3DBackground() {
           baseY: 0,
         })
       }
+
+      /* ---------- 2. HOLO-CORE centerpiece (hero backdrop) ----------
+         Torus knot holografik besar di belakang konten hero.
+         Rotasi otomatis + mengikuti mouse dengan lerp halus. */
+      let holoCore: ThreeNS.Group | null = null
+      let holoCoreMat: ThreeNS.MeshStandardMaterial | null = null
+      let holoCoreWire: ThreeNS.MeshBasicMaterial | null = null
+      if (!isMobile) {
+        holoCore = new THREE.Group()
+        holoCore.position.set(0, 0.4, -6.5)
+
+        const coreGeometry = new THREE.TorusKnotGeometry(4.1, 1.05, 160, 20)
+        holoCoreMat = new THREE.MeshStandardMaterial({
+          color: 0x00f5ff,
+          metalness: 0.55,
+          roughness: 0.28,
+          transparent: true,
+          opacity: 0.14,
+          emissive: 0x00f5ff,
+          emissiveIntensity: 0.35,
+        })
+        const coreMesh = new THREE.Mesh(coreGeometry, holoCoreMat)
+        disposables.push(coreGeometry, holoCoreMat)
+        holoCore.add(coreMesh)
+
+        const wireGeometry = new THREE.TorusKnotGeometry(5.6, 0.12, 120, 14)
+        holoCoreWire = new THREE.MeshBasicMaterial({
+          color: 0xff00aa,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.07,
+        })
+        const wireMesh = new THREE.Mesh(wireGeometry, holoCoreWire)
+        disposables.push(wireGeometry, holoCoreWire)
+        holoCore.add(wireMesh)
+
+        scene.add(holoCore)
+      }
+
+      /* ---------- 3. BLOCKCHAIN CONSTELLATION NETWORK ----------
+         Node bercahaya + garis koneksi — sinyatur visual Web3.
+         Rotasi lambat sebagai satu kesatuan, plus pulse opacity. */
+      const network = new THREE.Group()
+      scene.add(network)
+
+      const NODES = isMobile ? 14 : 26
+      const nodePositions: ThreeNS.Vector3[] = []
+      for (let i = 0; i < NODES; i++) {
+        nodePositions.push(
+          new THREE.Vector3(rand(-20, 20), rand(-12, 12), rand(-30, -5))
+        )
+      }
+
+      // Node points (glowing dots)
+      const nodeGeo = new THREE.BufferGeometry()
+      const nodePosArr = new Float32Array(NODES * 3)
+      nodePositions.forEach((v, i) => {
+        nodePosArr[i * 3] = v.x
+        nodePosArr[i * 3 + 1] = v.y
+        nodePosArr[i * 3 + 2] = v.z
+      })
+      nodeGeo.setAttribute('position', new THREE.BufferAttribute(nodePosArr, 3))
+      const nodeMat = new THREE.PointsMaterial({
+        size: 0.32,
+        color: 0x00f5ff,
+        transparent: true,
+        opacity: 0.85,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true,
+      })
+      disposables.push(nodeGeo, nodeMat)
+      network.add(new THREE.Points(nodeGeo, nodeMat))
+
+      // Edges: connect nodes within a threshold distance
+      const edgePairs: Array<[ThreeNS.Vector3, ThreeNS.Vector3]> = []
+      const LINK_DIST = 11.5
+      for (let i = 0; i < NODES; i++) {
+        for (let j = i + 1; j < NODES; j++) {
+          if (nodePositions[i]!.distanceTo(nodePositions[j]!) < LINK_DIST) {
+            edgePairs.push([nodePositions[i]!, nodePositions[j]!])
+          }
+        }
+      }
+      const edgeGeo = new THREE.BufferGeometry()
+      const edgePosArr = new Float32Array(edgePairs.length * 6)
+      edgePairs.forEach(([a, b], i) => {
+        edgePosArr[i * 6] = a.x
+        edgePosArr[i * 6 + 1] = a.y
+        edgePosArr[i * 6 + 2] = a.z
+        edgePosArr[i * 6 + 3] = b.x
+        edgePosArr[i * 6 + 4] = b.y
+        edgePosArr[i * 6 + 5] = b.z
+      })
+      edgeGeo.setAttribute('position', new THREE.BufferAttribute(edgePosArr, 3))
+      const edgeMat = new THREE.LineBasicMaterial({
+        color: 0x00f5ff,
+        transparent: true,
+        opacity: 0.14,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      })
+      disposables.push(edgeGeo, edgeMat)
+      network.add(new THREE.LineSegments(edgeGeo, edgeMat))
 
       /* ---------- particle field ---------- */
       const PARTICLES = isMobile ? 320 : 750
@@ -248,6 +353,33 @@ export function WebGL3DBackground() {
       const particles = new THREE.Points(particleGeometry, particleMaterial)
       scene.add(particles)
 
+      /* ---------- 4. ORBITERS — cahaya yang mengorbit (jalur elips miring) ---------- */
+      const ORBITERS = isMobile ? 3 : 6
+      const orbiterGeo = new THREE.BufferGeometry()
+      const orbiterPosArr = new Float32Array(ORBITERS * 3)
+      orbiterGeo.setAttribute('position', new THREE.BufferAttribute(orbiterPosArr, 3))
+      const orbiterMat = new THREE.PointsMaterial({
+        size: 0.5,
+        color: 0xff00aa,
+        transparent: true,
+        opacity: 0.9,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true,
+      })
+      disposables.push(orbiterGeo, orbiterMat)
+      const orbiters = new THREE.Points(orbiterGeo, orbiterMat)
+      scene.add(orbiters)
+
+      const orbiterParams = Array.from({ length: ORBITERS }, (_, i) => ({
+        radius: 7 + (i % 3) * 2.6,
+        speed: 0.12 + (i % 4) * 0.05,
+        phase: (i / ORBITERS) * Math.PI * 2,
+        tiltX: (i % 2 === 0 ? 1 : -1) * (0.4 + (i % 3) * 0.25),
+        tiltZ: (i % 3 === 0 ? 1 : -1) * (0.3 + (i % 2) * 0.4),
+        centerY: rand(-3, 5),
+      }))
+
       /* ---------- in-place theme switching (no canvas rebuild) ---------- */
       const applyTheme = (isLight: boolean) => {
         const CYAN = readVar('--neon-cyan', isLight ? '#0080FF' : '#00F5FF')
@@ -257,6 +389,7 @@ export function WebGL3DBackground() {
 
         // Atmosphere: deep space fog ↔ bright airy fog
         fog.color.set(isLight ? 0xeef2ff : 0x0a0a0f)
+        fog.density = isLight ? 0.010 : 0.013
 
         // Lighting: airy & bright ↔ dramatic neon
         ambient.intensity = isLight ? 0.9 : 0.35
@@ -285,6 +418,34 @@ export function WebGL3DBackground() {
             m.needsUpdate = true
           }
         }
+
+        // Holo-core: cyan glass knot ↔ brighter pastel
+        if (holoCoreMat && holoCoreWire) {
+          const cyan = new THREE.Color(CYAN)
+          holoCoreMat.color.set(cyan)
+          holoCoreMat.emissive.set(cyan)
+          holoCoreMat.opacity = isLight ? 0.10 : 0.14
+          holoCoreMat.needsUpdate = true
+          holoCoreWire.color.set(MAGENTA)
+          holoCoreWire.opacity = isLight ? 0.06 : 0.07
+          holoCoreWire.needsUpdate = true
+        }
+
+        // Constellation network
+        nodeMat.color.set(isLight ? new THREE.Color(CYAN).multiplyScalar(0.9) : CYAN)
+        nodeMat.opacity = isLight ? 0.65 : 0.85
+        nodeMat.blending = isLight ? THREE.NormalBlending : THREE.AdditiveBlending
+        nodeMat.needsUpdate = true
+        edgeMat.color.set(isLight ? new THREE.Color(PURPLE).lerp(new THREE.Color(CYAN), 0.4) : CYAN)
+        edgeMat.opacity = isLight ? 0.16 : 0.14
+        edgeMat.blending = isLight ? THREE.NormalBlending : THREE.AdditiveBlending
+        edgeMat.needsUpdate = true
+
+        // Orbiters: magenta ↔ deeper pink on light
+        orbiterMat.color.set(isLight ? new THREE.Color(MAGENTA).multiplyScalar(0.9) : MAGENTA)
+        orbiterMat.blending = isLight ? THREE.NormalBlending : THREE.AdditiveBlending
+        orbiterMat.opacity = isLight ? 0.7 : 0.9
+        orbiterMat.needsUpdate = true
 
         // Particles: additive glow only works on dark — switch to normal
         // blending on light so the field stays visible
@@ -340,7 +501,7 @@ export function WebGL3DBackground() {
       window.addEventListener('scroll', onScroll, { passive: true })
       window.addEventListener('resize', onResize)
 
-      /* ---------- animation loop ---------- */
+      /* ---------- animation loop (camera journey + living network) ---------- */
       const clock = new THREE.Clock()
       let raf = 0
       let running = true
@@ -357,6 +518,37 @@ export function WebGL3DBackground() {
           item.mesh.position.y = item.baseY + Math.sin(t * item.floatSpeed + item.phase) * item.floatAmp
         }
 
+        // holo-core: auto rotate + mouse-follow (lerp for buttery motion)
+        if (holoCore) {
+          holoCore.rotation.y += 0.0022
+          holoCore.rotation.x += (smooth.y * 0.35 - holoCore.rotation.x) * 0.02
+          holoCore.rotation.z = Math.sin(t * 0.1) * 0.08
+        }
+
+        // constellation network: slow group rotation + soft opacity pulse
+        network.rotation.y = t * 0.008
+        network.rotation.x = Math.sin(t * 0.04) * 0.05
+        const pulse = 0.5 + 0.5 * Math.sin(t * 0.8)
+        edgeMat.opacity = (themeRef.current === 'light' ? 0.10 : 0.09) + pulse * 0.07
+
+        // orbiters: parametric elliptical paths (tilted)
+        for (let i = 0; i < ORBITERS; i++) {
+          const p = orbiterParams[i]!
+          const a = t * p.speed + p.phase
+          let x = Math.cos(a) * p.radius
+          let y = Math.sin(a) * p.radius * 0.42
+          let z = Math.sin(a) * p.radius * 0.3
+          // tilt around X then Z
+          const y1 = y * Math.cos(p.tiltX) - z * Math.sin(p.tiltX)
+          const z1 = y * Math.sin(p.tiltX) + z * Math.cos(p.tiltX)
+          const x2 = x * Math.cos(p.tiltZ) - z1 * Math.sin(p.tiltZ)
+          const z2 = x * Math.sin(p.tiltZ) + z1 * Math.cos(p.tiltZ)
+          orbiterPosArr[i * 3] = x2
+          orbiterPosArr[i * 3 + 1] = y1 + p.centerY
+          orbiterPosArr[i * 3 + 2] = z2 - 12
+        }
+        orbiterGeo.getAttribute('position').needsUpdate = true
+
         // particle drift
         particles.rotation.y = t * 0.012
         particles.rotation.x = Math.sin(t * 0.05) * 0.04
@@ -364,13 +556,19 @@ export function WebGL3DBackground() {
         // gentle whole-group sway for parallax depth
         group.rotation.y = Math.sin(t * 0.05) * 0.05
 
-        // camera parallax: mouse + scroll (lerp for buttery motion)
+        // CAMERA JOURNEY: scroll = berjalan menembus dunia 3D.
+        // journey 0 (hero) → 1 (footer): dolly maju + naik + roll halus.
+        const docH = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)
+        const journey = Math.min(targetScrollY / docH, 1)
+
         smooth.x += (mouse.x - smooth.x) * 0.045
         smooth.y += (mouse.y - smooth.y) * 0.045
-        const scrollDrift = Math.min(targetScrollY / window.innerHeight, 3) * 1.6
+
         camera.position.x = smooth.x * 2.4
-        camera.position.y = -smooth.y * 1.5 + scrollDrift
-        camera.lookAt(0, scrollDrift * 0.55, 0)
+        camera.position.y = -smooth.y * 1.5 + journey * 5.5
+        camera.position.z = 26 - journey * 7
+        camera.rotation.z = Math.sin(journey * Math.PI * 2) * 0.028
+        camera.lookAt(0, journey * 3.4, -4)
 
         renderer.render(scene, camera)
         raf = requestAnimationFrame(tick)
