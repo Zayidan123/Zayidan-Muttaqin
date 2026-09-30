@@ -1,14 +1,15 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import Image from 'next/image'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { useLanguageStore } from '@/store/language-store'
 import { Target, Users, MessageSquare, Monitor, Video, Palette, Sparkles, GraduationCap, TrendingUp, Award, ShieldCheck, Code2, Terminal, Coins } from 'lucide-react'
 import { TiltCard } from '@/components/ui/TiltCard'
 import { ScrambleText } from '@/components/ui/ScrambleText'
 import { SkillRadar } from '@/components/ui/SkillRadar'
+import { WordsReveal, Float } from '@/components/ui/MotionKit'
 
 
 const skillCards = [
@@ -80,12 +81,15 @@ export function About() {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.05 })
   const [skillsRef, skillsInView] = useInView({ triggerOnce: true, threshold: 0.05 })
   const parallaxRef = useRef<HTMLDivElement>(null)
+  const prefersReduced = useReducedMotion()
   const { scrollYProgress } = useScroll({ target: parallaxRef, offset: ["start end", "end start"] })
-  const y = useTransform(scrollYProgress, [0, 1], [-15, 15])
+  // Gentle opposite-drift between the two columns while scrolling (depth)
+  const leftColY = useTransform(scrollYProgress, [0, 1], [22, -22])
+  const rightColY = useTransform(scrollYProgress, [0, 1], [-18, 18])
 
   return (
     <section id="about" className="relative py-20 sm:py-28 px-4 sm:px-6 lg:px-8" ref={parallaxRef}>
-      <motion.div className="max-w-6xl mx-auto" style={{ y }} ref={ref}>
+      <div className="max-w-6xl mx-auto" ref={ref}>
         {/* Section Title */}
         <motion.div
           initial={{ opacity: 0, y: 20, rotateX: 18, transformPerspective: 900 }}
@@ -100,21 +104,23 @@ export function About() {
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-          {/* Avatar + Education */}
+          {/* Avatar + Education — parallax drifts up while scrolling past */}
           <motion.div
             initial={{ opacity: 0, x: -30, rotateY: 10, transformPerspective: 900 }}
             animate={inView ? { opacity: 1, x: 0, rotateY: 0, transformPerspective: 900 } : {}}
             transition={{ duration: 0.6, delay: 0.2 }}
             className="flex flex-col items-center lg:items-start gap-6"
+            style={prefersReduced ? undefined : { y: leftColY }}
           >
-            {/* Avatar with HUD Brackets */}
-            <div className="relative w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80 shrink-0">
-              <div className="absolute -top-2 -left-2 w-6 h-6 border-t-2 border-l-2 border-[var(--neon-cyan)] z-10" />
-              <div className="absolute -top-2 -right-2 w-6 h-6 border-t-2 border-r-2 border-[var(--neon-cyan)] z-10" />
-              <div className="absolute -bottom-2 -left-2 w-6 h-6 border-b-2 border-l-2 border-[var(--neon-magenta)] z-10" />
-              <div className="absolute -bottom-2 -right-2 w-6 h-6 border-b-2 border-r-2 border-[var(--neon-magenta)] z-10" />
+            {/* Avatar with HUD Brackets — floats gently while idle */}
+            <Float amplitude={8} duration={7} className="relative w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80 shrink-0">
+              {/* HUD corner brackets — subtle synchronized pulse */}
+              <div className="absolute -top-2 -left-2 w-6 h-6 border-t-2 border-l-2 border-[var(--neon-cyan)] z-10 soft-breathe" />
+              <div className="absolute -top-2 -right-2 w-6 h-6 border-t-2 border-r-2 border-[var(--neon-cyan)] z-10 soft-breathe" style={{ animationDelay: '0.4s' }} />
+              <div className="absolute -bottom-2 -left-2 w-6 h-6 border-b-2 border-l-2 border-[var(--neon-magenta)] z-10 soft-breathe" style={{ animationDelay: '0.8s' }} />
+              <div className="absolute -bottom-2 -right-2 w-6 h-6 border-b-2 border-r-2 border-[var(--neon-magenta)] z-10 soft-breathe" style={{ animationDelay: '1.2s' }} />
 
-              <div className="avatar-gradient-border w-full h-full rounded-2xl overflow-hidden p-[3px]">
+              <div className="avatar-gradient-border w-full h-full rounded-2xl overflow-hidden p-[3px] holo-scan">
                 <div className="avatar-inner w-full h-full rounded-2xl overflow-hidden bg-zinc-950/80 relative">
                   <Image
                     src="/zayidan-photo.png"
@@ -127,7 +133,7 @@ export function About() {
               </div>
 
               <div className="absolute inset-0 rounded-2xl border-2 border-[var(--neon-cyan)]/20 pointer-events-none animate-pulse z-10" />
-            </div>
+            </Float>
 
             {/* Education Card */}
             <motion.div
@@ -192,19 +198,26 @@ export function About() {
             </motion.div>
           </motion.div>
 
-          {/* Text Content */}
+          {/* Text Content — counter-parallax vs avatar column */}
           <motion.div
             initial={{ opacity: 0, x: 30, rotateY: -10, transformPerspective: 900 }}
             animate={inView ? { opacity: 1, x: 0, rotateY: 0, transformPerspective: 900 } : {}}
             transition={{ duration: 0.6, delay: 0.3 }}
             className="space-y-6"
+            style={prefersReduced ? undefined : { y: rightColY }}
           >
-            <p className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
-              {t('about.bio')}
-            </p>
-            <p className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
-              {t('about.bio2')}
-            </p>
+            {/* Bio — word-by-word cinematic reveal on scroll */}
+            <WordsReveal
+              text={t('about.bio')}
+              className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed"
+              stagger={0.02}
+            />
+            <WordsReveal
+              text={t('about.bio2')}
+              className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed"
+              delay={0.25}
+              stagger={0.02}
+            />
 
             {/* Skill Identity Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4">
@@ -219,7 +232,7 @@ export function About() {
                   >
                     <TiltCard className="transition-[box-shadow_0.3s]">
                     <div className={`p-4 rounded-xl glass glass-depth border ${borderMap[skill.color]} transition-[box-shadow_0.3s]`}>
-                      <Icon className={`h-6 w-6 ${iconColorMap[skill.color]} mb-2`} />
+                      <Icon className={`h-6 w-6 ${iconColorMap[skill.color]} mb-2 icon-glow-pulse`} />
                       <h3 className="font-display text-xs sm:text-sm font-semibold text-[var(--text-primary)] mb-1">
                         {t(skill.titleKey)}
                       </h3>
@@ -269,10 +282,15 @@ export function About() {
                               initial={{ width: 0 }}
                               animate={skillsInView ? { width: `${skill.proficiency}%` } : { width: 0 }}
                               transition={{ duration: 1, delay: 0.4 + idx * 0.1, ease: 'easeOut' }}
-                              className="h-full rounded-full relative"
-                              style={{
-                                background: 'linear-gradient(90deg, var(--neon-cyan), rgba(0,245,255,0.4))',
-                              }}
+                              className="h-full rounded-full relative skill-flow-fill"
+                            />
+                            {/* Moving energy spark riding the bar's tip */}
+                            <motion.div
+                              initial={{ left: '0%', opacity: 0 }}
+                              animate={skillsInView ? { left: `${skill.proficiency}%`, opacity: 1 } : {}}
+                              transition={{ duration: 1, delay: 0.4 + idx * 0.1, ease: 'easeOut' }}
+                              className="absolute top-1/2 -translate-y-1/2 w-2 h-2 -ml-1 rounded-full bg-white shadow-[0_0_8px_var(--neon-cyan)]"
+                              style={{ boxShadow: '0 0 10px var(--neon-cyan), 0 0 4px #fff' }}
                             />
                           </div>
                           <span className="text-[10px] font-mono-custom text-[var(--neon-cyan)]/60 tabular-nums w-8 text-right">{skill.proficiency}%</span>
@@ -302,7 +320,8 @@ export function About() {
                     initial={{ opacity: 0, scale: 0.8, rotateX: 16, transformPerspective: 900 }}
                     animate={skillsInView ? { opacity: 1, scale: 1, rotateX: 0, transformPerspective: 900 } : {}}
                     transition={{ duration: 0.3, delay: 0.3 + idx * 0.06 }}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs sm:text-sm text-[var(--text-primary)] border border-[var(--glass-border)] bg-[var(--glass-bg)]/50 hover:border-[var(--neon-magenta)]/30 hover:text-[var(--neon-magenta)] transition-all duration-300 cursor-default soft-skill-tag"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs sm:text-sm text-[var(--text-primary)] border border-[var(--glass-border)] bg-[var(--glass-bg)]/50 hover:border-[var(--neon-magenta)]/30 hover:text-[var(--neon-magenta)] transition-all duration-300 cursor-default soft-skill-tag ambient-float-sm"
+                    style={{ animationDelay: `${idx * 0.45}s` }}
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-[var(--neon-magenta)]/60" />
                     {t(key)}
@@ -312,14 +331,17 @@ export function About() {
             </motion.div>
           </div>
 
-          {/* Skills Radar Chart */}
+          {/* Skills Radar Chart — slow rotating sweep ring + breathing frame */}
           <motion.div
             initial={{ opacity: 0, y: 20, rotateX: 18, transformPerspective: 900 }}
             animate={skillsInView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
             transition={{ duration: 0.6, delay: 0.4 }}
             className="mt-10 flex justify-center"
           >
-            <div className="p-6 rounded-xl glass glass-depth lift-3d holo-sheen border border-[var(--glass-border)]">
+            <div className="relative p-6 rounded-xl glass glass-depth lift-3d holo-sheen border border-[var(--glass-border)]">
+              {/* Rotating radar sweep halo behind the chart */}
+              <div className="absolute inset-4 rounded-full border border-dashed border-[var(--neon-cyan)]/10 spin-slowest pointer-events-none" aria-hidden="true" />
+              <div className="absolute inset-8 rounded-full border border-[var(--neon-magenta)]/5 glow-breathe pointer-events-none" aria-hidden="true" />
               <SkillRadar
                 skills={hardSkills.map(s => ({
                   name: t(s.key).split('(')[0].trim().substring(0, 12),
@@ -330,7 +352,7 @@ export function About() {
             </div>
           </motion.div>
         </div>
-      </motion.div>
+      </div>
     </section>
   )
 }

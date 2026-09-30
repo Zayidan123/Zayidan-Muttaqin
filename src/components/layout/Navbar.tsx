@@ -36,14 +36,21 @@ export function Navbar() {
 
   return (
     <>
-      <header className={cn('fixed top-0 left-0 right-0 z-50 transition-all duration-300', scrolled ? 'glass-strong shadow-lg' : 'bg-transparent')}>
+      <motion.header
+        initial={{ y: -70, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        className={cn('fixed top-0 left-0 right-0 z-50 transition-all duration-300', scrolled ? 'glass-strong shadow-lg' : 'bg-transparent')}
+      >
         {scrolled && <div className="absolute bottom-0 left-0 right-0 h-[1.5px] nav-holo-line" />}
-        <nav className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-2 px-3 sm:px-6 lg:px-8">
-          <a href="#hero" onClick={(e) => { e.preventDefault(); handleClick('#hero') }} className="nav-logo-3d shrink-0 font-display text-base font-bold tracking-wider text-[var(--neon-cyan)] text-glow-cyan transition-opacity hover:opacity-80 sm:text-lg"><span>ZAYIDAN</span></a>
+        <nav className={cn('mx-auto flex w-full max-w-7xl items-center justify-between gap-2 px-3 sm:px-6 lg:px-8 transition-all duration-300', scrolled ? 'h-14' : 'h-16')}>
+          <a href="#hero" onClick={(e) => { e.preventDefault(); handleClick('#hero') }} className="nav-logo-3d shrink-0 font-display text-base font-bold tracking-wider text-[var(--neon-cyan)] text-glow-cyan transition-opacity hover:opacity-80 sm:text-lg"><span className="soft-breathe">ZAYIDAN</span></a>
           <div className="nav-3d-links hidden items-center gap-8 md:flex">
             {navItems.map(item => (
-              <a key={item.key} href={item.href} onClick={(e) => { e.preventDefault(); handleClick(item.href) }} className={cn('nav-3d-link relative text-sm font-medium tracking-wide transition-colors duration-300 py-1', activeSection === item.key ? 'text-[var(--neon-cyan)]' : 'text-[var(--text-secondary)] hover:text-[var(--neon-cyan)]')}>
+              <a key={item.key} href={item.href} onClick={(e) => { e.preventDefault(); handleClick(item.href) }} className={cn('nav-3d-link relative text-sm font-medium tracking-wide transition-colors duration-300 py-1 group', activeSection === item.key ? 'text-[var(--neon-cyan)]' : 'text-[var(--text-secondary)] hover:text-[var(--neon-cyan)]')}>
                 {t(`nav.${item.key}`)}
+                {/* Hover underline — slides in from the left */}
+                <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 bg-[var(--neon-cyan)]/40 rounded-full transition-all duration-300 group-hover:w-full" aria-hidden="true" />
                 {activeSection === item.key && <motion.div layoutId="activeNav" className="absolute -bottom-0.5 left-0 right-0 h-0.5 bg-[var(--neon-cyan)] shadow-[var(--glow-cyan)] rounded-full" transition={{ type: 'spring', stiffness: 300, damping: 30 }} />}
               </a>
             ))}
@@ -55,11 +62,19 @@ export function Navbar() {
               <Search className="h-3.5 w-3.5" /><span className="hidden xl:inline">...</span><kbd className="hidden xl:inline-flex px-1.5 py-0.5 rounded text-[9px] font-mono-custom bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-secondary)]/60">Ctrl K</kbd>
             </button>
             <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden w-10 h-10 rounded-lg glass border border-[var(--glass-border)] flex items-center justify-center text-[var(--text-primary)] transition-all hover:text-[var(--neon-cyan)]" aria-label={t('shortcuts.sections')} aria-expanded={mobileOpen}>
-              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              <motion.span
+                key={mobileOpen ? 'close' : 'menu'}
+                initial={{ rotate: -90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                transition={{ duration: 0.25 }}
+                className="flex"
+              >
+                {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </motion.span>
             </button>
           </div>
         </nav>
-      </header>
+      </motion.header>
       <AnimatePresence>{mobileOpen && (<>
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/60 z-[55] md:hidden" onClick={() => setMobileOpen(false)} />
         <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }} className="fixed top-0 right-0 bottom-0 z-[60] flex w-[min(85vw,18rem)] flex-col md:hidden" style={{ borderLeft: '2px solid transparent' }}>

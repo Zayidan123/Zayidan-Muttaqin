@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback, useEffect } from 'react'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { useLanguageStore } from '@/store/language-store'
 import { Briefcase, Cpu, Users, HeartHandshake } from 'lucide-react'
@@ -70,8 +70,17 @@ export function Stats() {
   const { t } = useLanguageStore()
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.2 })
   const parallaxRef = useRef<HTMLDivElement>(null)
+  const prefersReduced = useReducedMotion()
   const { scrollYProgress } = useScroll({ target: parallaxRef, offset: ["start end", "end start"] })
-  const y = useTransform(scrollYProgress, [0, 1], [-15, 15])
+  // Cards rise gently against the scroll direction (weightless feel)
+  const y = useTransform(scrollYProgress, [0, 1], [-20, 20])
+
+  // Per-card depth: each card drifts at its own scroll rate (depth field)
+  const cardY0 = useTransform(scrollYProgress, [0, 1], [14, -14])
+  const cardY1 = useTransform(scrollYProgress, [0, 1], [-10, 10])
+  const cardY2 = useTransform(scrollYProgress, [0, 1], [10, -10])
+  const cardY3 = useTransform(scrollYProgress, [0, 1], [-14, 14])
+  const cardYs = [cardY0, cardY1, cardY2, cardY3]
 
   return (
     <section id="stats" className="relative py-16 sm:py-20 px-4 sm:px-6 lg:px-8" ref={parallaxRef}>
@@ -97,15 +106,16 @@ export function Stats() {
                 initial={{ opacity: 0, y: 30, rotateX: 22, transformPerspective: 900 }}
                 animate={inView ? { opacity: 1, y: 0, rotateX: 0, transformPerspective: 900 } : {}}
                 transition={{ duration: 0.6, delay: idx * 0.15 }}
+                style={prefersReduced ? undefined : { y: cardYs[idx] }}
               >
                 <TiltCard className="transition-[box-shadow_0.3s] rounded-xl holo-edge" maxTilt={6} glare>
-                <div className={`tilt-glare-host relative p-5 sm:p-6 pt-10 rounded-xl glass glass-depth border ${colors.border} glass-hover-glow glass-noise transition-[box-shadow_0.3s]`}>
+                <div className={`tilt-glare-host relative p-5 sm:p-6 pt-10 rounded-xl glass glass-depth border ${colors.border} glass-hover-glow glass-noise sheen-loop transition-[box-shadow_0.3s]`}>
                   {/* 3D Emitter — ikon melayang di ring orbit miring di atas kartu */}
                   <div className="stat-emitter">
                     <span className="stat-emitter-ring" aria-hidden="true" />
                     <span className="stat-emitter-ring stat-emitter-ring-2" aria-hidden="true" />
                     <span className="stat-emitter-core">
-                      <Icon className={`h-5 w-5 ${colors.icon}`} />
+                      <Icon className={`h-5 w-5 ${colors.icon} icon-glow-pulse`} />
                     </span>
                   </div>
                   <div className="stat-scanline" aria-hidden="true" />
@@ -121,8 +131,8 @@ export function Stats() {
                       {t(item.labelKey)}
                     </span>
                   </div>
-                  {/* Neon accent dot */}
-                  <div className={`absolute -top-1 -right-1 w-2 h-2 rounded-full ${colors.accent} ${colors.glow} opacity-60`} />
+                  {/* Neon accent dot — breathes while idle */}
+                  <div className={`absolute -top-1 -right-1 w-2 h-2 rounded-full ${colors.accent} ${colors.glow} opacity-60 soft-breathe`} style={{ animationDelay: `${idx * 0.6}s` }} />
                 </div>
                 </TiltCard>
               </motion.div>

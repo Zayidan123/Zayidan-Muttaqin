@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import Image from 'next/image'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform, useSpring, useReducedMotion } from 'framer-motion'
 import { Download, MapPin, Eye, Briefcase, Sparkles, TrendingUp, Coins, LineChart, Code2, MessageSquare, Zap, Palette } from 'lucide-react'
 import { NeonButton } from '@/components/ui/NeonButton'
 import { useLanguageStore } from '@/store/language-store'
@@ -29,10 +29,31 @@ export function Hero() {
   const [glitchDone, setGlitchDone] = useState(false)
   const [displayedTagline, setDisplayedTagline] = useState('')
   const [typingDone, setTypingDone] = useState(false)
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const parallaxRef = useRef<HTMLDivElement>(null)
-  const { scrollYProgress } = useScroll({ target: parallaxRef, offset: ["start end", "end start"] })
-  const y = useTransform(scrollYProgress, [0, 1], [-15, 15])
+  const prefersReduced = useReducedMotion()
+  const { scrollYProgress } = useScroll({ target: parallaxRef, offset: ["start start", "end start"] })
+
+  // ---- SCROLL-OUT CHOREOGRAPHY: as the visitor scrolls away from the hero,
+  // the whole scene sinks + fades + slightly scales down, while the photo
+  // card drifts at a different rate (depth). Shapes get their own rates too.
+  const contentY = useTransform(scrollYProgress, [0, 1], [0, 140])
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.75], [1, 0])
+  const contentScale = useTransform(scrollYProgress, [0, 1], [1, 0.94])
+  const photoY = useTransform(scrollYProgress, [0, 1], [0, 90])
+  const shapesY = useTransform(scrollYProgress, [0, 1], [0, -70])
+  const shapesOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.15])
+  const gridOpacity = useTransform(scrollYProgress, [0, 0.9], [1, 0.2])
+
+  // Springy mouse parallax — butter-smooth cursor tracking (idle + move)
+  const mouseX = useSpring(0, { stiffness: 60, damping: 18, mass: 0.6 })
+  const mouseY = useSpring(0, { stiffness: 60, damping: 18, mass: 0.6 })
+
+  // Layered mouse-parallax depths (photo card reacts more than text)
+  const textParallaxX = useTransform(mouseX, [-1, 1], [6, -6])
+  const textParallaxY = useTransform(mouseY, [-1, 1], [4, -4])
+  const photoParallaxX = useTransform(mouseX, [-1, 1], [-14, 14])
+  const auraParallaxX = useTransform(mouseX, [-1, 1], [10, -10])
+  const auraParallaxY = useTransform(mouseY, [-1, 1], [8, -8])
 
   // 3D tilt for the photo card
   const tilt = useTilt(10)
@@ -54,13 +75,12 @@ export function Hero() {
 
   useEffect(() => {
     const handleMouse = (e: MouseEvent) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 2
-      const y = (e.clientY / window.innerHeight - 0.5) * 2
-      setMousePos({ x, y })
+      mouseX.set((e.clientX / window.innerWidth - 0.5) * 2)
+      mouseY.set((e.clientY / window.innerHeight - 0.5) * 2)
     }
     window.addEventListener('mousemove', handleMouse)
     return () => window.removeEventListener('mousemove', handleMouse)
-  }, [])
+  }, [mouseX, mouseY])
 
   // Glitch timer
   useEffect(() => {
@@ -150,14 +170,29 @@ export function Hero() {
           3D ambience for BOTH themes — no per-theme decorations needed here. */}
 
       {/* Web3 perspective grid floor — holographic depth cue (both themes) */}
-      <div className="web3-grid-floor" aria-hidden="true" />
+      <motion.div className="web3-grid-floor" aria-hidden="true" style={prefersReduced ? undefined : { opacity: gridOpacity }} />
 
-      {/* Floating Web3 3D shapes — rotating holographic geometry */}
-      <div aria-hidden="true">
+      {/* Floating Web3 3D shapes — rotating holographic geometry.
+          Each shape gets its own scroll-parallax rate (depth field). */}
+      <motion.div aria-hidden="true" style={prefersReduced ? undefined : { y: shapesY, opacity: shapesOpacity }}>
         <span className="web3-shape-wrap web3-shape-1"><span className="web3-shape web3-diamond" /></span>
         <span className="web3-shape-wrap web3-shape-2"><span className="web3-shape web3-ring-shape" /></span>
         <span className="web3-shape-wrap web3-shape-3"><span className="web3-shape web3-plus" /></span>
         <span className="web3-shape-wrap web3-shape-4"><span className="web3-shape web3-diamond" /></span>
+      </motion.div>
+
+      {/* Ambient twinkling particles — idle life in the hero sky */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+        {[
+          { top: '18%', left: '12%', delay: '0s', color: 'var(--neon-cyan)' },
+          { top: '30%', left: '85%', delay: '1.2s', color: 'var(--neon-magenta)' },
+          { top: '62%', left: '8%',  delay: '2.1s', color: 'var(--neon-cyan)' },
+          { top: '75%', left: '78%', delay: '0.7s', color: 'var(--neon-purple)' },
+          { top: '12%', left: '55%', delay: '3s',  color: 'var(--neon-cyan)' },
+          { top: '48%', left: '93%', delay: '2.6s', color: 'var(--neon-magenta)' },
+        ].map((p, i) => (
+          <span key={i} className="twinkle-dot" style={{ top: p.top, left: p.left, animationDelay: p.delay, background: p.color }} />
+        ))}
       </div>
 
       {/* Content */}
@@ -170,12 +205,15 @@ export function Hero() {
         Tersedia untuk peluang kerja freelance, remote, maupun full-time di Banyuwangi dan sekitarnya.
       </p>
       <motion.div 
-        className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 transition-transform duration-300 ease-out" 
-        style={{ transform: `translate(${mousePos.x * -8}px, ${mousePos.y * -8}px)`, y }}
+        className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12" 
+        style={prefersReduced ? undefined : { y: contentY, opacity: contentOpacity, scale: contentScale, x: textParallaxX, rotateX: 0 }}
       >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-          {/* Left Column: Text content */}
-          <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
+          {/* Left Column: Text content — subtle counter-parallax vs photo */}
+          <motion.div 
+            className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left"
+            style={prefersReduced ? undefined : { y: textParallaxY }}
+          >
             {/* Greeting — 3D entrance */}
             <motion.p
               initial={{ opacity: 0, y: 20, rotateX: 35, transformPerspective: 800 }}
@@ -248,28 +286,36 @@ export function Hero() {
                 {t('hero.downloadCV')}
               </NeonButton>
             </motion.div>
-          </div>
+          </motion.div>
 
-          {/* Right Column: Modern 3D Photo Card */}
+          {/* Right Column: Modern 3D Photo Card — floats gently while idle,
+              drifts on scroll (depth layer) and follows the cursor on springs */}
           <motion.div
             initial={{ opacity: 0, scale: 0.86, rotateY: -18, transformPerspective: 1100 }}
             animate={{ opacity: 1, scale: 1, rotateY: 0, transformPerspective: 1100 }}
             transition={{ duration: 0.9, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="order-first lg:order-none lg:col-span-5 mb-8 lg:mb-0 flex justify-center items-center w-full"
           >
-            <div className="hero-3d-stage relative w-60 h-60 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-[320px] lg:h-[320px] xl:w-[360px] xl:h-[360px] shrink-0">
-              {/* Ambient aura glow behind the card */}
-              <div className="hero-3d-aura" aria-hidden="true" />
+            <motion.div
+              className="hero-3d-stage relative w-60 h-60 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-[320px] lg:h-[320px] xl:w-[360px] xl:h-[360px] shrink-0"
+              style={prefersReduced ? undefined : { y: photoY, x: photoParallaxX }}
+            >
+              {/* Ambient aura glow behind the card — breathes + counter-parallax */}
+              <motion.div
+                className="hero-3d-aura"
+                aria-hidden="true"
+                style={prefersReduced ? undefined : { x: auraParallaxX, y: auraParallaxY }}
+              />
 
-              {/* The tilt card itself */}
+              {/* The tilt card itself — gentle idle bob layered under cursor tilt */}
               <div
                 ref={tilt.ref}
                 onMouseMove={tilt.handleMouseMove}
                 onMouseLeave={tilt.handleMouseLeave}
-                className="hero-3d-card relative w-full h-full rounded-3xl"
+                className="hero-3d-card relative w-full h-full rounded-3xl ambient-float"
               >
                 {/* Gradient Border and Photo */}
-                <div className="avatar-gradient-border w-full h-full rounded-3xl overflow-hidden p-[3px] glass-depth">
+                <div className="avatar-gradient-border w-full h-full rounded-3xl overflow-hidden p-[3px] glass-depth holo-scan">
                   <div className="avatar-inner w-full h-full rounded-3xl overflow-hidden bg-zinc-950/80 relative">
                     <Image
                       src="/zayidan-photo.png"
@@ -313,8 +359,10 @@ export function Hero() {
                 </div>
               </div>
 
-              {/* FULL 3D ORBIT SATELLITES — gyroscope ganda mengelilingi foto.
-                  Chip counter-rotate agar ikon selalu menghadap pembaca. */}
+              {/* Breathing halo ring (outside the tilt card) + FULL 3D ORBIT
+                  SATELLITES — gyroscope ganda mengelilingi foto; chip counter-rotate
+                  agar ikon selalu menghadap pembaca. */}
+              <div className="absolute -inset-14 rounded-full border border-[var(--neon-purple)]/4 pointer-events-none glow-breathe" aria-hidden="true" />
               <div className="hero-orbit-stage" aria-hidden="true">
                 <div className="hero-orbit-wrap hero-orbit-wrap-a">
                   <div className="hero-orbit-spin hero-orbit-spin-a">
@@ -361,7 +409,7 @@ export function Hero() {
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         </div>
       </motion.div>
@@ -376,7 +424,7 @@ export function Hero() {
         aria-label={t('hero.scrollDown')}
       >
         <motion.span
-          animate={{ opacity: [0.3, 1, 0.3] }}
+          animate={{ y: [0, 5, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
           className="text-[10px] font-mono-custom text-[var(--neon-cyan)] tracking-[0.3em] uppercase"
         >

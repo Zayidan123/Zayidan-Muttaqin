@@ -58,35 +58,42 @@ export function Footer() {
             </p>
           </div>
 
-          {/* Center: Social Links */}
+          {/* Center: Social Links — each icon floats with its own phase */}
           <div className="flex items-center gap-2.5">
-            {socialLinks.map((social) => (
-              <a
+            {socialLinks.map((social, i) => (
+              <motion.a
                 key={social.label}
                 href={social.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`group w-9 h-9 sm:w-10 sm:h-10 rounded-lg glass flex items-center justify-center text-[var(--text-secondary)] hover:text-[${social.hoverColor}] hover:border-[${social.hoverBorder}]/30 hover:shadow-[${social.hoverGlow}] transition-all duration-300 hover:scale-110`}
+                initial={{ opacity: 0, y: 14 }}
+                animate={inView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.4, delay: 0.2 + i * 0.08 }}
+                whileHover={{ y: -4, scale: 1.12 }}
+                whileTap={{ scale: 0.94 }}
+                className={`group w-9 h-9 sm:w-10 sm:h-10 rounded-lg glass flex items-center justify-center text-[var(--text-secondary)] transition-all duration-300`}
                 style={{ '--hover-color': social.hoverColor } as React.CSSProperties}
                 onMouseEnter={(e) => { const el = e.currentTarget as HTMLElement; el.style.color = social.hoverColor; el.style.borderColor = social.hoverColor + '4D'; el.style.boxShadow = `0 0 15px ${social.hoverColor}33` }}
                 onMouseLeave={(e) => { const el = e.currentTarget as HTMLElement; el.style.color = ''; el.style.borderColor = ''; el.style.removeProperty('box-shadow') }}
                 aria-label={social.label}
               >
-                <social.icon className="h-4 w-4" />
-              </a>
+                <span className="ambient-float-sm" style={{ animationDelay: `${i * 0.4}s`, display: 'flex' }}>
+                  <social.icon className="h-4 w-4" />
+                </span>
+              </motion.a>
             ))}
           </div>
 
-          {/* Right: Back to top */}
+          {/* Right: Back to top — arrow hops on hover */}
           <motion.button
             onClick={scrollToTop}
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg glass border border-[var(--glass-border)] text-xs font-mono-custom text-[var(--text-secondary)] hover:text-[var(--neon-cyan)] hover:border-[var(--neon-cyan)]/30 hover:shadow-[var(--glow-cyan)] transition-all duration-300"
+            className="group flex items-center gap-2 px-4 py-2 rounded-lg glass border border-[var(--glass-border)] text-xs font-mono-custom text-[var(--text-secondary)] hover:text-[var(--neon-cyan)] hover:border-[var(--neon-cyan)]/30 hover:shadow-[var(--glow-cyan)] transition-all duration-300"
             aria-label={t('footer.backToTop')}
           >
             <span>{t('footer.backToTop')}</span>
-            <ArrowUp className="h-3.5 w-3.5" />
+            <ArrowUp className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-y-0 group-hover:animate-bounce" />
           </motion.button>
         </motion.div>
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, type FormEvent } from 'react'
 import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { useLanguageStore } from '@/store/language-store'
 import { useToastStore } from '@/store/toast-store'
@@ -47,6 +47,7 @@ export function Contact() {
   const { addToast } = useToastStore()
   const { setOpen: setCvOpen } = useCvStore()
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 })
+  const prefersReduced = useReducedMotion()
   const [formStatus, setFormStatus] = useState<FormStatus>('idle')
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' })
   const [copiedField, setCopiedField] = useState<string | null>(null)
@@ -141,20 +142,27 @@ export function Contact() {
         </motion.div>
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 lg:gap-12">
           <motion.div initial={{ opacity: 0, x: -30, rotateY: 10, transformPerspective: 900 }} animate={inView ? { opacity: 1, x: 0, rotateY: 0, transformPerspective: 900 } : {}} transition={{ duration: 0.6, delay: 0.2 }} className="lg:col-span-2 space-y-4 relative">
-            {contactInfo.map((item) => {
+            {contactInfo.map((item, itemIdx) => {
               const Icon = item.key === 'email' && copiedField === 'email' ? Check : item.key === 'phone' && copiedField === 'phone' ? Check : item.icon
               return (
-                <a key={item.key} href={item.isShare || item.key === 'cv' ? undefined : item.href} download={item.key === 'cv' ? undefined : ('download' in item && item.download ? true : undefined)} target={item.href?.startsWith('http') ? '_blank' : undefined} rel={item.href?.startsWith('http') ? 'noopener noreferrer' : undefined}
+                <motion.a
+                  key={item.key}
+                  initial={prefersReduced ? undefined : { opacity: 0, x: -24 }}
+                  whileInView={prefersReduced ? undefined : { opacity: 1, x: 0 }}
+                  viewport={{ once: true, amount: 0.6 }}
+                  transition={{ duration: 0.45, delay: 0.25 + itemIdx * 0.07, ease: [0.22, 1, 0.36, 1] }}
+                  whileHover={prefersReduced ? undefined : { x: 5 }}
+                  href={item.isShare || item.key === 'cv' ? undefined : item.href} download={item.key === 'cv' ? undefined : ('download' in item && item.download ? true : undefined)} target={item.href?.startsWith('http') ? '_blank' : undefined} rel={item.href?.startsWith('http') ? 'noopener noreferrer' : undefined}
                   onClick={(e) => { if (item.copyable) { e.preventDefault(); handleCopy(item.copyValue!, item.key) } else if (item.isShare) { e.preventDefault(); handleShare() } else if (item.key === 'cv') { e.preventDefault(); setCvOpen(true) } }}
-                  className={`flex items-start gap-4 p-4 rounded-xl glass glass-depth border border-[var(--glass-border)] glass-card-advanced holo-sheen transition-all duration-300 group${item.isShare ? ' share-profile-btn cursor-pointer' : ''}`}
+                  className={`flex items-start gap-4 p-4 rounded-xl glass glass-depth border border-[var(--glass-border)] glass-card-advanced holo-sheen sheen-loop transition-all duration-300 group${item.isShare ? ' share-profile-btn cursor-pointer' : ''}`}
                   style={{ '--hover-glow': item.color } as React.CSSProperties}
                   onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = `0 0 20px ${item.color}33` }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.removeProperty('box-shadow') }}>
-                  <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border" style={{ color: item.color, borderColor: `${item.color}33`, backgroundColor: `${item.color}0D` }}><Icon className="h-5 w-5" /></div>
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border ambient-float-sm" style={{ color: item.color, borderColor: `${item.color}33`, backgroundColor: `${item.color}0D`, animationDelay: `${itemIdx * 0.5}s` }}><Icon className="h-5 w-5 icon-glow-pulse" style={{ color: item.color }} /></div>
                   <div><p className="text-xs text-[var(--text-secondary)] mb-0.5">{item.label}</p><p className="text-sm font-mono-custom font-medium" style={{ color: item.color }}>{item.value || t('contact.share')}</p></div>
                   {item.isShare && <ExternalLink className="h-4 w-4 text-[var(--text-secondary)]/40 ml-auto mt-1 shrink-0" />}
                   {item.copyable && copiedField !== item.key && <Copy className="h-4 w-4 text-[var(--text-secondary)]/40 ml-auto mt-1 shrink-0" />}
-                </a>
+                </motion.a>
               )
             })}
 
@@ -164,23 +172,27 @@ export function Contact() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.5 }}
-                className="flex items-center gap-4 p-4 rounded-xl glass glass-depth border border-[var(--glass-border)] glass-card-advanced transition-all duration-300 group"
+                className="flex items-center gap-4 p-4 rounded-xl glass glass-depth border border-[var(--glass-border)] glass-card-advanced sheen-loop transition-all duration-300 group"
                 style={{ '--hover-glow': 'var(--neon-cyan)' } as React.CSSProperties}
                 onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '0 0 20px var(--neon-cyan)33' }}
                 onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.removeProperty('box-shadow') }}
               >
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border" style={{ color: 'var(--neon-cyan)', borderColor: 'rgba(0,245,255,0.2)', backgroundColor: 'rgba(0,245,255,0.05)' }}>
-                  <QrCode className="h-5 w-5" />
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border ambient-float-sm" style={{ color: 'var(--neon-cyan)', borderColor: 'rgba(0,245,255,0.2)', backgroundColor: 'rgba(0,245,255,0.05)' }}>
+                  <QrCode className="h-5 w-5 icon-glow-pulse" />
                 </div>
                 <div className="flex-1 flex flex-col items-center">
-                  <Image
-                    src={qrDataUrl}
-                    alt="vCard QR Code"
-                    width={120}
-                    height={120}
-                    unoptimized
-                    className="rounded-lg mb-2"
-                  />
+                  <div className="relative rounded-lg mb-2">
+                    {/* Breathing halo behind the QR code */}
+                    <div className="absolute -inset-2 rounded-xl border border-[var(--neon-cyan)]/20 glow-breathe pointer-events-none" aria-hidden="true" />
+                    <Image
+                      src={qrDataUrl}
+                      alt="vCard QR Code"
+                      width={120}
+                      height={120}
+                      unoptimized
+                      className="rounded-lg"
+                    />
+                  </div>
                   <p className="text-[10px] font-mono-custom text-[var(--text-secondary)] tracking-wider">{t('contact.scanToSave')}</p>
                 </div>
               </motion.div>
@@ -201,7 +213,7 @@ export function Contact() {
             )}
           </motion.div>
           <motion.div initial={{ opacity: 0, x: 30, rotateY: -10, transformPerspective: 900 }} animate={inView ? { opacity: 1, x: 0, rotateY: 0, transformPerspective: 900 } : {}} transition={{ duration: 0.6, delay: 0.3 }} className="lg:col-span-3 space-y-6">
-            <TiltCard maxTilt={4} className="rounded-xl holo-ring holo-ring-always"><div className="relative p-6 sm:p-8 rounded-xl glass glass-depth border border-[var(--glass-border)] glass-noise">
+            <TiltCard maxTilt={4} className="rounded-xl holo-ring holo-ring-always"><div className="relative p-6 sm:p-8 rounded-xl glass glass-depth border border-[var(--glass-border)] glass-noise holo-scan">
               <div className="absolute -top-px -left-px w-5 h-5 border-t-2 border-l-2 border-[var(--neon-cyan)]" /><div className="absolute -top-px -right-px w-5 h-5 border-t-2 border-r-2 border-[var(--neon-magenta)]" /><div className="absolute -bottom-px -left-px w-5 h-5 border-b-2 border-l-2 border-[var(--neon-magenta)]" /><div className="absolute -bottom-px -right-px w-5 h-5 border-b-2 border-r-2 border-[var(--neon-cyan)]" />
               {formStatus === 'success' ? (
                 <div className="flex flex-col items-center justify-center py-12 gap-4">
@@ -221,9 +233,9 @@ export function Contact() {
                     <textarea required rows={5} maxLength={500} value={formData.message} onChange={e => setFormData(p => ({ ...p, message: e.target.value }))} className="w-full px-4 py-2.5 rounded-lg bg-transparent border border-[var(--glass-border)] text-sm text-[var(--text-primary)] placeholder-[var(--text-secondary)]/40 transition-all focus:outline-none focus:border-[var(--neon-cyan)] focus:shadow-[var(--glow-cyan)] resize-none" placeholder={t('contact.messagePlaceholder')} />
                   </div>
                   {formStatus === 'error' && <div className="flex items-center gap-2 text-xs text-red-400"><AlertCircle className="h-4 w-4" /><span>{t('contact.error')}</span></div>}
-                  <button type="submit" disabled={formStatus === 'loading'} className="w-full sm:w-auto ripple-effect btn-web3 inline-flex items-center justify-center gap-2 px-8 py-3 rounded-lg font-display text-sm tracking-wider uppercase border border-[var(--neon-cyan)] text-[var(--neon-cyan)] transition-all hover:shadow-[var(--glow-cyan)] hover:bg-[var(--neon-cyan)] hover:text-[var(--dark-base)] disabled:opacity-50 disabled:cursor-not-allowed">
-                    {formStatus === 'loading' ? <><Loader2 className="h-4 w-4 animate-spin" />{t('contact.sending')}</> : <><Send className="h-4 w-4" />{t('contact.send')}</>}
-                  </button>
+                  <motion.button type="submit" disabled={formStatus === 'loading'} whileHover={prefersReduced ? undefined : { scale: 1.03 }} whileTap={prefersReduced ? undefined : { scale: 0.97 }} className="w-full sm:w-auto ripple-effect btn-web3 inline-flex items-center justify-center gap-2 px-8 py-3 rounded-lg font-display text-sm tracking-wider uppercase border border-[var(--neon-cyan)] text-[var(--neon-cyan)] transition-all hover:shadow-[var(--glow-cyan)] hover:bg-[var(--neon-cyan)] hover:text-[var(--dark-base)] disabled:opacity-50 disabled:cursor-not-allowed">
+                    {formStatus === 'loading' ? <><Loader2 className="h-4 w-4 animate-spin" />{t('contact.sending')}</> : <><Send className="h-4 w-4 icon-bob" />{t('contact.send')}</>}
+                  </motion.button>
                 </form>
               )}
             </div></TiltCard>

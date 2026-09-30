@@ -1,10 +1,21 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { motion, useMotionValue, useSpring, useReducedMotion } from 'framer-motion'
 
+/**
+ * CursorGlow — ambient cursor aura.
+ * A large soft halo follows the pointer on springs (buttery lag), plus a
+ * small bright core that tracks instantly. Disabled on touch devices.
+ */
 export function CursorGlow() {
-  const [position, setPosition] = useState({ x: 0, y: 0 })
   const [visible, setVisible] = useState(false)
+  const prefersReduced = useReducedMotion()
+
+  const x = useMotionValue(-300)
+  const y = useMotionValue(-300)
+  const haloX = useSpring(x, { stiffness: 120, damping: 22, mass: 0.7 })
+  const haloY = useSpring(y, { stiffness: 120, damping: 22, mass: 0.7 })
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -13,26 +24,43 @@ export function CursorGlow() {
     if (isTouch) return
 
     const handleMouseMove = (e: MouseEvent) => {
-      setPosition({ x: e.clientX, y: e.clientY })
+      x.set(e.clientX)
+      y.set(e.clientY)
       if (!visible) setVisible(true)
     }
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true })
     return () => window.removeEventListener('mousemove', handleMouseMove)
-  }, [visible])
+  }, [visible, x, y])
 
-  if (!visible) return null
+  if (!visible || prefersReduced) return null
 
   return (
-    <div
-      className="fixed pointer-events-none z-[9999] w-[300px] h-[300px] rounded-full"
-      style={{
-        left: position.x - 150,
-        top: position.y - 150,
-        background: 'radial-gradient(circle, var(--neon-cyan) 0%, transparent 70%)',
-        opacity: 0.07,
-        transition: 'left 0.1s ease-out, top 0.1s ease-out',
-      }}
-    />
+    <>
+      {/* Large trailing halo */}
+      <motion.div
+        className="fixed pointer-events-none z-[9998] w-[340px] h-[340px] rounded-full"
+        style={{
+          left: haloX,
+          top: haloY,
+          x: '-50%',
+          y: '-50%',
+          background: 'radial-gradient(circle, var(--neon-cyan) 0%, transparent 70%)',
+          opacity: 0.07,
+        }}
+      />
+      {/* Small bright core — follows instantly */}
+      <motion.div
+        className="fixed pointer-events-none z-[9999] w-[36px] h-[36px] rounded-full"
+        style={{
+          left: x,
+          top: y,
+          x: '-50%',
+          y: '-50%',
+          background: 'radial-gradient(circle, var(--neon-magenta) 0%, transparent 65%)',
+          opacity: 0.12,
+        }}
+      />
+    </>
   )
 }

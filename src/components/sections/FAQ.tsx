@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
+import { motion, useScroll, useTransform, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { useLanguageStore } from '@/store/language-store'
 import { ScrambleText } from '@/components/ui/ScrambleText'
@@ -14,6 +14,7 @@ export function FAQ() {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 })
   const [openIndex, setOpenIndex] = useState<number | null>(null)
   const parallaxRef = useRef<HTMLDivElement>(null)
+  const prefersReduced = useReducedMotion()
   const { scrollYProgress } = useScroll({ target: parallaxRef, offset: ["start end", "end start"] })
   const y = useTransform(scrollYProgress, [0, 1], [-15, 15])
 
@@ -52,22 +53,34 @@ export function FAQ() {
                 <div
                   className={`rounded-xl glass border holo-edge transition-all duration-300 ${
                     isOpen
-                      ? 'border-[var(--neon-cyan)]/30 shadow-[0_0_20px_rgba(0,245,255,0.08)]'
+                      ? 'border-[var(--neon-cyan)]/30 shadow-[0_0_20px_rgba(0,245,255,0.08)] soft-breathe'
                       : 'border-[var(--glass-border)] hover:border-[var(--glass-border)]/80'
                   }`}
                 >
                   <button
                     onClick={() => toggle(idx)}
-                    className="w-full flex items-center gap-3 px-5 py-4 text-left"
+                    className="w-full flex items-center gap-3 px-5 py-4 text-left group"
                     aria-expanded={isOpen}
                   >
-                    <HelpCircle className={`h-4 w-4 shrink-0 transition-colors duration-300 ${isOpen ? 'text-[var(--neon-cyan)]' : 'text-[var(--text-secondary)]'}`} />
-                    <span className={`flex-1 text-sm font-medium transition-colors duration-300 ${isOpen ? 'text-[var(--neon-cyan)]' : 'text-[var(--text-primary)]'}`}>
+                    <motion.span
+                      animate={prefersReduced ? undefined : { rotate: isOpen ? 180 : 0 }}
+                      transition={{ type: 'spring', stiffness: 260, damping: 18 }}
+                      className="shrink-0"
+                    >
+                      <HelpCircle className={`h-4 w-4 transition-colors duration-300 group-hover:text-[var(--neon-cyan)] ${isOpen ? 'text-[var(--neon-cyan)] icon-glow-pulse' : 'text-[var(--text-secondary)]'}`} />
+                    </motion.span>
+                    <span className={`flex-1 text-sm font-medium transition-colors duration-300 ${isOpen ? 'text-[var(--neon-cyan)]' : 'text-[var(--text-primary)] group-hover:text-[var(--neon-cyan)]'}`}>
                       {t(`faq.${key}`)}
                     </span>
-                    <ChevronDown
-                      className={`h-4 w-4 text-[var(--text-secondary)] shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
-                    />
+                    <motion.span
+                      animate={prefersReduced ? undefined : { y: isOpen ? 0 : [0, -2, 0] }}
+                      transition={isOpen ? { duration: 0.3 } : { duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+                      className="shrink-0"
+                    >
+                      <ChevronDown
+                        className={`h-4 w-4 text-[var(--text-secondary)] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+                      />
+                    </motion.span>
                   </button>
 
                   <AnimatePresence initial={false}>
@@ -80,11 +93,16 @@ export function FAQ() {
                         style={{ transformOrigin: 'top center', transformPerspective: 700 }}
                         className="overflow-hidden"
                       >
-                        <div className="px-5 pb-4 pl-12">
+                        <motion.div
+                          initial={prefersReduced ? undefined : { opacity: 0, y: -6 }}
+                          animate={prefersReduced ? undefined : { opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3, delay: 0.12 }}
+                          className="px-5 pb-4 pl-12"
+                        >
                           <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
                             {t(`faq.a${key.slice(1)}`)}
                           </p>
-                        </div>
+                        </motion.div>
                       </motion.div>
                     )}
                   </AnimatePresence>

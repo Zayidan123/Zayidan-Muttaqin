@@ -28,10 +28,14 @@ export function FloatingBackToTop() {
           exit={{ opacity: 0, scale: 0.5, y: 20 }}
           transition={{ type: 'spring', stiffness: 200, damping: 20 }}
           onClick={scrollToTop}
-          className="fixed bottom-[88px] right-[30px] z-50 w-11 h-11 rounded-xl glass border border-[var(--neon-cyan)]/30 flex items-center justify-center text-[var(--neon-cyan)] transition-all duration-300 hover:shadow-[var(--glow-cyan)] hover:border-[var(--neon-cyan)]/60 hover:scale-110 cursor-pointer"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.92 }}
+          className="group fixed bottom-[88px] right-[30px] z-50 w-11 h-11 rounded-xl glass border border-[var(--neon-cyan)]/30 flex items-center justify-center text-[var(--neon-cyan)] transition-all duration-300 hover:shadow-[var(--glow-cyan)] hover:border-[var(--neon-cyan)]/60 cursor-pointer"
           aria-label="Back to top"
         >
-          <ArrowUp className="h-5 w-5" />
+          {/* Rotating dashed halo — idle life */}
+          <span className="absolute -inset-1.5 rounded-2xl border border-dashed border-[var(--neon-cyan)]/15 spin-slower pointer-events-none" aria-hidden="true" />
+          <ArrowUp className="h-5 w-5 icon-bob" />
         </motion.button>
       )}
     </AnimatePresence>

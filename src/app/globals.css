@@ -2493,3 +2493,253 @@ html {
   .nav-3d-link,
   .nav-logo-3d > span { transition-duration: 0.01ms !important; }
 }
+
+/* ============================================================
+ * 10. AMBIENT MOTION SYSTEM — idle (non-scroll) animations
+ *      Site-wide enrichment layer (scroll + idle)
+ * ============================================================ */
+
+/* -- Idle floating / drifting -------------------------------- */
+
+@keyframes ambient-float-y {
+  0%, 100% { transform: translateY(0px); }
+  50%      { transform: translateY(-9px); }
+}
+
+@keyframes ambient-drift {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  25%  { transform: translate(6px, -8px) rotate(1.5deg); }
+  50%  { transform: translate(-4px, -12px) rotate(-1deg); }
+  75%  { transform: translate(-7px, -4px) rotate(1deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+@keyframes ambient-bob {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-5px) scale(1.02); }
+}
+
+@keyframes ambient-sway {
+  0%, 100% { transform: rotate(-1.2deg); }
+  50%      { transform: rotate(1.2deg); }
+}
+
+/* -- Breathing glows ------------------------------------------ */
+
+@keyframes glow-breathe {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50%      { opacity: 0.75; transform: scale(1.06); }
+}
+
+@keyframes soft-breathe {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1; }
+}
+
+@keyframes halo-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(0, 245, 255, 0.18); }
+  70%  { box-shadow: 0 0 0 14px rgba(0, 245, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 245, 255, 0); }
+}
+
+/* -- Card sheen / shine loops --------------------------------- */
+
+@keyframes sheen-loop {
+  0%   { transform: translateX(-130%) skewX(-18deg); }
+  55%  { transform: translateX(240%) skewX(-18deg); }
+  100% { transform: translateX(240%) skewX(-18deg); }
+}
+
+@keyframes border-glow-flow {
+  0%, 100% { border-color: rgba(0, 245, 255, 0.14); }
+  33%      { border-color: rgba(255, 0, 170, 0.16); }
+  66%      { border-color: rgba(139, 92, 246, 0.16); }
+}
+
+/* -- Icon micro-motions --------------------------------------- */
+
+@keyframes icon-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
+}
+
+@keyframes icon-pulse-glow {
+  0%, 100% { filter: drop-shadow(0 0 2px currentColor); }
+  50%      { filter: drop-shadow(0 0 9px currentColor); }
+}
+
+@keyframes spin-slower {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* -- Timeline / node effects ---------------------------------- */
+
+@keyframes node-ping-ring {
+  0%   { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+
+/* -- Skill bar flowing energy --------------------------------- */
+
+@keyframes skill-flow {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* -- Scanline (holographic sweep) ------------------------------ */
+
+@keyframes scanline-y {
+  0%   { top: -12%; opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { top: 108%; opacity: 0; }
+}
+
+/* -- Twinkle particles ----------------------------------------- */
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.12; transform: scale(0.8); }
+  50%      { opacity: 0.9;  transform: scale(1.25); }
+}
+
+/* -- Utility classes ------------------------------------------- */
+
+.ambient-float    { animation: ambient-float-y 6s ease-in-out infinite; }
+.ambient-float-sm { animation: ambient-bob 5s ease-in-out infinite; }
+.ambient-drift    { animation: ambient-drift 14s ease-in-out infinite; }
+.ambient-sway     { animation: ambient-sway 9s ease-in-out infinite; }
+.glow-breathe     { animation: glow-breathe 4s ease-in-out infinite; }
+.soft-breathe     { animation: soft-breathe 3.4s ease-in-out infinite; }
+.halo-pulse       { animation: halo-pulse 3.2s ease-out infinite; }
+.icon-bob         { animation: icon-bob 3.6s ease-in-out infinite; }
+.icon-glow-pulse  { animation: icon-pulse-glow 3.2s ease-in-out infinite; }
+.spin-slower      { animation: spin-slower 22s linear infinite; }
+.spin-slowest     { animation: spin-slower 48s linear infinite; }
+
+/* Holographic scanline overlay for cards */
+.holo-scan {
+  position: relative;
+  overflow: hidden;
+}
+.holo-scan::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 22%;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in srgb, var(--neon-cyan) 7%, transparent),
+    transparent
+  );
+  animation: scanline-y 7s linear infinite;
+  pointer-events: none;
+}
+
+/* Looping sheen sweep — subtle idle shimmer for glass cards */
+.sheen-loop {
+  position: relative;
+  overflow: hidden;
+}
+.sheen-loop::after {
+  content: '';
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  width: 34%;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 255, 255, 0.055),
+    transparent
+  );
+  animation: sheen-loop 7.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Timeline node breathing ring */
+.node-ring::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 1.5px solid var(--neon-cyan);
+  animation: node-ping-ring 2.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  pointer-events: none;
+}
+
+/* Skill bar flowing gradient energy (applied to the fill) */
+.skill-flow-fill {
+  background-image: linear-gradient(
+    90deg,
+    var(--neon-cyan) 0%,
+    #7dfaff 25%,
+    var(--neon-cyan) 50%,
+    #7dfaff 75%,
+    var(--neon-cyan) 100%
+  );
+  background-size: 200% 100%;
+  animation: skill-flow 2.8s linear infinite;
+}
+
+/* Twinkling ambient particles container */
+.twinkle-dot {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 9999px;
+  background: var(--neon-cyan);
+  animation: twinkle 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Section divider upgrade — flowing energy line */
+.section-divider {
+  position: relative;
+  height: 1px;
+  max-width: 80%;
+  margin: 0 auto;
+  background: linear-gradient(90deg, transparent, var(--neon-cyan) 20%, var(--neon-magenta) 50%, var(--neon-cyan) 80%, transparent);
+  opacity: 0.3;
+  overflow: visible;
+}
+.section-divider::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background: var(--neon-cyan);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--neon-cyan);
+}
+
+/* Mobile drawer & touch devices: no hover-only sheen loops */
+@media (hover: none) {
+  .sheen-loop::after { animation: none; opacity: 0; }
+  .holo-scan::after  { animation: none; opacity: 0; }
+}
+
+/* Reduced motion: disable all ambient loops added in section 10 */
+@media (prefers-reduced-motion: reduce) {
+  .ambient-float,
+  .ambient-float-sm,
+  .ambient-drift,
+  .ambient-sway,
+  .glow-breathe,
+  .soft-breathe,
+  .halo-pulse,
+  .icon-bob,
+  .icon-glow-pulse,
+  .spin-slower,
+  .spin-slowest,
+  .node-ring::before,
+  .skill-flow-fill,
+  .twinkle-dot,
+  .holo-scan::after,
+  .sheen-loop::after { animation: none !important; }
+}
